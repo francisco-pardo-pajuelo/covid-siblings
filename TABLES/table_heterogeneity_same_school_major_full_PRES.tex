@@ -1,0 +1,40 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+ & 4th grade expectations  &   8th grade expectations  & Completed             & Applied to    & \multicolumn{2}{c}{Application Exam Score}    & Admitted to           & Enrolled in                   \\
+ & 4-year college                &     4-year college                  & Secondary             & 4-year college        & Any & Same                            & 4-year college        & 4-year college                        \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-9}
+& (1)                          & (2)                   & (3)                   & (4)                   & (5)    &  (6) & (7) & (8) \\
+\bottomrule
+& & & & & & & &  \\
+\multicolumn{9}{l}{Panel A: Sibling's went to different schools } \\
+Older sibling enrolled&       0.074   &      -0.070   &      -0.010   &       0.044   &       0.173   &       0.121   &      -0.026   &      -0.045   \\
+                    &     (0.066)   &     (0.054)   &     (0.037)   &     (0.048)   &     (0.132)   &     (0.167)   &     (0.050)   &     (0.051)   \\
+ 
+Older sibling above cutoff&       0.029   &      -0.028   &      -0.004   &       0.019   &       0.070   &       0.048   &      -0.011   &      -0.019   \\
+                    &     (0.026)   &     (0.021)   &     (0.016)   &     (0.021)   &     (0.053)   &     (0.066)   &     (0.022)   &     (0.022)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &       2,122   &       4,740   &      10,795   &      10,385   &       6,406   &       4,572   &      11,641   &      11,361   \\
+Counterfactual mean &       0.922   &       0.890   &       0.837   &       0.689   &       0.077   &       0.065   &       0.468   &       0.463   \\
+Bandwidth           &       0.912   &       0.919   &       0.720   &       0.718   &       0.717   &       0.784   &       0.798   &       0.780   \\
+FE: college-major-year&         712   &       1,240   &       2,123   &       2,052   &       1,425   &       1,045   &       2,208   &       2,178   \\
+ 
+&  &  &  & & & & & &    \\
+\multicolumn{9}{l}{Panel B: Siblings went to same schools} \\
+Older sibling enrolled&       0.182*  &       0.096   &       0.063** &       0.072*  &       0.001   &      -0.079   &       0.060   &       0.053   \\
+                    &     (0.095)   &     (0.071)   &     (0.030)   &     (0.037)   &     (0.091)   &     (0.132)   &     (0.039)   &     (0.043)   \\
+ 
+Older sibling above cutoff&       0.076*  &       0.036   &       0.028** &       0.031*  &       0.000   &      -0.031   &       0.026   &       0.023   \\
+                    &     (0.039)   &     (0.026)   &     (0.013)   &     (0.016)   &     (0.036)   &     (0.051)   &     (0.017)   &     (0.019)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &       1,549   &       2,776   &      13,425   &      15,762   &      12,014   &       6,701   &      17,914   &      14,660   \\
+Counterfactual mean &       0.894   &       0.898   &       0.874   &       0.699   &       0.027   &      -0.000   &       0.456   &       0.459   \\
+Bandwidth           &       0.820   &       0.539   &       0.615   &       0.723   &       0.842   &       0.666   &       0.808   &       0.678   \\
+FE: college-major-year&         579   &         872   &       2,609   &       2,836   &       2,355   &       1,561   &       3,046   &       2,734   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

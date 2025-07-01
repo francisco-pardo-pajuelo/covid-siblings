@@ -1,0 +1,24 @@
+\begin{table}[!htbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect on focal child}\label{tab:t_first_stage_1_first_bwoptimal_2}
+\scalebox{0.7}{\setlength{\textwidth}{.1cm}
+\newcommand{\contents}{
+\begin{tabular}{lcccccc}
+\toprule
+& Admitted target      & Enrolled target       & Enrolled any  & Enrolled target       & Enrolled target       & Enrolled any \\
+\cline{2-7}
+& college-major        & college-major         & college               & college-major         & college                       & college \\
+& Semester             & Semester                      & Semester              & ever                          & ever                          & ever \\
+& (1) & (2) & (3) & (4) & (5) & (6) \\
+\bottomrule
+&  &  &  & &  \\
+Applicant above cutoff&       0.626***&       0.428***&       0.410***&       0.381***&       0.294***&       0.172***\\
+                    &     (0.007)   &     (0.008)   &     (0.007)   &     (0.006)   &     (0.006)   &     (0.006)   \\
+                    &               &               &               &               &               &               \\
+Observations        &      77,311   &      69,937   &     109,390   &     150,663   &     126,699   &     100,518   \\
+Counterfactual mean &       0.357   &       0.321   &       0.366   &       0.419   &       0.569   &       0.780   \\
+Bandwidth           &       0.496   &       0.451   &       0.687   &       0.929   &       0.790   &       0.636   \\
+\textit{F}-statistic&               &               &       4,753   &       6,697   &       5,565   &       4,323   \\
+ 
+
+\bottomrule \multicolumn{7}{p{\textwidth}} {\footnotesize \textit{Notes:} ***p$<$0.01, **p$<$0.05, *p$<$0.1. }\end{tabular}}\setbox0=\hbox{\contents}
+\setlength{\textwidth}{\wd0-2\tabcolsep-.25em} \contents} \end{table}

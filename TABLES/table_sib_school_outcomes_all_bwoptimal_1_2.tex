@@ -1,0 +1,27 @@
+\begin{table}[!htbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect on younger sibling school outcomes}\label{tab:table_sib_school_outcomes_all_bwoptimal_1_2}
+\scalebox{0.9}{\setlength{\textwidth}{.1cm}
+\newcommand{\contents}{
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{8th grade exam }  & \multicolumn{2}{c}{School Completion}   \\
+\cline{2-3} \cline{4-5}
+& \multirow{2}{*}{Math}        & \multirow{2}{*}{Read}         & \multirow{2}{*}{Dropout}      & Completed      \\
+&                                              &                                                       &                                                       & Secondary      \\
+& (1)                                          & (2)                                           & (3)                                           & (4)                    \\
+\bottomrule
+&  &  &    \\
+Older sibling enrolled&       0.084   &       0.019   &      -0.010** &       0.036***\\
+                    &     (0.059)   &     (0.056)   &     (0.004)   &     (0.013)   \\
+ 
+Older sibling above cutoff&       0.038   &       0.009   &      -0.005** &       0.017***\\
+                    &     (0.027)   &     (0.026)   &     (0.002)   &     (0.006)   \\
+                    &               &               &               &               \\
+Observations        &      24,997   &      24,715   &     239,022   &      56,933   \\
+Counterfactual mean &       0.413   &       0.356   &       0.052   &       0.860   \\
+Bandwidth           &       0.729   &       0.719   &       0.583   &       0.457   \\
+\textit{F}-statistic&       1,769   &       1,776   &      13,325   &       4,182   \\
+ 
+
+\bottomrule \multicolumn{5}{p{\textwidth}} {\footnotesize \textit{Notes:} ***p$<$0.01, **p$<$0.05, *p$<$0.1. }\end{tabular}}\setbox0=\hbox{\contents}
+\setlength{\textwidth}{\wd0-2\tabcolsep-.25em} \contents} \end{table}

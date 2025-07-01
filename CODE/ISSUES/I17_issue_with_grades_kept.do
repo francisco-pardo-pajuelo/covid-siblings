@@ -1,0 +1,63 @@
+*- We seem to be excluding some grades
+*- Open file prior to regression
+//open
+
+
+	
+	*- How many 3rd graders (4th in 2024) are there in 2023
+	use "$TEMP\siagie_2023", clear
+	keep if grade==3
+	
+	merge 1:1 id_per_umc using "$TEMP\id_siblings", keep(master match)
+	drop _m
+	
+	keep  id_fam_2 fam_order_2
+	rename fam_order_2 fam_order_2_sib
+	gen year_4p = 2024
+	tempfile year_4p_2024
+	save `year_4p_2024', replace
+	
+	use "$TEMP\siagie_2017", clear
+	keep if grade==3
+	
+	merge 1:1 id_per_umc using "$TEMP\id_siblings", keep(master match)
+	drop _m
+	
+	keep  id_fam_2 fam_order_2
+	rename fam_order_2 fam_order_2_sib
+	gen year_4p = 2018
+	tempfile year_4p_2018
+	save `year_4p_2018', replace
+	
+	append using `year_4p_2024'
+	
+	bys id_fam_2 fam_order_2: keep if _n==1
+	tempfile ece_4p
+	save `ece_4p', replace
+	
+open
+
+	
+	global main_stack = "student_sibling"
+	global main_sibling_sample = "oldest"
+	global main_rel_app = "restrict"
+	global main_term = "first"
+	global main_bw = "optimal"
+	global main_covs_rdrob = "semester_foc" //semester_foc
+	global main_kernel = "uniform" //semester_foc
+	global main_cell = "major"
+	
+	global scores_1 		= "score_relative_1"
+	global ABOVE_scores_1 	= "ABOVE_score_relative_1"
+
+
+		
+	
+	merge m:1 id_fam_2 fam_order_2_sib using `ece_4p', keep(master match)
+	
+	tab year_applied_foc year_4p if abs(score_relative)<0.8	& year_4p>=year_applied_foc
+	tab year_applied_foc year_4p if abs(score_relative)<0.8 & year_4p>=year_applied_foc & year_applied_foc
+	//add to this ~5k if we get applications from 2024 based on same year ratio of obs vs t-1 from the 2018 ece
+	 di 2408/1462*3104
+	
+//why are not all grades represented? But rather skewed towards grade 11th?

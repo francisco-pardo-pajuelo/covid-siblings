@@ -1,0 +1,27 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+ &\multicolumn{2}{c}{GPA same year} & \multicolumn{2}{c}{GPA next year}  & \multicolumn{2}{c}{4th grade Standardized scores}   & \multicolumn{2}{c}{8th grade Standardized scores}   \\
+               & Mathematics                   & Literacy      & Mathematics & Literacy & Mathematics                  & Literacy  & Mathematics               & Literacy   \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+& (1)                          & (2)                   & (3)                   & (4)                   & (5) & (6) & (7) & (8) \\
+\bottomrule
+ & &  &  &  &  & &  &  \\
+Older sibling enrolled&       0.541***&       0.254*  &       0.717***&       0.534** &       0.099   &       0.099   &      -0.014   &      -0.014   \\
+                    &     (0.188)   &     (0.149)   &     (0.252)   &     (0.219)   &     (0.145)   &     (0.145)   &     (0.142)   &     (0.142)   \\
+ 
+Older sibling above cutoff&       0.283***&       0.135*  &       0.361***&       0.270** &       0.053   &       0.053   &      -0.007   &      -0.007   \\
+                    &     (0.098)   &     (0.080)   &     (0.126)   &     (0.110)   &     (0.078)   &     (0.078)   &     (0.072)   &     (0.072)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &      15,018   &      18,184   &       9,310   &      10,077   &       4,063   &       4,063   &       4,448   &       4,448   \\
+Counterfactual mean &      13.879   &      14.117   &      13.965   &      14.247   &       0.437   &       0.437   &       0.373   &       0.373   \\
+Bandwidth           &       0.608   &       0.719   &       0.479   &       0.511   &       0.783   &       0.783   &       0.482   &       0.482   \\
+\textit{F}-statistic&       1,286   &       1,633   &         700   &         774   &         318   &         318   &         330   &         330   \\
+FE: college-major-year&       3,226   &       3,637   &       2,169   &       2,281   &       1,385   &       1,385   &       1,424   &       1,424   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

@@ -1,0 +1,23 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Passed grade}            &       Dropout & Graduate      \\
+               & Same year             & t+1 year      &       Ever  & Secondary \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1)                          & (2)                   & (3)                   & (4)  \\
+\bottomrule
+ & &  &  &   \\
+Older sibling above cutoff&       0.000   &      -0.001   &       0.002   &       0.002   \\
+                    &     (0.002)   &     (0.003)   &     (0.004)   &     (0.011)   \\
+                    &               &               &               &               \\
+Observations        &      59,852   &      53,235   &      60,380   &      16,562   \\
+Counterfactual mean &       0.984   &       0.980   &       0.039   &       0.891   \\
+Bandwidth           &       0.697   &       0.755   &       0.647   &       0.733   \\
+FE: college-major-year&       6,285   &       5,340   &       6,294   &       2,820   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

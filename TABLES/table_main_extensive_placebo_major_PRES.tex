@@ -1,0 +1,28 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lccccccc}
+\toprule
+ & \multicolumn{5}{c}{Applied to}                      & Admitted to           & Enrolled in     \\
+ & \multicolumn{5}{c}{4-year college}                  & 4-year college        & 4-year college  \\
+\cmidrule(lr){2-6} \cmidrule(lr){7-7} \cmidrule(lr){8-8}
+& Any                  & Public                & Same as sibling               & Other public          & Private & Any & Any           \\
+& (1)                          & (2)                   & (3)                   & (4)                   & (5)    &  (6) & (7) \\
+\bottomrule
+&  &  &  &  & & &\\
+Older sibling enrolled&       0.016   &       0.035   &       0.058   &      -0.034   &       0.098** &       1.440***&       0.004   \\
+                    &     (0.040)   &     (0.046)   &     (0.046)   &     (0.035)   &     (0.044)   &     (0.045)   &     (0.046)   \\
+ 
+Older sibling above cutoff&       0.009   &       0.018   &       0.031   &      -0.018   &       0.052** &       0.770***&       0.002   \\
+                    &     (0.021)   &     (0.024)   &     (0.024)   &     (0.019)   &     (0.023)   &     (0.016)   &     (0.024)   \\
+                    &               &               &               &               &               &               &               \\
+Observations        &       9,551   &       9,298   &       9,525   &       9,930   &       9,952   &       8,246   &       9,570   \\
+Counterfactual mean &       0.745   &       0.644   &       0.558   &       0.191   &       0.318   &       0.376   &       0.615   \\
+Bandwidth           &       0.458   &       0.448   &       0.456   &       0.472   &       0.473   &       0.458   &       0.459   \\
+\textit{F}-statistic&         851   &         809   &         843   &         901   &         901   &         754   &         858   \\
+FE: college-major-year&       2,755   &       2,701   &       2,751   &       2,835   &       2,840   &       2,415   &       2,758   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

@@ -1,0 +1,24 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+\cmidrule(lr){2-7}
+& Male & Age & Mother has & very low  & \multicolumn{2}{c}{2nd grade standardized} & \multicolumn{2}{c}{8th grade standardized} \\
+& &  & higher education & SES & Mathematics & Reading & Mathematics & Reading \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-8} 
+& (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\
+\bottomrule
+&  &  &  & & & &   & \\
+Older sibling above cutoff&      -0.004   &       0.010   &       0.014*  &       0.001   &       0.059** &       0.013   &       0.058** &       0.023   \\
+                    &     (0.008)   &     (0.024)   &     (0.009)   &     (0.011)   &     (0.026)   &     (0.024)   &     (0.024)   &     (0.022)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &      53,867   &      44,899   &      40,570   &      19,531   &      23,046   &      23,643   &      24,307   &      23,146   \\
+Counterfactual mean &       0.513   &      17.484   &       0.233   &       0.210   &       0.626   &       0.641   &       0.864   &       0.757   \\
+Bandwidth           &       0.586   &       0.494   &       0.465   &       0.478   &       0.464   &       0.475   &       0.577   &       0.551   \\
+FE: college-major-year&       1,050   &       1,037   &       1,034   &         969   &         986   &         992   &         984   &         979   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

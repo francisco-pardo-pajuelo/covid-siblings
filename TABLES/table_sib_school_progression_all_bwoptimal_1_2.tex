@@ -1,0 +1,26 @@
+\begin{table}[!htbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect on younger sibling school progression}\label{tab:table_sib_school_progression_all_bwoptimal_1_2}
+\scalebox{0.9}{\setlength{\textwidth}{.1cm}
+\newcommand{\contents}{
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{Approved grade}   & \multicolumn{2}{c}{Approved grade directly}   & \multicolumn{2}{c}{Changed schools} \\
+\cline{2-3} \cline{4-5}  \cline{6-7}
+&  \textit{t}  & \textit{t+1}                  &  \textit{t}   & \textit{t+1}                                  &  \textit{t}   & \textit{t+1} \\
+& (1)                  & (2)                                   & (3)                   & (4)                                                   & (5)                   & (6)    \\
+\bottomrule
+&  &  &  & &   \\
+Older sibling enrolled&      -0.001   &       0.003   &       0.013*  &       0.011   &      -0.017*  &      -0.002   \\
+                    &     (0.003)   &     (0.003)   &     (0.007)   &     (0.008)   &     (0.009)   &     (0.011)   \\
+ 
+Older sibling above cutoff&      -0.000   &       0.001   &       0.006*  &       0.005   &      -0.008*  &      -0.001   \\
+                    &     (0.001)   &     (0.001)   &     (0.003)   &     (0.004)   &     (0.004)   &     (0.005)   \\
+                    &               &               &               &               &               &               \\
+Observations        &     177,168   &     147,140   &     183,581   &     141,831   &     176,864   &     132,046   \\
+Counterfactual mean &       0.985   &       0.982   &       0.882   &       0.861   &       0.219   &       0.210   \\
+Bandwidth           &       0.494   &       0.520   &       0.512   &       0.502   &       0.640   &       0.591   \\
+\textit{F}-statistic&       9,906   &       8,300   &      10,288   &       7,992   &      11,577   &       8,263   \\
+ 
+
+\bottomrule \multicolumn{7}{p{\textwidth}} {\footnotesize \textit{Notes:} ***p$<$0.01, **p$<$0.05, *p$<$0.1. }\end{tabular}}\setbox0=\hbox{\contents}
+\setlength{\textwidth}{\wd0-2\tabcolsep-.25em} \contents} \end{table}

@@ -1,0 +1,217 @@
+
+%%%%%%%%%%%%%%
+% Introduction
+%%%%%%%%%%%%%%
+
+% 1. Motivation (1 Pargraph)
+
+
+\begin{comment}
+
+Introduce the topic area 
+Must be about the economics
+Never start with literature or new technique
+Be specific and motivate your research question
+What’s the Hook? 
+    Y matters: When Y rises or falls, people are hurt or helped
+    Y is puzzling: it defies easy explanation
+    Y is controversial: some argue one thing while other say another
+    Y is big /common / high impact / novel
+    
+\end{comment}
+
+% 
+The decision to pursue higher education is one of the most important choices young people make. Wage premiums between college-educated and high school graduates persist throughout adulthood and so does the gap of employment in the formal sector, especially in developing countries with high levels of informality. The determinants of this choice are not yet fully understood. Still, peers and family background influence many educational outcomes such as test scores (\cite{qureshi_siblings_2018}, college choices (\cite{altmejd_o_2021}) and college enrollment (\cite{barrios-fernandez_neighbors_2022}). Causally identifying this is challenging and although many recent papers show evidence on college and major choices, only a few have found effects on overall college enrollment. To my knowledge, none have found effects on overall college applications and admission exam performance.
+
+Among the different peer effects studied in the literature, siblings tend to have a stronger influence. These may arise due to direct interaction or through parents' actions (e.g. through differences in educational investment in one of their children). In particular, students might be impacted by their older siblings' experience with college applications or enrollment if they receive relevant information about specific institutions, support in the application process, with admission exams or even having their preferences over higher education change. Although the exact mechanisms through which these peer effects operate are not yet understood, some research has pointed to information as a possible channel. This may be even more relevant as the application process gets more complex. Additionally, both parental and student´s expectations over attaining higher education play a key role in their decisions over it and siblings may act as a role model in this regard.
+
+%Research Question
+This article provides causal evidence that older siblings' college admission and enrollment influence school performance, the decision to apply to college, performance in the admission exam, and enrollment of younger siblings. To provide additional information on the effects during school, I link college applications with school progression administrative data, which includes information on standardized exams. I explore mechanisms such as educational expectations through survey responses from both parents and younger siblings.
+
+%I also provide suggestive evidence that part of that influence is through changes in parental expectations over the educational attainment of their other children once an older sibling goes to college. 
+
+
+%experiences of people in their social networks, such social factors may partly explain persistent differences in college enrollment by income, race and geography. [Draft US]
+
+
+%%%%%
+\begin{comment}
+[PEER EFFECTS BARRIOS-FERNANDEZ] information transmission, direct academic support, and changes in preferences (e.g., changes in aspirations and motivation, taste for spending time with peers). Assessing the relevance of these different mechanisms is important to understand which policy tools governments have available to support students. For instance, if the main driver of peer effects on educational trajectories is the transmission of information, then governments could design strategies to substitute for the lack of informed peers and directly provide information to students. 
+
+Independently of the mechanisms behind peer effects, the existence of social spillovers on educational trajectories is relevant to understand inequality in educational achievement. They imply that the consequences of the barriers and challenges disproportionately affecting certain groups of students are amplified through their social networks.
+\end{comment}
+%%%%
+
+
+I exploit admission cutoffs that generate quasi-random variation in the college-major in which older siblings enroll. This is possible even though each college has its admission exam. \footnote{For the most part, these are SAT-type exams, with a focus on Mathematics and Communications skills. In some cases, it includes other subjects like History, Chemistry, Biology, etc.} To do this I estimate the admission cutoffs based on students who applied to each college-major, their scores, and their admission status. I use rich administrative data of applications and enrollments to universities linked with school progression, examinations, and parent and student school surveys. Parents' IDs are recorded for all students registered in school which allows us to identify siblings and follow them through their education trajectory. I then used a regression discontinuity design with multiple admission cutoffs to compare the outcomes of younger siblings whose older siblings were just above or below the admission cutoffs.
+
+Peru has decentralized applications and exams. This contrasts with most of the countries studied in the literature, where there is a centralized application system where students take a standardized exam and rank their choices of preferred colleges. One exception is the US, which has a standardized test but applications at each college are done separately.  Most studies exploring college outcomes focus on a sample of students who apply to college or at least register for a standardized exam. Because of this, it is not always possible to explore the effects on the extensive margin, but even more, effects on enrollment might be attenuated given that conditional enrollment is high for this sample. Because my initial sample comes from students enrolled in school I can to explore these extensive margins adequately. Additionally, even though the identification is through admission in public universities, I can explore the effect on decisions over any of the 140 public or private universities in the country.
+
+
+%% Our context and empirical approach
+
+
+
+
+%creates bigger information barriers and costs for applications that may cause larger spillover effects. It also creates methodological challenges that a centralized system does not. I have school administrative data with exams in 2nd, 4th and 8th grade and survey data to students and parents on behavior, beliefs, expectations, etc. This allows for unexplored effects in early childhood and in mechanisms. In terms of outcomes, we can explore: 8th grade student's aspirations of going to college, 8th grade exams (earlier than literature) and full school grade progression.
+
+% 2. Results (2 Pargraph)
+I find causal evidence that having an older sibling enrolled in a public university increases younger siblings' likelihood of applying to a 4 year college by 7pp, a 10\% increase. Admissions and enrollment rates also increase by 5.7pp each. This translates into an overall 0.1 increase in the average number of applications which is a reflection of most students only applying 1 or 2 times. Performance in the admission exam increases by 0.09$\sigma$ although this effect is not significant. Regarding effects during school, I only observed an increase in math performance during 8th grade, which is when the standardized tests are taken, but no effects on graduation rates. Finally, I see an increase in the expectations that parents report over their children achieving 4+ years of college education. This is driven by parents with no level of higher education. 
+
+% 3. Contribution  (3 Pargraph)
+
+%% Literature branch #1: Sibling spillovers in education trajectories
+My results contribute to two strands of research. First, I am the first to provide evidence of positive peer effects on the decision to apply to college. In previous work, \cite{goodman_relationship_2015} finds correlations in applications and enrollment between siblings in the US but causal links remained to be established. Our results are consistent with undermatching, that is, students who have the potential to attend college but fail to do so (\cite{black_under_2013}, \cite{hoxby_missing_2012}). One study from Chile (\cite{barrios-fernandez_neighbors_2022}) finds that student who receive financial aid for college increase their neighbors and siblings enrollment and registration for standardized exams, but effects on application rates are imprecisely estimated.\footnote{Additionally, they do not focus on the full set of 4-year colleges so applications may be reflecting substitution from one college to another}. Recent literature that uses similar identification strategies has focused on sibling spillovers on college and major choices but failed to find effects on the extensive margin of applications or performance in the admission exams ((\cite{altmejd_o_2021}, \cite{dahl_intergenerational_2024}, \cite{avdeev_spillovers_2024}, \cite{aguirre_walking_2021})). I also extend the literature on sibling spillovers of college admission on the school performance of younger siblings prior to high school. %and labor market outcomes 
+
+%Prior to high school might be relevant because some may react earlier? Perhaps HS is too late? also, some papers have found positive evidence when age-gap is bigger.
+
+%% Literature branch #2: Information frictions, expectations... 
+Second, the results I find on mechanisms contribute to the literature on how expectations are formed and how information frictions play a role in education decisions. In a setting with low levels of college enrollment compared to other countries from previous studies and a complex application system, older siblings' college enrollment has a bigger impact on the expectations of parents with no higher education. Such a mechanism is consistent with parents updating their beliefs and consequently their investment decisions (\cite{dizon-ross_parents_2019}). For students whose parents have some level of higher education, effects are bigger but not through a change in expectations. Rather, information mechanism likely plays a role, similar to what is found in other settings (\cite{altmejd_o_2021}). This may be particularly true in decentralized settings such as the US and Peru given some prior evidence of information interventions (\cite{dynarski_closing_2021}). 
+
+%Literature on information on how when the system is complex the gains are larger []. Interventions are particularly relevant when systems are complex (\textcolor{red}{[CITE]}) or users are not familiar with it (\textcolor{red}{[CITE]}) both of which can happen in decentralized admission systems and context with low college enrollment.
+
+
+%% Literature branch #3: Decentralized admission systems
+
+%Third, my work informs the literature on decentralized admission systems. Previous work has studied the effect of higher education mainly in the US  , but given the context has been limited to a small subset of schools (\cite{altmejd_o_2021}, \cite{mountjoy_marginal_2024}) or to a specific college (\cite{hoekstra_effect_2009}). In my study, I focus on the whole set of public colleges. Decentralized admissions are more complex and has more potential for information gains from older siblings. At the same time, having to take different exams for each application adds another layer from which younger siblings can learn from their older sibling´s experience.
+
+%Most of the work on peer effects and college outcomes has been focused on college or major choices (Sacerdote 2001, De Giorgi 2011, ). More  but failed to find any effects on the decision to apply to college.  Previous literature has focused on the effect of having XXX peers. My study establishes a causal link between having an older sibling attending college and an increase in younger siblings' school progression, parent's expectations for 4-year college and (XX) in labor market participation.
+
+
+
+%\footnote{Full literature: \cite{booij_ability_2017}, \cite{borovickova_peer_nodate}, \cite{dillon_determinants_2017}, \cite{winston_peer_2004}, \cite{hoxby_going_2004}, \cite{hoxby_student_2004}, \cite{hoxby_missing_2012}, \cite{barrios_fernandez_elite_2021}, \cite{barrios-fernandez_neighbors_2022}, \cite{barrios-fernandez_peer_nodate}. Peer effects in higher education (\cite{sacerdote_peer_2001}, \cite{de_giorgi_identification_2010}), Peer effects in school performance (), Peer effects in labor market (), Peer effects in education trajectories (\cite{barrios-fernandez_neighbors_2022}) Only to universities with CA, so it may reflect choices? They find increased effect in enrollment but not in applications or performance in the applications. This can be my main contribution. Sibling spillovers (\cite{altmejd_o_2021}, \cite{dahl_intergenerational_2024}, \cite{avdeev_spillovers_2024}, \cite{aguirre_walking_2021}), Sibling spillovers other educ (). Estimating the cutoffs: Discussion of multiple RD (\cite{dahl_high_2023}, \cite{kirkeboen_field_2016}). Coordinated choice: \cite{neilson_rise_nodate}}
+
+%\footnote{Areas of further research: Efficient allocation of peers (\cite{duflo_peer_2011}, \cite{carrell_natural_2013}, \cite{booij_ability_2017}), Undermatching of high achieving ( \cite{black_under_2013})}
+
+
+
+
+
+
+
+
+
+%The decentralized setting allows us to explore going to college as a treatment rather than simply going to a preferred program. In this way we can see extensive margin results rather than just effects on younger siblings' choices. Other work has documented substantial spillover effects in different educational settings such as high school (CITE) ...., health (), etc...
+
+
+%\cite{altmejd_o_2021} does look at spillovers on academic performance but finds no significant effects. [Table IX] (How to make sense of this with Table IV results on enrollment? Email Goodman)
+
+%Peer effects on college choice decisions. [Altmejd claims there were none?]
+
+%Second, my work informs on the formation of education beliefs of students and their parents...
+
+
+
+
+
+
+
+%Finally, my work informs the literature on returns to higher education in developing countries. In Peru, there is a small employment gap (4pp) between those with college education and complete seconadary but in a country with 70\% of informal work, the formal employment gap is of 40pp. Consequently, the and overall net income gap is of 140\%. Previous work has studied the effect 
+
+%%% From: https://faculti.net/o-brother-where-start-thou/
+%the motivation for this study is that we see in many communities and families lots of correlations between college choices or college majors that students choose. We see families or communities who send all students to the same college.
+
+%Goodman: one fifth of SAT takers who attend college, do so at the same college their family attended. (FOR EMAIL)
+
+%Students within the communities tend to make similar choices. Is this because those members have influenced my decision or is it because we are all influenced by the same things such as location or demand.
+
+%Why we see persistence patterns in college going behavior in families and communities.
+
+%Mentoring by other individuals from the community that have previously attended college. If peer effects are powerful we can actually provide students who are otherwise lacking in peers who have succeeded in pathways with such individuals
+%%%%%
+
+%determinants of postsecondary education decisions and their implications for inequality.
+
+%% Literature branch #2
+
+%% Literature branch #3 
+
+%%%%%%%%%%%%%%%% DRAFT
+ % Effects are strong on the choices they make, mainly following their older siblings to the same college. Less clear results on overall applications and enrollment. Null results on effort during high school. Some evidence of stronger effects when siblings are more similar (in age or sex). Mixed results and no clarity on mechanisms. \footnote{\cite{dustan_family_2018}, \cite{joensen_spillovers_2018}, \cite{altmejd_o_2021}, \cite{aguirre_walking_2021}, \cite{black_sibling_2021}, \cite{de_gendre_class_2021}, \cite{avdeev_spillovers_2024}, \cite{dahl_intergenerational_2024}}
+
+
+
+% 5. Policy implications and conclusions
+Understanding the magnitude and how peer effects work is important for several reasons. We can provide students who are lacking in peers who can serve as support or role models with such individuals. I also show that there can be several constraints binding the decisions over educational investments and what characteristics of the family environment, such as having parents with higher education, might give insight into what interventions may be more efficient. Finally, understanding the full scope of how shocks from one individual spillover into others is fundamental for better assessing the full social benefit of different education interventions. % REFERENCE TO DECENTRALIZED ADMISSION?
+
+% 6. Roadmap of paper.
+The paper proceeds as follows. \hyperref[sec:empirical_strategy]{Section \ref{sec:empirical_strategy}} details the empirical approach. \hyperref[sec:data]{Section \ref{sec:data}}  describes the higher education system in Peru and linked administrative data. \hyperref[sec:results]{Section \ref{sec:results}} presents results. \hyperref[sec:robustness_mechanisms]{Section \ref{sec:robustness_mechanisms}} discusses potential mechanisms. \hyperref[sec:conclusions]{Section \ref{sec:conclusions}} concludes.
+
+
+
+
+%%%%%%%%%%%%%%
+% Empirical Strategy
+%%%%%%%%%%%%%%
+\section{Empirical Strategy}\label{sec:empirical_strategy}
+
+%I do fuzzy regression discontinuity using college-major-semester (cell) cutoffs. (i) I estimate the likely cutoff for each cell, (ii) stack all applications, (iii) estimate an RD model with cell fixed effects. This is done with for the oldest sibling, with effects estimated on their younger siblings (after the application). This is done for all public universities in the country from 2017-2023.
+
+%%%%%%%%%%%%%%
+% Data
+%%%%%%%%%%%%%%
+\section{Data}\label{sec:data}
+
+%%%%%%%%%%%%%%
+% Results
+%%%%%%%%%%%%%%
+\section{Results}\label{sec:results}
+
+% First stage
+Being above the cutoff has signficant first stage effects as can be seen in \hyperref[fig:first_stage]{Figure \ref{fig:first_stage}}. Being above the cutoff means the focal (older) sibling is 62pp more likely to be admitted into target college-major during the application period and 42.9pp more likely to be enrolled. Overall, there are also long term consequences. Being above the cutoff of a targe college-major increases enrollment in any college by 17.1pp. It also shiftes enrollment from public to private colleges.
+
+Younger siblings are impacted by this. Application to any college increases by 7.1pp when an older sibling enrolls in their target college-major and enrollment by 5.8pp (\hyperref[tab:t_sib_univ_1_first_bwoptimal_2]{Table \ref{tab:t_sib_univ_1_first_bwoptimal_2}}). These correspond to increases of more than 10\%. Results on the admission exam score are positive but not significant. I also find 0.142$\sigma$ increase in school performance in 8th grade Mathematics standardized tests according to \hyperref[tab:t_sib_school_first_bwoptimal_2]{Table \ref{tab:t_sib_school_first_bwoptimal_2}}. Although there is no increase in students expectations for higher education, parent's expectations do increase by 13.9pp (\hyperref[tab:t_sib_asp_first_bwoptimal_2]{Table \ref{tab:t_sib_asp_first_bwoptimal_2}}). This is mostly cause by parents with no higher education (\hyperref[tab:t_sib_heterog_asp_gen_pared_first_bwoptimal_2]{Table \ref{tab:t_sib_heterog_asp_gen_pared_first_bwoptimal_2}}) while parents with higher education have no change in expectations although their children have the biggest change in outcomes (\hyperref[tab:t_sib_heterog_pared_first_bwoptimal_2]{Table \ref{tab:t_sib_heterog_pared_first_bwoptimal_2}}).
+
+
+
+
+
+
+
+
+
+
+
+
+% Why does getting in matter? 
+% Actual change in decisions and outcomes
+
+
+
+     %The first stage is quite big. Being above the cutoff means a 70\% increased chance of admission and 50\% of enrollment to the applied cutoff. Being above the cutoff also increases enrollment in ANY university EVER by 18\%. \hyperref[fig:first_stage]{Figure \ref{fig:first_stage}}. Results for the full sample are as follow:
+
+\begin{comment}
+\begin{itemize}    
+    \item College choices: \hyperref[tab:table_sib_choices_all_1_2]{Table \ref{tab:table_sib_choices_all_1_2}}
+    \item School progression:  \hyperref[tab:table_sib_school_outcomes_all_1_2]{Table \ref{tab:table_sib_school_outcomes_all_1_2}}
+    \item College aspirations: \hyperref[tab:table_sib_univ_outcomes_all_1_2]{Table \ref{tab:table_sib_univ_outcomes_all_1_2}}
+    \item Heterogeneous analysis: \hyperref[tab:table_sib_heterog_all_1_2]{Table \ref{tab:table_sib_heterog_all_1_2}}
+    \item Balance test: \hyperref[tab:table_foc_balance_all_1_2]{Table \ref{tab:table_foc_balance_all_1_2}}
+\end{itemize}    
+
+\begin{itemize}  
+    \item When restricting only for the first semester each focal child applies results look stronger but possibly caused by unbalanced sample: \hyperref[tab:table_sib_choices_first_1_2]{Table \ref{tab:table_sib_choices_first_1_2}}, \hyperref[tab:table_sib_school_outcomes_first_1_2]{Table \ref{tab:table_sib_school_outcomes_first_1_2}}, \hyperref[tab:table_sib_univ_outcomes_first_1_2]{Table \ref{tab:table_sib_univ_outcomes_first_1_2}}, \hyperref[tab:table_sib_heterog_first_1_2]{Table \ref{tab:table_sib_heterog_first_1_2}}, \hyperref[tab:table_foc_balance_first_1_2]{Table \ref{tab:table_foc_balance_first_1_2}}.
+\end{itemize}  
+\end{comment}
+%%%%%%%%%%%%%%
+% Robustness and Mechanisms
+%%%%%%%%%%%%%%
+\section{Robustness and Mechanisms}\label{sec:robustness_mechanisms}
+
+
+%%%%%%%%%%%%%%
+% Policy Discussion
+%%%%%%%%%%%%%%
+%\section{Policy Discussion}\label{sec:policy}
+
+%%%%%%%%%%%%%%
+%Conclusions
+%%%%%%%%%%%%%%
+\section{Conclusions}\label{sec:conclusions}
+
+
+%We argue that an older sibling’s enrollment in a higher quality college can provide for families information about postsecondary education that would otherwise be difficult or impossible to obtain. [draft US]
+
+
+
+

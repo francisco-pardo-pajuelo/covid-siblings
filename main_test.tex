@@ -1,0 +1,97 @@
+\documentclass[12pt, a4paper]{article}
+
+
+% Uncomment the next line to use the natbib package with bibtex 
+\usepackage{natbib}
+
+% Uncomment the next line to use the harvard package with bibtex
+%\usepackage[abbr]{harvard}
+
+%other packages
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{comment}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx} % Allows including images
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{forest}
+\usepackage{lscape}
+\usepackage{adjustbox}
+\usepackage{pgf,tikz}
+\usepackage{subcaption} %for subfigure
+\forestset{qtree/.style={for tree={parent anchor=south, 
+           child anchor=north,align=center,inner sep=0pt}}}
+
+\usepackage{progressbar}
+
+\usepackage{csquotes}
+\usepackage{setspace}
+
+\setlength{\bibsep}{3pt plus 0.3ex}
+
+\renewcommand{\thesection}{\Roman{section}} 
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+%For number in equations with 'align'
+\newcommand{\tabnotes}[2]{\bottomrule \multicolumn{#1}{@{}p{0.70\linewidth}@{}}{\footnotesize #2 }\end{tabular}\end{table}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}} %https://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
+
+%For quotting we define this 2:
+\SetBlockThreshold{2}
+\newcommand\myblockquote[2]{%
+  \blockquote{\hspace*{2em}\emph{`#1'}\hfill(#2)}\par}
+
+\let\footnote\thanks
+%Prevent Footnote from breaking pages
+\interfootnotelinepenalty=10000
+
+%For links
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.65}
+\definecolor{darkgreen}{rgb}{0.0, 0.65, 0.0}
+\hypersetup{
+	citecolor=blue,
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=magenta
+}
+
+
+\parskip 2pt
+
+
+
+
+
+% This command determines the leading (vertical space between lines) in draft mode
+% with 1.5 corresponding to "double" spacing.
+
+\begin{document}
+
+% Literature review:
+
+%Newer results
+\input{./TABLES/table_sibling_applications.tex}
+
+%Full text
+%\input{./TABLES/tests_ranking.tex}
+
+\newpage
+\begin{landscape}
+%\input{./TABLES/aspirations_ranking.tex}
+%\input{./FIGURES/FINAL/figure1.tex}
+\end{landscape}
+
+\newpage
+\begin{landscape}
+%\input{./TABLES/covariates_rd.tex}
+\end{landscape}
+\end{document}
+
+
+
+

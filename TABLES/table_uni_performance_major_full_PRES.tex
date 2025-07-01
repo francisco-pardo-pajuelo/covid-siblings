@@ -1,0 +1,27 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lccccccccc}
+\toprule
+& Applies on           & \multicolumn{3}{c}{Number of Applications}    & \multicolumn{5}{c}{Application Score}    \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-5} \cmidrule(lr){6-10}
+& time                         & Total & First time    & Same College                  & Any & Same College    & Public        & Other Colleges        & Other Public          \\
+& (1)                          & (2)   & (3)                   & (4)                                   & (5) & (6)                     & (7)           & (8)                           & (9)    \\
+\bottomrule
+&  &  &  &  & \\
+Older sibling enrolled&       0.115***&       0.133   &       0.071   &       0.184   &       0.070   &       0.072   &       0.060   &       0.083   &       0.093   \\
+                    &     (0.033)   &     (0.134)   &     (0.051)   &     (0.114)   &     (0.072)   &     (0.107)   &     (0.081)   &     (0.141)   &     (0.294)   \\
+ 
+Older sibling above cutoff&       0.051***&       0.059   &       0.030   &       0.081   &       0.029   &       0.028   &       0.025   &       0.032   &       0.037   \\
+                    &     (0.014)   &     (0.060)   &     (0.022)   &     (0.050)   &     (0.030)   &     (0.042)   &     (0.034)   &     (0.055)   &     (0.116)   \\
+                    &               &               &               &               &               &               &               &               &               \\
+Observations        &      23,598   &      24,899   &      19,890   &      21,941   &      18,306   &      10,116   &      14,574   &       6,635   &       1,531   \\
+Counterfactual mean &       0.573   &       1.812   &       1.344   &       1.140   &       0.050   &       0.031   &       0.001   &       0.070   &      -0.086   \\
+Bandwidth           &       0.620   &       0.651   &       0.767   &       0.579   &       0.739   &       0.591   &       0.712   &       0.609   &       0.433   \\
+\textit{F}-statistic&       1,354   &       1,446   &       1,066   &       1,251   &         951   &         463   &         762   &         294   &          70   \\
+FE: college-major-year&       3,431   &       3,528   &       3,034   &       3,303   &       2,888   &       1,968   &       2,502   &       1,544   &         481   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

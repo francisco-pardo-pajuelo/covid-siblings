@@ -1,0 +1,111 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%YOU HAVE ALREADY MADE A BACKUP. EDIT THIS FREELY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\textbf{Research Question:} \textcolor{blue}{\textbf{`Do older siblings college experience affect their younger siblings aspirations, effort and actions over higher education?'}}
+
+
+\textbf{Literature}
+\begin{itemize}
+    \item  Effects are strong on the choices they make, mainly following their older siblings to the same college. Less clear results on overall applications and enrollment. Null results on effort during high school.
+    \item Some evidence of stronger effects when siblings are more similar (in age or sex). Mixed results and no clarity on mechanisms. \footnote{}\footnotetext{\cite{dustan_family_2018}, \cite{joensen_spillovers_2018}, \cite{altmejd_o_2021}, \cite{aguirre_walking_2021}, \cite{de_gendre_class_2021}, \cite{avdeev_spillovers_2024}, \cite{dahl_intergenerational_2024}}
+\end{itemize}
+
+\textbf{Motivation:}
+\begin{itemize}
+    \item Peru has decentralized applications and exams. This contrasts with systems like Chile, where there is a centralized application system (choice set) with a standardized exam for all applications. This creates bigger information barriers and costs for applications that may cause larger spillover effects. It also creates methodological challenges that a centralized system does not.
+    \item I have school administrative data with exams in 2nd, 4th and 8th grade and survey data to students and parents on behavior, beliefs, expectations, etc. This allows for unexplored effects in early childhood and in mechanisms. In terms of outcomes, we can explore: 8th grade student's aspirations of going to college, 8th grade exams (earlier than literature) and full school grade progression.
+\end{itemize}
+
+\textbf{Strategy:} I do fuzzy regression discontinuity using college-major-semester (cell) cutoffs. (i) I estimate the likely cutoff for each cell, (ii) stack all applications, (iii) estimate an RD model with cell fixed effects. This is done with for the oldest sibling, with effects estimated on their younger siblings (after the application). This is done for all public universities in the country from 2017-2023.
+
+\textbf{Results:}
+     The first stage is quite big. Being above the cutoff means a 70\% increased chance of admission and 50\% of enrollment to the applied cutoff. Being above the cutoff also increases enrollment in ANY university EVER by 18\%. \hyperref[fig:first_stage]{Figure \ref{fig:first_stage}}. Results for the full sample are as follow:
+
+\begin{itemize}    
+    \item College choices: \hyperref[tab:table_sib_choices_all_1_2]{Table \ref{tab:table_sib_choices_all_1_2}}
+    \item School progression:  \hyperref[tab:table_sib_school_outcomes_all_1_2]{Table \ref{tab:table_sib_school_outcomes_all_1_2}}
+    \item College aspirations: \hyperref[tab:table_sib_univ_outcomes_all_1_2]{Table \ref{tab:table_sib_univ_outcomes_all_1_2}}
+    \item Heterogeneous analysis: \hyperref[tab:table_sib_heterog_all_1_2]{Table \ref{tab:table_sib_heterog_all_1_2}}
+    \item Balance test: \hyperref[tab:table_foc_balance_all_1_2]{Table \ref{tab:table_foc_balance_all_1_2}}
+\end{itemize}    
+
+\begin{itemize}  
+    \item When restricting only for the first semester each focal child applies results look stronger but possibly caused by unbalanced sample: \hyperref[tab:table_sib_choices_first_1_2]{Table \ref{tab:table_sib_choices_first_1_2}}, \hyperref[tab:table_sib_school_outcomes_first_1_2]{Table \ref{tab:table_sib_school_outcomes_first_1_2}}, \hyperref[tab:table_sib_univ_outcomes_first_1_2]{Table \ref{tab:table_sib_univ_outcomes_first_1_2}}, \hyperref[tab:table_sib_heterog_first_1_2]{Table \ref{tab:table_sib_heterog_first_1_2}}, \hyperref[tab:table_foc_balance_first_1_2]{Table \ref{tab:table_foc_balance_first_1_2}}.
+\end{itemize}   
+
+\newpage
+\textbf{Issues:}
+\begin{itemize}
+    \item In centralized settings, it is common to keep the first set of choices/application. It is not clear I can do the same here since I don't (currently) have dates of exams, but even then, that would mean only keep 1 exam.
+    \item I am considering 2 options: Use full sample and use only first semester of applications. I also considered using only those who apply once but sample is too small.
+    \item I am not sure if using the full sample is methodologically correct, although it seems balanced. Results there however look very similar to \cite{altmejd_o_2021} in the case of choices.
+    \item Main problem now is the balance is not working properly for 8th grade exams when keeping only the first semester.
+\end{itemize}
+
+
+
+%\section{Introduction}
+%\label{sec:intro}
+
+
+%\footnote{}\footnotetext{example footnote}
+
+%medication/treatment  (\cite{sokol_impact_2005})
+%\section{Literature review and contribution}
+%\label{sec:literature}
+
+
+%\section{Context}
+%\label{sec:context}
+
+
+%\section{Data}
+%\label{sec:data}
+
+%\section{Empirical Strategy}
+%\label{sec:empirical}
+
+
+%General RD
+%\begin{align*}
+%Y_{it}=\alpha_{i} + \beta {ABOVE} + \gamma  f(Age) + \delta X_{it} + \epsilon_{it} \numberthis \label{eq_main}
+%\end{align*}
+
+
+
+%\section{Mechanisms}
+%\label{sec:mechanisms}
+
+
+%\section{Heterogenity}
+%\label{sec:heterogeneity}
+
+%\section{Conclusion}
+%\label{sec:conclusion}
+
+%\subsection{Future Research}
+%\label{sec:future}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figures and Tables 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%:::::::::::::: FIGURES
+
+
+%\input{./figures/figure1.tex} 
+
+
+%\clearpage
+
+%:::::::::::::: TABLES
+
+
+%\input{./tables/mechanisms.tex}
+
+

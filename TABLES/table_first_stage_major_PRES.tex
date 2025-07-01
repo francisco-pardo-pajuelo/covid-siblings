@@ -1,0 +1,26 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lccccccc}
+\toprule
+& \multicolumn{3}{c}{Same semester}                                                                    & \multicolumn{3}{c}{Ever} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+& Admitted                             & Enrolled                      & Enrolled                      & Enrolled target       & Enrolled private  & Enrolled any \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+& target college-major         & target college-major  & any college           & college                       & college                       & college \\
+& (1) & (2) & (3) & (4) & (5) & (6) \\
+\bottomrule
+&  &  &  & &  \\
+Older sibling above cutoff&       0.780***&       0.508***&       0.476***&       0.349***&      -0.093***&       0.185***\\
+                    &     (0.008)   &     (0.009)   &     (0.009)   &     (0.011)   &     (0.010)   &     (0.011)   \\
+                    &               &               &               &               &               &               \\
+Observations        &      29,523   &      33,091   &      40,220   &      32,675   &      29,191   &      21,602   \\
+Counterfactual mean &       0.399   &       0.339   &       0.410   &       0.646   &       0.174   &       0.817   \\
+Bandwidth           &       0.374   &       0.411   &       0.486   &       0.407   &       0.371   &       0.290   \\
+\textit{F}-statistic&               &               &               &               &               &               \\
+FE: college-major-year&       6,279   &       6,763   &       7,538   &       6,711   &       6,236   &       5,181   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

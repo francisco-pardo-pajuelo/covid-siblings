@@ -1,0 +1,34 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+ & 4th grade expectations  &   8th grade expectations  & Completed             & Applied to    & \multicolumn{2}{c}{Application Exam Score}    & Admitted to           & Enrolled in                   \\
+ & 4-year college                &     4-year college                  & Secondary             & 4-year college        & Any & Same                            & 4-year college        & 4-year college                        \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-9}
+& (1)                          & (2)                   & (3)                   & (4)                   & (5)    &  (6) & (7) & (8) \\
+\bottomrule
+& & & & & & & &  \\
+\multicolumn{9}{l}{Panel A: Older sibling likely not applying } \\
+Older sibling above cutoff&       0.088*  &       0.017   &       0.022   &       0.046*  &      -0.004   &       0.005   &       0.010   &       0.029   \\
+                    &     (0.048)   &     (0.045)   &     (0.017)   &     (0.024)   &     (0.082)   &     (0.104)   &     (0.023)   &     (0.026)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &       1,389   &       1,754   &      10,864   &      10,295   &       3,572   &       2,072   &      10,538   &       8,459   \\
+Counterfactual mean &       0.851   &       0.859   &       0.861   &       0.569   &      -0.153   &      -0.150   &       0.335   &       0.339   \\
+Bandwidth           &       1.159   &       0.762   &       0.966   &       0.959   &       0.864   &       0.761   &       0.974   &       0.824   \\
+FE: college-major-year&         516   &         615   &       2,237   &       2,143   &         989   &         625   &       2,173   &       1,884   \\
+ 
+&  &  &  & & & & & &    \\
+\multicolumn{9}{l}{Panel B: Older sibling likely applying} \\
+Older sibling above cutoff&       0.017   &      -0.038   &      -0.006   &      -0.009   &       0.058   &       0.004   &      -0.001   &      -0.012   \\
+                    &     (0.038)   &     (0.024)   &     (0.015)   &     (0.020)   &     (0.054)   &     (0.078)   &     (0.024)   &     (0.023)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &         764   &       2,389   &       7,285   &       8,429   &       7,035   &       3,581   &      10,079   &      11,093   \\
+Counterfactual mean &       0.950   &       0.933   &       0.924   &       0.802   &       0.126   &       0.141   &       0.570   &       0.565   \\
+Bandwidth           &       0.582   &       0.798   &       0.704   &       0.812   &       1.070   &       0.821   &       0.956   &       1.043   \\
+FE: college-major-year&         286   &         692   &       1,509   &       1,659   &       1,343   &         774   &       1,853   &       1,960   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

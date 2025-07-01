@@ -1,0 +1,30 @@
+*- Simulation: Check FE in RCT. Comment from Le
+
+clear
+set obs 10000
+gen id = _n
+expand 2
+
+bys id: gen t = _n==1
+
+bys id: egen school_fe=max(uniform())
+gen y = 1+t+school_fe+rnormal()
+
+
+reg y t
+reghdfe y t, a(id)
+
+
+gen drop = runiform()
+
+reg y t if drop>0.2
+reghdfe y t if drop>0.2, a(id)
+
+
+
+
+gen drop = runiform()
+
+reg y t if drop>0.2
+reghdfe y t if drop>0.2, a(id)
+

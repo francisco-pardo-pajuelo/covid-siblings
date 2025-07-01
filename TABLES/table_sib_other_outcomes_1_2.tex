@@ -1,0 +1,26 @@
+\begin{table}[!htbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{}\label{tab:table_}
+\scalebox{1}{\setlength{\textwidth}{.1cm}
+\newcommand{\contents}{
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{8th grade exam }  & \multicolumn{2}{c}{Aspirations}   & \multicolumn{2}{c}{Applications}   \\
+\cline{2-3} \cline{4-5} \cline{6-7}
+& Math                 & Comm  & Higher Ed.    & Years Ed.     & On Time       & Total \\
+& (1)                          & (2)                           & (3)                   & (4)                   & (5)           & (6) \\
+\bottomrule
+&  &  &  & & &  \\
+Older sibling enrolled&       0.144*  &       0.135*  &       0.040   &       0.024   &       0.028   &      -0.048   \\
+                    &     (0.081)   &     (0.082)   &     (0.050)   &     (0.214)   &     (0.028)   &     (0.120)   \\
+ 
+Older sibling above cutoff&       0.060*  &       0.057*  &       0.016   &       0.010   &       0.013   &      -0.020   \\
+                    &     (0.034)   &     (0.034)   &     (0.019)   &     (0.086)   &     (0.013)   &     (0.051)   \\
+                    &               &               &               &               &               &               \\
+Observations        &      16,097   &      14,849   &       5,896   &       9,073   &      29,285   &      29,615   \\
+Counterfactual mean &       0.368   &       0.314   &       0.892   &      16.592   &       0.338   &       2.579   \\
+Bandwidth           &       0.858   &       0.798   &       0.460   &       0.657   &       0.568   &       0.863   \\
+\textit{F}-statistic&      869.36   &      814.27   &      277.91   &      446.82   &    1,675.31   &    1,614.97   \\
+ 
+
+\bottomrule \multicolumn{7}{p{\textwidth}} {\footnotesize \textit{Notes:} ***p$<$0.01, **p$<$0.05, *p$<$0.1. }\end{tabular}}\setbox0=\hbox{\contents}
+\setlength{\textwidth}{\wd0-2\tabcolsep-.25em} \contents} \end{table}

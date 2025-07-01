@@ -1,0 +1,25 @@
+\makebox[0.1\width][l]{
+\resizebox{0.8\textwidth}{!}{
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{8th grade exam }  & \multicolumn{4}{c}{Progression}   \\
+\cline{2-3} \cline{4-7}
+& \multirow{2}{*}{Math}        & \multirow{2}{*}{Read} & Approved      & Approved      & \multirow{2}{*}{Dropout}      & Completed      \\
+&                                              &                                               &  \textit{t}   & \textit{t+1}  &                                                       & Secondary      \\
+& (1)                                          & (2)                                   & (3)                   & (4)                   & (5)                                           & (6)    \\
+\bottomrule
+&  &  &  & &   \\
+Older sibling above cutoff&       0.038   &       0.008   &      -0.000   &       0.001   &      -0.004** &       0.017***\\
+                    &     (0.027)   &     (0.026)   &     (0.001)   &     (0.001)   &     (0.002)   &     (0.006)   \\
+                    &               &               &               &               &               &               \\
+Observations        &      25,011   &      24,735   &     181,880   &     149,675   &     288,119   &      56,933   \\
+Counterfactual mean &       0.413   &       0.356   &       0.985   &       0.982   &       0.053   &       0.860   \\
+Bandwidth           &       0.729   &       0.719   &       0.493   &       0.516   &       0.669   &       0.457   \\
+\textit{F}-statistic&    1,770.27   &    1,776.24   &    9,919.40   &    8,235.92   &   15,413.11   &    4,181.96   \\
+ 
+
+    \bottomrule 
+    %\multicolumn{8}{p{\textwidth}} {\footnotesize \textit{Notes:} ***p$<$0.01, **p$<$0.05, *p$<$0.1. }
+    \end{tabular}
+    }
+}

@@ -1,0 +1,42 @@
+\makebox[0.1\width][l]{
+\resizebox{0.8\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+&  \multicolumn{2}{c}{School}          &  \multicolumn{3}{c}{Applies}                          &       \multicolumn{3}{c}{Enrolls}             \\
+&  \multicolumn{2}{c}{Progression} &  \multicolumn{3}{c}{ever}                                 &       \multicolumn{3}{c}{ever}                \\
+\cline{2-3} \cline{4-6} \cline{7-9} 
+&  \multirow{2}{*}{Dropout}    & Secondary             &  Any                  & STEM                          & Non-STEM      &  Any          & STEM                  & Non-STEM              \\
+&                                                      & Complete                      &  Major                & Major                         & Major                 &  Major        & Major                 & Major                 \\
+& (1)                                                  & (2)                           & (3)                   & (4)                           & (5)                   & (6)           & (7)                   & (9)                   \\
+\bottomrule
+&  &  &  & & & & & \\
+\multicolumn{9}{l}{Panel A: Focal child is a female} \\
+Older sibling enrolled&       0.029   &      -0.046   &       0.078   &       0.057   &       0.170   &       0.005   &      -0.011   &      -0.005   \\
+                    &     (0.027)   &     (0.100)   &     (0.127)   &     (0.142)   &     (0.135)   &     (0.141)   &     (0.131)   &     (0.115)   \\
+ 
+Older sibling above cutoff&       0.011   &      -0.017   &       0.028   &       0.021   &       0.061   &       0.002   &      -0.004   &      -0.002   \\
+                    &     (0.010)   &     (0.036)   &     (0.046)   &     (0.051)   &     (0.048)   &     (0.051)   &     (0.047)   &     (0.041)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &       9,657   &       2,468   &       2,406   &       2,406   &       2,406   &       2,406   &       2,406   &       2,406   \\
+Counterfactual mean &       0.056   &       0.838   &       0.678   &       0.452   &       0.323   &       0.467   &       0.288   &       0.191   \\
+Bandwidth           &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   \\
+\textit{F}-statistic&         349   &          79   &          78   &          78   &          78   &          78   &          78   &          78   \\
+ 
+&  &  &  & & & & & \\
+\multicolumn{10}{l}{Panel B: Focal child is a male (sex-match)} \\
+Older sibling enrolled&      -0.011   &       0.024   &       0.057   &       0.056   &       0.032   &       0.078   &       0.021   &       0.056   \\
+                    &     (0.012)   &     (0.033)   &     (0.046)   &     (0.050)   &     (0.048)   &     (0.050)   &     (0.045)   &     (0.041)   \\
+ 
+Older sibling above cutoff&      -0.005   &       0.012   &       0.029   &       0.028   &       0.016   &       0.039   &       0.010   &       0.028   \\
+                    &     (0.006)   &     (0.016)   &     (0.023)   &     (0.025)   &     (0.024)   &     (0.025)   &     (0.022)   &     (0.020)   \\
+                    &               &               &               &               &               &               &               &               \\
+Observations        &      28,300   &       8,443   &       8,269   &       8,269   &       8,269   &       8,269   &       8,269   &       8,269   \\
+Counterfactual mean &       0.053   &       0.862   &       0.685   &       0.432   &       0.352   &       0.453   &       0.265   &       0.197   \\
+Bandwidth           &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   \\
+\textit{F}-statistic&       1,975   &         700   &         680   &         680   &         680   &         680   &         680   &         680   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}

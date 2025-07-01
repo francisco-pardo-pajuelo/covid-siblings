@@ -1,0 +1,27 @@
+\begin{table}[!htbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect on focal child}\label{tab:table_foc_fs_first_bwfixed_1_2}
+\scalebox{0.7}{\setlength{\textwidth}{.1cm}
+\newcommand{\contents}{
+\begin{tabular}{lcccccc}
+\toprule
+\cline{2-7}
+& Admitted target      & Enrolled target       & Enrolled any  & Enrolled target       & Enrolled target       & Enrolled any \\
+& college-major        & college-major         & college               & college-major         & college                       & college \\
+& Semester             & Semester                      & Semester              & ever                          & ever                          & ever \\
+& (1) & (2) & (3) & (4) & (5) & (6) \\
+\bottomrule
+&  &  &  & &  \\
+Older sibling enrolled&               &               &       0.942***&       0.842***&       0.668***&       0.399***\\
+                    &               &               &     (0.012)   &     (0.016)   &     (0.018)   &     (0.015)   \\
+ 
+Older sibling above cutoff&       0.626***&       0.429***&       0.404***&       0.361***&       0.287***&       0.171***\\
+                    &     (0.007)   &     (0.008)   &     (0.008)   &     (0.008)   &     (0.008)   &     (0.007)   \\
+                    &               &               &               &               &               &               \\
+Observations        &      77,934   &      77,934   &      77,934   &      77,934   &      77,934   &      77,934   \\
+Counterfactual mean &       0.356   &       0.313   &       0.391   &       0.494   &       0.616   &       0.793   \\
+Bandwidth           &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   &       0.500   \\
+\textit{F}-statistic&               &               &       3,246   &       3,246   &       3,246   &       3,246   \\
+ 
+
+\bottomrule \multicolumn{7}{p{\textwidth}} {\footnotesize \textit{Notes:} ***p$<$0.01, **p$<$0.05, *p$<$0.1. }\end{tabular}}\setbox0=\hbox{\contents}
+\setlength{\textwidth}{\wd0-2\tabcolsep-.25em} \contents} \end{table}

@@ -1,0 +1,27 @@
+\makebox[0.1\width][l]{
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{lccccccc}
+\toprule
+ & Completed                   &  \multicolumn{2}{c}{4th grade}                & \multicolumn{2}{c}{8th grade}     \\
+ & Secondary                   & Academic score        & 4-year college expectation & Academic score   & 4-year college expectation  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+& (1)                          & (2)                   & (3)                   & (4)                   & (5) \\
+\bottomrule
+&  &  &  &  & \\
+Older sibling enrolled&      -0.008   &       0.110   &       0.121** &       0.071   &       0.011   \\
+                    &     (0.022)   &     (0.167)   &     (0.047)   &     (0.117)   &     (0.043)   \\
+ 
+Older sibling above cutoff&      -0.004   &       0.056   &       0.064***&       0.036   &       0.005   \\
+                    &     (0.012)   &     (0.085)   &     (0.024)   &     (0.059)   &     (0.021)   \\
+                    &               &               &               &               &               \\
+Observations        &      20,774   &       3,312   &       3,210   &       6,143   &       4,707   \\
+Counterfactual mean &       0.851   &       0.464   &       0.914   &       0.449   &       0.901   \\
+Bandwidth           &       0.700   &       0.680   &       0.760   &       0.610   &       0.605   \\
+\textit{F}-statistic&       1,838   &         243   &         234   &         474   &         359   \\
+FE: college-major-year&       3,921   &       1,148   &       1,128   &       1,793   &       1,404   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+}
