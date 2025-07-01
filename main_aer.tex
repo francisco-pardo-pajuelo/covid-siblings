@@ -1,0 +1,103 @@
+% PP-Article.tex for AEA last revised 22 June 2011
+%\documentclass[draftmode]{AEA}
+\documentclass[AER]{AEA}
+
+%\documentclass[12pt, a4paper]{article}
+% If you have trouble with the mathtime package please see our technical support 
+% document at: http://www.aeaweb.org/templates/technical_support.pdf
+% You may remove the mathtime package if you can't get it working but your page
+% count may be inaccurate as a result.
+%\usepackage[cmbold]{mathtime}
+
+% Note: you may use either harvard or natbib (but not both) to provide a wider
+% variety of citation commands than latex supports natively. See below.
+
+% Uncomment the next line to use the natbib package with bibtex 
+\usepackage{natbib}
+
+% Uncomment the next line to use the harvard package with bibtex
+%\usepackage[abbr]{harvard}
+
+%other packages
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{comment}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx} % Allows including images
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{forest}
+\usepackage{lscape}
+\usepackage{adjustbox}
+\usepackage{multicol}
+\setlength{\columnsep}{1cm}
+\usepackage{pgf,tikz}
+\usepackage{subcaption} %for subfigure
+\forestset{qtree/.style={for tree={parent anchor=south, 
+           child anchor=north,align=center,inner sep=0pt}}}
+
+\usepackage{progressbar}
+
+\usepackage{csquotes}
+\usepackage{setspace}
+           
+
+%For number in equations with 'align'
+\newcommand{\tabnotes}[2]{\bottomrule \multicolumn{#1}{@{}p{0.70\linewidth}@{}}{\footnotesize #2 }\end{tabular}\end{table}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}} %https://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
+
+
+%For quotting we define this 2:
+\SetBlockThreshold{2}
+\newcommand\myblockquote[2]{%
+  \blockquote{\hspace*{2em}\emph{`#1'}\hfill(#2)}\par}
+
+
+%For links
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.65}
+\definecolor{darkgreen}{rgb}{0.0, 0.65, 0.0}
+\hypersetup{
+	citecolor=blue,
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=magenta
+}
+
+\let\footnote\thanks
+%Prevent Footnote from breaking pages
+\interfootnotelinepenalty=10000
+
+%\usepackage[round]{natbib}
+
+
+% This command determines the leading (vertical space between lines) in draft mode
+% with 1.5 corresponding to "double" spacing.
+\draftSpacing{1.5}
+
+\begin{document}
+
+%Has information on all the statistics estimated
+\input{./macros.tex} 
+
+%Full text
+\input{./1_title.tex}
+\input{./2_abstract.tex}
+\maketitle
+
+\newpage
+
+\begin{multicols}{2}
+\input{./3_main_1pager.tex}
+%\blindtext \blindtext
+\end{multicols}
+
+\input{./4_references.tex}
+
+\input{./5_tables_figures.tex}
+
+\input{./6_appendix.tex}
+\end{document}
+
