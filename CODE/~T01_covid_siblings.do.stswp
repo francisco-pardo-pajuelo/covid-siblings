@@ -7,14 +7,15 @@ program define main
 	
 	*clean_data
 	
-	raw_ece_trends
-	raw_gpa_trends
+	*raw_ece_trends
+	*raw_gpa_trends
 	
 	//ece_baseline_netherlands
 	
 	twfe
 	
-	//event_ece
+	event_ece_student
+	event_ece_school
 	event_gpa
 	//event_approved
 	event_cohort_grade
@@ -297,6 +298,12 @@ program define clean_data
 		replace pass_read = 0 if comm<=`fail_letter' & comm!=. & letter==1
 		replace pass_read = 0 if comm<=`fail_number' & comm!=. & letter==0
 		
+		*- Fix weights for census examinations
+		replace peso_m_4p = 1 if inlist(year,2016,2018,2024)==1 & grade==4 & peso_m_4p==.
+		replace peso_c_4p = 1 if inlist(year,2016,2018,2024)==1 & grade==4 & peso_c_4p==.
+		replace peso_m_2s = 1 if inlist(year,2015,2016,2018,2019)==1 & grade==8 & peso_m_2s==.
+		replace peso_c_2s = 1 if inlist(year,2015,2016,2018,2019)==1 & grade==8 & peso_c_2s==.		
+		
 		*- Events
 		ds urban_siagie higher_ed_parent
 
@@ -368,10 +375,13 @@ use "$TEMP\pre_reg_covid", clear
 	keep fam_total_${fam_type} grade year score_*_??  peso_?_?? id_ie
 	keep if inlist(grade,2,4,8)==1
 
+	/*
 	replace peso_m_4p = 1 if inlist(year,2016,2018,2024)==1 & grade==4 & peso_m_4p==.
 	replace peso_c_4p = 1 if inlist(year,2016,2018,2024)==1 & grade==4 & peso_c_4p==.
 	replace peso_m_2s = 1 if inlist(year,2015,2016,2018,2019)==1 & grade==8 & peso_m_2s==.
 	replace peso_c_2s = 1 if inlist(year,2015,2016,2018,2019)==1 & grade==8 & peso_c_2s==.
+	*/
+	
 	//keep if year<=2016 | year==2019
 	//bys id_ie year: gen n=_n==1
 	//bys id_ie : egen N=sum(n)
@@ -765,53 +775,78 @@ end
 * Event Study - ECE
 ********************************************************************************
 
-capture program drop event_ece
-program define event_ece	
+capture program drop event_ece_student
+program define event_ece_student	
+
+	global x = "$x_all"
 
 	*---------
-	*- ECE
+	*- ECE - Student level
 	*---------
 	*- ECE - 2P
 	foreach v in "score_math_2p" "score_com_2p" "score_math_std_2p" "score_com_std_2p" "score_acad_std_2p" "satisf_m_2p" "satisf_c_2p" {
 		di "`v'"
-		if inlist("`v'","score_math_std_2p","satisf_m_2p")==1 	local subj = "math"
-		if inlist("`v'","score_com_std_2p","satisf_c_2p")==1 	local subj = "com"
+		if inlist("`v'","score_math_2p","score_math_std_2p","satisf_m_2p")==1 	local subj = "math"
+		if inlist("`v'","score_com_2p","score_com_std_2p","satisf_c_2p")==1 	local subj = "com"
 		if inlist("`v'","score_acad_std_2p")==1 				local subj = "acad"
 		use `v' year_t_?? year grade treated id_ie fam_order_${fam_type} ${x} if grade==2 using "$TEMP\pre_reg_covid", clear
 		keep if inlist(year,2015,2016,2018,2019,2022,2023)==1
 		merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_2p_*) nogen
+		if inlist("`v'","score_math_2p","score_com_2p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
 		reghdfe 	`v' ${x}	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
 		*reghdfe 	score_acad_std_2p	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated if score_acad_std_2p_max==2022 & score_acad_std_2p_sum==5 & fam_order_2==1, a(id_ie)
 		estimates 	store `v'
 		}
 
 	*- ECE - 4P
-	foreach v in "score_math_std_4p" "score_com_std_4p" "score_acad_std_4p" "satisf_m_4p" "satisf_c_4p" {
+	foreach v in "score_math_4p" "score_com_4p" "score_math_std_4p" "score_com_std_4p" "score_acad_std_4p" "satisf_m_4p" "satisf_c_4p" {
 		di "`v'"
-		if inlist("`v'","score_math_std_4p","satisf_m_4p")==1 	local subj = "math"
-		if inlist("`v'","score_com_std_4p","satisf_c_4p")==1 	local subj = "com"
+		if inlist("`v'","score_math_4p","score_math_std_4p","satisf_m_4p")==1 	local subj = "math"
+		if inlist("`v'","score_com_4p","score_com_std_4p","satisf_c_4p")==1 	local subj = "com"
 		if inlist("`v'","score_acad_std_4p")==1 				local subj = "acad"
 		use `v' year_t_?? year grade treated id_ie fam_order_${fam_type} ${x} if grade==4 using "$TEMP\pre_reg_covid", clear
 		keep if inlist(year,2016,2018,2019,2022,2023,2024)==1
 		merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_4p_*) nogen
-		reghdfe 	`v' 	${x}						year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3  treated, a(year id_ie)
+		if inlist("`v'","score_math_4p","score_com_4p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
+		reghdfe 	`v' 	${x}						year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4  treated, a(year id_ie)
 		estimates 	store `v'		
 		}	
 
 	*- ECE - 2S
-	foreach v in "score_math_std_2s" "score_com_std_2s" "score_acad_std_2s" "satisf_m_2s" "satisf_c_2s" {
+	foreach v in "score_math_2s" "score_com_2s" "score_math_std_2s" "score_com_std_2s" "score_acad_std_2s" "satisf_m_2s" "satisf_c_2s" {
 		di "`v'"
-		if inlist("`v'","score_math_std_2s","satisf_m_2s")==1 	local subj = "math"
-		if inlist("`v'","score_com_std_2s","satisf_c_2s")==1 	local subj = "com"
+		if inlist("`v'","score_math_2s","score_math_std_2s","satisf_m_2s")==1 	local subj = "math"
+		if inlist("`v'","score_com_2s","score_com_std_2s","satisf_c_2s")==1 	local subj = "com"
 		if inlist("`v'","score_acad_std_2s")==1 				local subj = "acad"
 		use `v' year_t_?? year grade treated id_ie fam_order_${fam_type} ${x} if grade==8 using "$TEMP\pre_reg_covid", clear
 		merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_2s_*) nogen
+		if inlist("`v'","score_math_2s","score_com_2s")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
 		keep if inlist(year,2015,2016,2018,2019,2022,2023)==1
 		reghdfe 	`v' ${x}			 year_t_b5 		year_t_b4  			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3  treated, a(year id_ie)
 		estimates 	store `v'		
 		}	
 		
+	foreach g in "2p" "4p" "2s" {
+		if "`g'" == "2p" local g_label = "2nd Grade"
+		if "`g'" == "4p" local g_label = "4th Grade"
+		if "`g'" == "2s" local g_label = "8th Grade"
 
+		coefplot 	score_math_`g' score_com_`g', ///
+					omitted ///
+					keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+					drop(year_t_b3) ///
+					leg(order(1 "Mathematics" 3 "Reading")) ///
+					coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+					yline(0,  lcolor(gs6))  ///
+					ytitle("Effect") ///
+					subtitle("Panel A: Standardized Exams - `g_label'") ///
+					legend(pos(6) col(3)) ///
+					name(panel_A_SATISF_`g',replace)	
+		//graph save "$FIGURES\covid_ece_`g'.gph" , replace	
+		//capture qui graph export "$FIGURES\covid_ece_`g'.eps", replace	
+		capture qui graph export "$FIGURES\Event Study\ece_student_score_`g'.png", replace			
+		capture qui graph export "$FIGURES\Event Study\ece_student_score_`g'.pdf", replace		
+	}	
 
 	foreach g in "2p" "4p" "2s" {
 		if "`g'" == "2p" local g_label = "2nd Grade"
@@ -822,17 +857,17 @@ program define event_ece
 					omitted ///
 					keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
 					drop(year_t_b3) ///
-					leg(order(1 "Mathematics" 3 "Communications" 5 "Average")) ///
-					coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024")) ///
-					yline(0,  lcolor(gs10))  ///
+					leg(order(1 "Mathematics" 3 "Reading" 5 "Average")) ///
+					coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+					yline(0,  lcolor(gs6))  ///
 					ytitle("Effect (SD)") ///
 					subtitle("Panel A: Standardized Exams - `g_label'") ///
 					legend(pos(6) col(3)) ///
 					name(panel_A_STD_`g',replace)	
 		//graph save "$FIGURES\covid_ece_`g'.gph" , replace	
 		//capture qui graph export "$FIGURES\covid_ece_`g'.eps", replace	
-		capture qui graph export "$FIGURES\Event Study\covid_ece_`g'.png", replace			
-		capture qui graph export "$FIGURES\Event Study\covid_ece_`g'.pdf", replace		
+		capture qui graph export "$FIGURES\Event Study\ece_student_std_score`g'.png", replace			
+		capture qui graph export "$FIGURES\Event Study\ece_student_std_score`g'.pdf", replace		
 	}
 
 	foreach g in "2p" "4p" "2s" {
@@ -844,21 +879,156 @@ program define event_ece
 					omitted ///
 					keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
 					drop(year_t_b3) ///
-					leg(order(1 "Mathematics" 3 "Communications")) ///
-					coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a3 = "2024") ///
-					yline(0,  lcolor(gs10))  ///
+					leg(order(1 "Mathematics" 3 "Reading")) ///
+					coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+					yline(0,  lcolor(gs6))  ///
 					ytitle("Effect") ///
 					subtitle("Panel A: Satisfactory Level - `g_label'") ///
 					legend(pos(6) col(3)) ///
 					name(panel_A_SATISF_`g',replace)	
 		//graph save "$FIGURES\covid_ece_`g'.gph" , replace	
 		//capture qui graph export "$FIGURES\covid_ece_`g'.eps", replace	
-		capture qui graph export "$FIGURES\Event Study\covid_ece_`g'.png", replace			
-		capture qui graph export "$FIGURES\Event Study\covid_ece_`g'.pdf", replace		
+		capture qui graph export "$FIGURES\Event Study\ece_student_satisf_`g'.png", replace			
+		capture qui graph export "$FIGURES\Event Study\ece_student_satisf_`g'.pdf", replace		
 	}	
 
 end	
 
+
+capture program drop event_ece_school
+program define event_ece_school	
+
+	
+	global x = "$x_all"
+
+	*---------
+	*- ECE - Student level
+	*---------
+	
+	foreach weight in "" "_weighted" {
+	estimates clear	
+		*- ECE - 2P
+		foreach v in "score_math_2p" "score_com_2p" "score_math_std_2p" "score_com_std_2p" "score_acad_std_2p" "satisf_m_2p" "satisf_c_2p" {
+			di "`v'"
+			if inlist("`v'","score_math_2p","score_math_std_2p","satisf_m_2p")==1 	local subj = "math"
+			if inlist("`v'","score_com_2p","score_com_std_2p","satisf_c_2p")==1 	local subj = "com"
+			if inlist("`v'","score_acad_std_2p")==1 				local subj = "acad"
+			use `v' year_t_?? year grade treated id_ie fam_order_${fam_type} ${x} peso_?_2p if grade==2 using "$TEMP\pre_reg_covid", clear
+			
+			keep if inlist(year,2015,2016,2018,2019,2022,2023)==1
+			//merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_2p_*) nogen
+			if inlist("`v'","score_math_2p","score_com_2p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
+			gen pop = 1
+			collapse (sum) pop (mean) `v' [iw=peso_m_2p], by(id_ie year_?_?? year treated) 
+			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
+			if "`weight'" == "_weight" 	reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)
+			*reghdfe 	score_acad_std_2p	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated if score_acad_std_2p_max==2022 & score_acad_std_2p_sum==5 & fam_order_2==1, a(id_ie)
+			estimates 	store `v'
+			}
+
+		*- ECE - 4P
+		foreach v in "score_math_4p" "score_com_4p" "score_math_std_4p" "score_com_std_4p" "score_acad_std_4p" "satisf_m_4p" "satisf_c_4p" {
+			di "`v'"
+			if inlist("`v'","score_math_4p","score_math_std_4p","satisf_m_4p")==1 	local subj = "math"
+			if inlist("`v'","score_com_4p","score_com_std_4p","satisf_c_4p")==1 	local subj = "com"
+			if inlist("`v'","score_acad_std_4p")==1 				local subj = "acad"
+			use `v' year_t_?? year grade treated id_ie fam_order_${fam_type} ${x} peso_?_4p if grade==4 using "$TEMP\pre_reg_covid", clear
+			
+			keep if inlist(year,2016,2018,2019,2022,2023,2024)==1
+			//merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_4p_*) nogen
+			if inlist("`v'","score_math_4p","score_com_4p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
+			gen pop = 1
+			collapse (sum) pop (mean) `v' [iw=peso_m_4p], by(id_ie year_?_?? year treated) 
+			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated, a(id_ie)
+			if "`weight'" == "_weight" 	reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated [aw=pop], a(id_ie)			estimates 	store `v'
+			estimates 	store `v'		
+			}	
+
+		*- ECE - 2S
+		foreach v in "score_math_2s" "score_com_2s" "score_math_std_2s" "score_com_std_2s" "score_acad_std_2s" "satisf_m_2s" "satisf_c_2s" {
+			di "`v'"
+			if inlist("`v'","score_math_2s","score_math_std_2s","satisf_m_2s")==1 	local subj = "math"
+			if inlist("`v'","score_com_2s","score_com_std_2s","satisf_c_2s")==1 	local subj = "com"
+			if inlist("`v'","score_acad_std_2s")==1 				local subj = "acad"
+			use `v' year_t_?? year grade treated id_ie fam_order_${fam_type} ${x} peso_?_2s if grade==8 using "$TEMP\pre_reg_covid", clear
+			
+			keep if inlist(year,2015,2016,2018,2019,2022,2023)==1
+			//merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_2s_*) nogen
+			if inlist("`v'","score_math_2s","score_com_2s")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
+			gen pop = 1
+			collapse (sum) pop (mean) `v' [iw=peso_m_2s], by(id_ie year_?_?? year treated) 
+			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
+			if "`weight'" == "_weight" 	reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)			estimates 	store `v'		
+			estimates 	store `v'
+			}	
+			
+		foreach g in "2p" "4p" "2s" {
+			if "`g'" == "2p" local g_label = "2nd Grade"
+			if "`g'" == "4p" local g_label = "4th Grade"
+			if "`g'" == "2s" local g_label = "8th Grade"
+
+			coefplot 	score_math_`g' score_com_`g', ///
+						omitted ///
+						keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+						drop(year_t_b3) ///
+						leg(order(1 "Mathematics" 3 "Reading")) ///
+						coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+						yline(0,  lcolor(gs6))  ///
+						ytitle("Effect") ///
+						subtitle("Panel A: Standardized Exams - `g_label'") ///
+						legend(pos(6) col(3)) ///
+						name(panel_A_SATISF_`g',replace)	
+			//graph save "$FIGURES\covid_ece_`g'.gph" , replace	
+			//capture qui graph export "$FIGURES\covid_ece_`g'.eps", replace	
+			capture qui graph export "$FIGURES\Event Study\ece_school`weight'_score_`g'.png", replace			
+			capture qui graph export "$FIGURES\Event Study\ece_school`weight'_score_`g'.pdf", replace		
+		}	
+
+		foreach g in "2p" "4p" "2s" {
+			if "`g'" == "2p" local g_label = "2nd Grade"
+			if "`g'" == "4p" local g_label = "4th Grade"
+			if "`g'" == "2s" local g_label = "8th Grade"
+
+			coefplot 	score_math_std_`g' score_com_std_`g' score_acad_std_`g', ///
+						omitted ///
+						keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+						drop(year_t_b3) ///
+						leg(order(1 "Mathematics" 3 "Reading" 5 "Average")) ///
+						coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+						yline(0,  lcolor(gs6))  ///
+						ytitle("Effect (SD)") ///
+						subtitle("Panel A: Standardized Exams - `g_label'") ///
+						legend(pos(6) col(3)) ///
+						name(panel_A_STD_`g',replace)	
+			//graph save "$FIGURES\covid_ece_`g'.gph" , replace	
+			//capture qui graph export "$FIGURES\covid_ece_`g'.eps", replace	
+			capture qui graph export "$FIGURES\Event Study\ece_school`weight'_std_score_`g'.png", replace			
+			capture qui graph export "$FIGURES\Event Study\ece_school`weight'_std_score_`g'.pdf", replace		
+		}
+
+		foreach g in "2p" "4p" "2s" {
+			if "`g'" == "2p" local g_label = "2nd Grade"
+			if "`g'" == "4p" local g_label = "4th Grade"
+			if "`g'" == "2s" local g_label = "8th Grade"
+
+			coefplot 	satisf_m_`g' satisf_c_`g', ///
+						omitted ///
+						keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+						drop(year_t_b3) ///
+						leg(order(1 "Mathematics" 3 "Reading")) ///
+						coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" /*year_t_b3 = "2017"*/ year_t_b2 = "2018" year_t_o1 = "2019" /*year_t_a0 = "2020" year_t_a1 = "2021"*/ year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+						yline(0,  lcolor(gs6))  ///
+						ytitle("Effect") ///
+						subtitle("Panel A: Satisfactory Level - `g_label'") ///
+						legend(pos(6) col(3)) ///
+						name(panel_A_SATISF_`g',replace)	
+			//graph save "$FIGURES\covid_ece_`g'.gph" , replace	
+			//capture qui graph export "$FIGURES\covid_ece_`g'.eps", replace	
+			capture qui graph export "$FIGURES\Event Study\ece_school`weight'_satisf_`g'.png", replace			
+			capture qui graph export "$FIGURES\Event Study\ece_school`weight'_satisf_`g'.pdf", replace		
+		}	
+	}
+end	
 
 
 ********************************************************************************
@@ -957,7 +1127,7 @@ end
 capture program drop twfe
 program define twfe	
 		
-	estimates clear
+	
 	clear
 
 	*- TWFE Estimates
@@ -965,6 +1135,7 @@ program define twfe
 	foreach level in "all" /*"elm" "sec"*/ {
 		foreach v in "std_gpa_m" "std_gpa_c" "pass_math" "pass_read" /*"approved" "approved_first"*/ {
 			
+			estimates clear
 			global x = "$x_all"
 			if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
 			
@@ -1393,13 +1564,13 @@ clear
 *- Event Study
 
 
-foreach level in /*"all"*/ "elm" /*"sec"*/ {
+foreach level in "all" "elm" "sec" {
 	foreach young in "" /*"0" "1"*/ {
 		foreach area in  "all" /*"urb" "rur"*/  { 
-			foreach lives_both_parents in  "all" "both" "notboth"  { 
+			foreach lives_both_parents in  "all" /*"both" "notboth"*/  { 
 				foreach hed in "all" /*"hed" "nhed"*/  { //none or at least one. # No change
 					foreach res in "all" /*"alls"*/ /*"nint"*/ /*"ncom" "lses" "nqui"*/ { //all sample with data, No internet, no computer, low ses, no quiet room
-						foreach v in /*"std_gpa_m" "std_gpa_c"*/ "pass_math" "pass_read"  {
+						foreach v in "std_gpa_m" "std_gpa_c" "pass_math" "pass_read"  {
 							di "`v' - `area' - `hed' - `level' - `res'"
 							
 							//if "`area'" == "urb" continue
@@ -1542,9 +1713,9 @@ foreach level in /*"all"*/ "elm" /*"sec"*/ {
 							if "`level'" == "elm" & "`young'" == "1" local drop_vars = "year_t_b5 year_t_b4 year_t_b3"
 							
 							coefplot 	(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'1, drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
-										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'2, drop(year_t_b6 `drop_vars') mcolor("`blue_3'") ciopts(bcolor("`blue_3'")) lcolor("`blue_3'")) ///
-										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'3, drop(year_t_b6 `drop_vars') mcolor("`blue_2'") ciopts(bcolor("`blue_2'")) lcolor("`blue_2'")) ///
-										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'4, drop(year_t_b6 `drop_vars') mcolor("`blue_1'") ciopts(bcolor("`blue_1'")) lcolor("`blue_1'")) ///
+										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'2, drop(year_t_b6 `drop_vars') mcolor("${blue_3}") ciopts(bcolor("${blue_3}")) lcolor("${blue_3}")) ///
+										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'3, drop(year_t_b6 `drop_vars') mcolor("${blue_2}") ciopts(bcolor("${blue_2}")) lcolor("${blue_2}")) ///
+										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'4, drop(year_t_b6 `drop_vars') mcolor("${blue_1}") ciopts(bcolor("${blue_1}")) lcolor("${blue_1}")) ///
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
@@ -1666,7 +1837,7 @@ foreach level in "all" "elm" "sec" {
 								coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016"  year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
 								yline(0,  lcolor(gs10))  ///
 								ytitle("Effect") ///
-								xline(2019.5 2021.5) ///
+								///xline(2019.5 2021.5) ///
 								subtitle("Panel B: Grade Pass Rate") ///
 								legend(pos(6) col(3)) ///
 								name(panel_B_PASSED_`level'_`res'`i',replace)	
@@ -1842,14 +2013,14 @@ program define event_cohort_grade
 				if "`res'" == "all" {
 				coefplot 	(c_all*, 													mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
 							///(c_2013*, drop(year_t_b6) 									mcolor("`blue_1'") ciopts(bcolor("`blue_1'"))) ///
-							(c_2011*, drop(year_t_b6)									mcolor("`blue_1'") ciopts(bcolor("`blue_1'")) lcolor("`blue_1'")) ///
-							(c_2012*, drop(year_t_b6)									mcolor("`blue_2'") ciopts(bcolor("`blue_2'")) lcolor("`blue_2'")) ///
-							(c_2013*, drop(year_t_b6)									mcolor("`blue_3'") ciopts(bcolor("`blue_3'")) lcolor("`blue_3'")) ///
-							(c_2014*, drop(year_t_b6)									mcolor("`blue_4'") ciopts(bcolor("`blue_4'")) lcolor("`blue_4'")) ///
-							(c_2015*, drop(year_t_b6)									mcolor("`red_4'") ciopts(bcolor("`red_4'")) lcolor("`red_4'")) ///
-							(c_2016*, drop(year_t_b6 year_t_b5)							mcolor("`red_3'") ciopts(bcolor("`red_3'")) lcolor("`red_3'")) ///
-							(c_2017*, drop(year_t_b6 year_t_b5 year_t_b4) 				mcolor("`red_2'") ciopts(bcolor("`red_2'")) lcolor("`red_2'")) /// 2007 not included for survey sample since that cohort wouldn't be surveyed in 2nd or 4th grade.
-							(c_2018*, drop(year_t_b6 year_t_b5 year_t_b4 year_t_b3) 	mcolor("`red_1'") ciopts(bcolor("`red_1'")) lcolor("`red_1'")), ///
+							(c_2011*, drop(year_t_b6)									mcolor("${blue_1}") ciopts(bcolor("${blue_1}")) lcolor("${blue_1}")) ///
+							(c_2012*, drop(year_t_b6)									mcolor("${blue_2}") ciopts(bcolor("${blue_2}")) lcolor("${blue_2}")) ///
+							(c_2013*, drop(year_t_b6)									mcolor("${blue_3}") ciopts(bcolor("${blue_3}")) lcolor("${blue_3}")) ///
+							(c_2014*, drop(year_t_b6)									mcolor("${blue_4}") ciopts(bcolor("${blue_4}")) lcolor("${blue_4}")) ///
+							(c_2015*, drop(year_t_b6)									mcolor("${red_4}") ciopts(bcolor("${red_4}")) lcolor("${red_4}")) ///
+							(c_2016*, drop(year_t_b6 year_t_b5)							mcolor("${red_3}") ciopts(bcolor("${red_3}")) lcolor("${red_3}")) ///
+							(c_2017*, drop(year_t_b6 year_t_b5 year_t_b4) 				mcolor("${red_2}") ciopts(bcolor("${red_2}")) lcolor("${red_2}")) /// 2007 not included for survey sample since that cohort wouldn't be surveyed in 2nd or 4th grade.
+							(c_2018*, drop(year_t_b6 year_t_b5 year_t_b4 year_t_b3) 	mcolor("${red_1}") ciopts(bcolor("${red_1}")) lcolor("${red_1}")), ///
 							omitted ///
 							keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
 							drop(year_t_b6) ///
@@ -1858,7 +2029,7 @@ program define event_cohort_grade
 							yline(0,  lcolor(gs10))  ///
 							ytitle("Effect") ///
 							ylab(-.1(.02).04) ///
-							xline(2019.5 2021.5) ///
+							///xline(2019.5 2021.5) ///
 							subtitle("`tlab' by year in 1st grade") ///
 							legend(pos(6) col(6)) ///
 							name(check_cohorts,replace)	
@@ -1867,10 +2038,10 @@ program define event_cohort_grade
 				if "`res'" != "all" {
 				coefplot 	(c_all*, 													mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
 							///(c_2013*, drop(year_t_b6) 									mcolor("`blue_1'") ciopts(bcolor("`blue_1'"))) ///
-							(c_2014*, drop(year_t_b6)									mcolor("`blue_2'") ciopts(bcolor("`blue_2'")) lcolor("`blue_2'")) ///
-							(c_2015*, drop(year_t_b6)									mcolor("`blue_3'") ciopts(bcolor("`blue_3'")) lcolor("`blue_3'")) ///
-							(c_2016*, drop(year_t_b6 year_t_b5)							mcolor("`red_3'") ciopts(bcolor("`red_3'")) lcolor("`red_3'")) ///
-							(c_2018*, drop(year_t_b6 year_t_b5 year_t_b4 year_t_b3) 	mcolor("`red_1'") ciopts(bcolor("`red_1'")) lcolor("`red_1'")) ///
+							(c_2014*, drop(year_t_b6)									mcolor("${blue_2}") ciopts(bcolor("${blue_2}")) lcolor("${blue_2}")) ///
+							(c_2015*, drop(year_t_b6)									mcolor("${blue_3}") ciopts(bcolor("${blue_3}")) lcolor("${blue_3}")) ///
+							(c_2016*, drop(year_t_b6 year_t_b5)							mcolor("${red_3}") ciopts(bcolor("${red_3}")) lcolor("${red_3}")) ///
+							(c_2018*, drop(year_t_b6 year_t_b5 year_t_b4 year_t_b3) 	mcolor("${red_1}") ciopts(bcolor("${red_1}")) lcolor("${red_1}")) ///
 							, ///
 							omitted ///
 							keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
@@ -1880,7 +2051,7 @@ program define event_cohort_grade
 							yline(0,  lcolor(gs10))  ///
 							ytitle("Effect") ///
 							ylab(-.1(.02).04) ///
-							xline(2019.5 2021.5) ///
+							///xline(2019.5 2021.5) ///
 							subtitle("`tlab' by year in 1st grade") ///
 							legend(pos(6) col(6)) ///
 							name(check_cohorts,replace)	
@@ -1897,7 +2068,7 @@ program define event_cohort_grade
 							yline(0,  lcolor(gs10))  ///
 							ytitle("Effect") ///
 							ylab(-.1(.02).04) ///
-							xline(2019.5 2021.5) ///
+							///xline(2019.5 2021.5) ///
 							subtitle("`tlab'") ///
 							legend(off) 		
 							
