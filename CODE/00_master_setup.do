@@ -126,6 +126,16 @@ prog define VarStandardiz_control
 	gen `newvar' = (`1' - `mean')/`sd'
 end	
 
+
+*- beep when finished
+cap prog drop finished
+prog define finished
+	forvalues i = 1/10 {
+	beep
+	sleep 165
+	}
+end
+
 /*
 Default Stata colors
 ("stc1" = "26 133 255"%100)

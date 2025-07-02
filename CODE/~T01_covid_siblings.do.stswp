@@ -5,7 +5,7 @@ program define main
 
 	setup_COVID
 	
-	*clean_data
+	clean_data
 	
 	*raw_ece_trends
 	*raw_gpa_trends
@@ -186,7 +186,7 @@ program define clean_data
 	rename _m merge_ece_survey_stud_6p	
 	rename aspiration_6p aspiration_stu_6p	
 	
-	merge m:1 id_estudiante_2s year using "$TEMP\ece_student_2s", keep(master match) keepusing(aspiration_2s lives_with_*_2s total_siblings_2s) //m:1 because there are missings
+	merge m:1 id_estudiante_2s year using "$TEMP\ece_student_2s", keep(master match) keepusing(aspiration_2s lives_with_*_2s total_siblings_2s pc_2s internet_2s laptop_2s radio_2s) //m:1 because there are missings
 	rename _m merge_ece_survey_stud_2s
 	rename aspiration_2s aspiration_stu_2s
 		
@@ -202,12 +202,12 @@ program define clean_data
 		}
 		
 	*-- Baseline Resources/SES
-	foreach g in "2p" "4p" {
+	foreach g in "2p" "4p" "2s" {
 		//We used family before, but OC have no siblings so better to have a comparable sample.
 		bys id_per_umc: egen has_internet_`g' = max(cond(year<=2019,internet_`g',.)) 	
 		bys id_per_umc: egen has_pc_`g' = max(cond(year<=2019,pc_`g',.)) 	
 		bys id_per_umc: egen has_laptop_`g' = max(cond(year<=2019,laptop_`g',.)) 	
-		bys id_per_umc: egen is_low_ses_`g' = min(cond(year<=2019,socioec_index_cat_`g',.)) 		
+		bys id_per_umc: egen is_low_ses_`g' = min(cond(year<=2019,socioec_index_cat_`g',.)) 	
 		}
 
 	bys id_per_umc: egen quiet_room = min(cond(year<=2019,quiet_room_4p,.)) 
@@ -215,6 +215,23 @@ program define clean_data
 	egen has_internet 	= rmax(has_internet_2p has_internet_4p) if has_internet_2p!=. | has_internet_4p!=.
 	egen has_comp 		= rmax(has_pc_2p has_laptop_2p has_pc_4p has_laptop_4p) if has_pc_2p!=. | has_laptop_2p!=. | has_pc_4p!=. | has_laptop_4p!=.
 	egen low_ses 		= rmin(is_low_ses_2p is_low_ses_4p) if is_low_ses_2p!=. | is_low_ses_4p!=.
+	
+	*-- Overall Resources/SES (more sample but endogenous)
+	foreach g in "2p" "4p" "2s" {
+		//We used family before, but OC have no siblings so better to have a comparable sample.
+		bys id_per_umc: egen full_has_internet_`g' = max(cond(internet_`g'!=.,internet_`g',.)) 	
+		bys id_per_umc: egen full_has_pc_`g' = max(cond(pc_`g'!=.,pc_`g',.)) 	
+		bys id_per_umc: egen full_has_laptop_`g' = max(cond(laptop_`g'!=.,laptop_`g',.)) 	
+		bys id_per_umc: egen full_is_low_ses_`g' = min(cond(socioec_index_cat_`g'!=.,socioec_index_cat_`g',.)) 		
+		}
+
+	bys id_per_umc: egen full_quiet_room = min(cond(quiet_room_4p!=.,quiet_room_4p,.)) 
+
+	egen full_has_internet 	= rmax(full_has_internet_2p full_has_internet_4p full_has_internet_2s) 													if full_has_internet_2p!=. 	| full_has_internet_4p!=. | full_has_internet_2s!=.
+	egen full_has_comp 		= rmax(full_has_pc_2p 		full_has_laptop_2p full_has_pc_4p full_has_laptop_4p full_has_pc_2s full_has_laptop_2s) 	if full_has_pc_2p!=. 		| full_has_laptop_2p!=. | full_has_pc_4p!=. | full_has_laptop_4p!=. | full_has_pc_2s!=. | full_has_laptop_2s!=.
+	egen low_ses 		= rmin(full_is_low_ses_2p 	full_is_low_ses_4p full_is_low_ses_2s) 																		if full_is_low_ses_2p!=. 	| full_is_low_ses_4p!=.	
+	
+	
 
 	//rename quiet_room_4p quiet_room
 
@@ -244,7 +261,7 @@ program define clean_data
 
 
 	*- Create Event Study vars	
-	use id_per_umc id_ie grade year male_siagie public_siagie urban_siagie educ_mother educ_father  lives_with_mother lives_with_father socioec* has_internet has_comp low_ses quiet_room approved* std* math comm score* satisf* fam_order_${fam_type} fam_total_${fam_type} base* year_2p peso* using "$TEMP\long_siagie_ece", clear
+	use id_per_umc id_ie grade year male_siagie public_siagie urban_siagie educ_mother educ_father  lives_with_mother lives_with_father socioec* *has_internet *has_comp *low_ses *quiet_room approved* std* math comm score* satisf* fam_order_${fam_type} fam_total_${fam_type} base* year_2p peso* using "$TEMP\long_siagie_ece", clear
 
 		keep if fam_total_${fam_type}<=${max_sibs}
 		
@@ -533,7 +550,7 @@ program define raw_gpa_trends
 						ytitle("`ytitle_`v''", size(small)) ///
 						xtitle("Year") ///
 						///legend(off) ///
-						legend(order(1 "Only childs" 3 "Children with siblings") col(3) pos(6)) ///
+						legend(order(2 "Only childs" 4 "Children with siblings") col(3) pos(6)) ///
 						name(total_`v', replace)	
 						
 						capture qui graph export "$FIGURES\Descriptive\raw_total_`v'.png", replace			
@@ -562,7 +579,7 @@ program define raw_gpa_trends
 		
 		forvalues y = 2008(1)2018 {
 			foreach v in "std_gpa_m" "std_gpa_c" "pass_math" "pass_read" {
-				sum `v' 
+				sum `v' if proxy_1st>=2008 & proxy_1st<=2018 & `v'!=. & year>=2014 & year<=2024
 				gen miny = r(min)
 				gen maxy = r(max)
 				twoway 	(rarea miny maxy areax if inrange(areax, 2019.5, 2021.5), color(gs15)) ///
@@ -572,7 +589,7 @@ program define raw_gpa_trends
 						(line `v' year if proxy_1st == `y' & treated==1 & year>=2020, lcolor("${blue_1}")) ///
 						, ///
 						xline(2019.5) ///
-						xlabel(2014 "14" 2015 "15" 2016 "16" 2017 "17" 2018 "18" 2019 "19" 2020 "20" 2021 "21" 2022 "22" 2023 "23")  ///
+						xlabel(2014 "14" 2015 "15" 2016 "16" 2017 "17" 2018 "18" 2019 "19" 2020 "20" 2021 "21" 2022 "22" 2023 "23" 2024 "24")  ///
 						ytitle("`ytitle_`v''", size(small)) ///
 						xtitle("Year") ///
 						subtitle("`y' cohort") ///
@@ -620,7 +637,7 @@ program define raw_gpa_trends
 		
 		forvalues g = 1(1)11 {
 			foreach v in "std_gpa_m" "std_gpa_c" "pass_math" "pass_read" {
-				sum `v' 
+				sum `v' if grade>=1 & grade<=11 & `v'!=. & year>=2014 & year<=2024
 				gen miny = r(min)
 				gen maxy = r(max)
 				twoway 	(rarea miny maxy areax if inrange(areax, 2019.5, 2021.5), color(gs15)) ///
@@ -921,8 +938,7 @@ program define event_ece_school
 			gen pop = 1
 			collapse (sum) pop (mean) `v' [iw=peso_m_2p], by(id_ie year_?_?? year treated) 
 			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
-			if "`weight'" == "_weight" 	reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)
-			*reghdfe 	score_acad_std_2p	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated if score_acad_std_2p_max==2022 & score_acad_std_2p_sum==5 & fam_order_2==1, a(id_ie)
+			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)
 			estimates 	store `v'
 			}
 
@@ -940,7 +956,7 @@ program define event_ece_school
 			gen pop = 1
 			collapse (sum) pop (mean) `v' [iw=peso_m_4p], by(id_ie year_?_?? year treated) 
 			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated, a(id_ie)
-			if "`weight'" == "_weight" 	reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated [aw=pop], a(id_ie)			estimates 	store `v'
+			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated [aw=pop], a(id_ie)		
 			estimates 	store `v'		
 			}	
 
@@ -958,7 +974,7 @@ program define event_ece_school
 			gen pop = 1
 			collapse (sum) pop (mean) `v' [iw=peso_m_2s], by(id_ie year_?_?? year treated) 
 			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
-			if "`weight'" == "_weight" 	reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)			estimates 	store `v'		
+			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)					
 			estimates 	store `v'
 			}	
 			
@@ -1140,7 +1156,7 @@ program define twfe
 			if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
 			
 
-			use std_gpa_? pass_math pass_read approved approved_first id_per_umc year_t_?? public_siagie urban_siagie male_siagie educ_cat_mother higher_ed_parent lives_with_mother lives_with_father has_internet has_comp low_ses quiet_room year grade treated post treated_post id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid", clear
+			use std_gpa_? pass_math pass_read approved approved_first id_per_umc year_t_?? public_siagie urban_siagie male_siagie educ_cat_mother higher_ed_parent lives_with_mother lives_with_father *has_internet *has_comp *low_ses *quiet_room year grade treated post treated_post id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid", clear
 			
 			*- Remove early grades and years
 			keep if year>=2016
@@ -1579,7 +1595,7 @@ foreach level in "all" "elm" "sec" {
 							global x = "$x_all"
 							if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"							
 							
-							use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent lives_with_mother lives_with_father has_internet has_comp low_ses quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid", clear
+							use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent lives_with_mother lives_with_father *has_internet *has_comp *low_ses *quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid", clear
 							
 							*- Remove early grades and years
 							keep if year>=2016
@@ -1787,7 +1803,7 @@ foreach level in "all" "elm" "sec" {
 					//if "`area'" == "urb" continue
 					//if "`area'" == "rur" &  "`hed_parent'" =="no" & "`level'" == "all" & inlist("`v'","approved_first")!=1 continue
 						
-					use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent has_internet has_comp low_ses quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid", clear
+					use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent *has_internet *has_comp *low_ses *quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid", clear
 					
 					if "`area'" == "rur" keep if urban_siagie == 0
 					if "`area'" == "urb" keep if urban_siagie == 1
@@ -1892,7 +1908,7 @@ program define event_cohort_grade
 				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"
 				 
 				estimates clear
-				use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent has_internet has_comp low_ses quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x_all} using "$TEMP\pre_reg_covid", clear
+				use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent *has_internet *has_comp *low_ses *quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x_all} using "$TEMP\pre_reg_covid", clear
 						
 				di as result "*******************************"
 				di as text "`v' - `area' - `res'"
