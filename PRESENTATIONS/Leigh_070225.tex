@@ -1,0 +1,187 @@
+
+\RequirePackage{currfile} 
+\documentclass{beamer}
+
+
+
+%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%
+\usepackage{textpos}   
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{biblatex} % Allows for \cite 
+\usepackage[utf8]{inputenc}
+\usepackage{tikz} \usetikzlibrary{calc, arrows.meta, intersections, patterns, positioning, shapes.misc, fadings, through,decorations.pathreplacing}
+\usepackage{array} % To pause columns
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{colortbl}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{block} %blocks for statements
+\usepackage{comment}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{forest}
+\forestset{qtree/.style={for tree={parent anchor=south, 
+           child anchor=north,align=center,inner sep=0pt}}}
+
+
+\definecolor{ColorOne}{named}{MidnightBlue}
+\definecolor{ColorTwo}{named}{Dandelion}
+\definecolor{ColorThree}{named}{Plum}
+
+\tikzstyle{descript} = [text = black,align=center, minimum height=1.8cm, align=center, outer sep=0pt,font = \footnotesize]
+\tikzstyle{activity} =[align=center,outer sep=1pt]
+
+%% Change the bg color to adjust your transition slide background color!
+\newenvironment{transitionframe}{
+  \setbeamercolor{background canvas}{bg=White}
+  \begin{frame}}{
+    \end{frame}
+}
+
+%%%%%%%%%%%%%% COMMANDS %%%%%%%%%%%%%%%%%%%%%
+\newcommand{\progressbar}{%
+\pgfmathsetmacro{\theta}{360/\inserttotalframenumber*\insertframenumber}
+\begin{tikzpicture}[scale=0.025]
+\fill[blue] (0,0) circle (9);
+\fill[green] (0,0) -- (9,0) arc (0:-\theta:9);
+\fill[white] (0,0) circle (5);
+\node at (0,0) {\insertframenumber};
+\end{tikzpicture}
+}
+
+%%% TIKZ STUFF
+\tikzset{   
+        every picture/.style={remember picture,baseline},
+        every node/.style={anchor=base,align=center,outer sep=1.5pt},
+        every path/.style={thick},
+        }
+\newcommand\marktopleft[1]{%
+    \tikz[overlay,remember picture] 
+        \node (marker-#1-a) at (-.3em,.3em) {};%
+}
+\newcommand\markbottomright[2]{%
+    \tikz[overlay,remember picture] 
+        \node (marker-#1-b) at (0em,0em) {};%
+}
+\tikzstyle{every picture}+=[remember picture] 
+\tikzstyle{mybox} =[draw=black, very thick, rectangle, inner sep=10pt, inner ysep=20pt]
+\tikzstyle{fancytitle} =[draw=black,fill=red, text=white]
+%%%% END TIKZ STUFF
+
+%%% COLOR COLUMN (did not make it work...)
+\newcolumntype{G}{>{\centering\columncolor{gray!20!white}}p{0.2\textwidth}}
+\newcolumntype{C}{>{\centering\arraybackslash}p{0.2\textwidth}}
+%%% END COLOR COLUMN
+
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+%%%%%%%%%%%%%%% SETTINGS %%%%%%%%%%%%%%%%%%%%%%%
+\mode<presentation> {
+%\usetheme{Warsaw}
+%\usetheme{Frankfurt}
+%\usetheme{Madrid}
+\usetheme{default}
+%\usecolortheme{whale}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+}
+
+%To call references
+%\bibliographystyle{../aea.bst}
+%\bibliography{references}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%FOR LINKS
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.65}
+\definecolor{darkgreen}{rgb}{0.0, 0.65, 0.0}
+\hypersetup{
+	citecolor=blue,
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=magenta
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\setbeamertemplate{navigation symbols}{} 
+
+
+%Title
+\title[]{New Idea: School closures, remote learning and differential effects between only childs and children with siblings}
+%\subtitle[]{DLP Writing Seminar}
+
+\author[Francisco Pardo] % (optional, for multiple authors)
+{Francisco Pardo - fpardo@utexas.edu \inst{1}}
+ 
+\institute[UT] % (optional)
+{
+  \inst{1}%
+  University of Texas at Austin
+  %\and
+  %\inst{2}%
+   % ...
+}
+
+\date{\today}
+ 
+
+ 
+ 
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+%Commented because presentations are short, we don't need that. 
+\begin{comment}
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+\end{comment}
+%------------------------------------------------------------
+
+\begin{document}
+
+
+\frame{\titlepage}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Some updates}
+    \begin{itemize}
+        \item Raw plots
+        \item Single parents, sex, public schools...
+        \item No consistency when dividing by cohorts...
+        \item Evidence from Netherlands
+        \item Grade thresholds and Distribution. Grade imputation
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw plots per cohort - Age trend}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/raw_cohorts_std_gpa_m.png}
+      }
+    }
+\end{frame}
+
+
+\end{document}
