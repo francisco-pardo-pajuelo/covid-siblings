@@ -577,7 +577,7 @@ program define raw_gpa_trends
 						name(total_`v', replace)	
 						
 						capture qui graph export "$FIGURES\Descriptive\raw_total_`level'_`v'${covid_data}.png", replace			
-						capture qui graph export "$FIGURES\Descriptive\raw_total_`level'_`v'${covid_data}.pdf", replace	
+						capture qui graph export "$FIGURES\Descriptive\raw_total_`level'`v'${covid_data}.pdf", replace	
 						
 			drop miny maxy
 				}	
