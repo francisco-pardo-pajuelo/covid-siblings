@@ -2112,130 +2112,135 @@ end
 capture program drop analyze_2018_D_vs_2022
 program define analyze_2018_D_vs_2022
 
-	use  "$TEMP\COVID_pisa_append", clear
+		use  "$TEMP\COVID_pisa_append", clear
+			
+		keep if sibs!=.
+
+		//collapse PV1MATH, by(CNTRYID year)
+		keep if min_year_sibs==2018 
+		keep if max_year_sibs==2022
 		
-	keep if sibs!=.
-
-	//collapse PV1MATH, by(CNTRYID year)
-	keep if min_year_sibs==2018 
-	keep if max_year_sibs==2022
-	
-	tab CNTRYID
-	//  Cambodia  Guatemala   Paraguay
-	
-	*- Standardize results by base year:
-	foreach v of var PV*MATH PV*READ PV*SCIE {
-		sum `v' if year==2018, de
-		local m = r(mean)
-		local sd = r(sd)
-		replace `v' = (`v'-`m')/`sd'
-	}	
-	
-
-	
-	//Overall average
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(year OECD)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
-		tempfile PV_all_avg
-		save `PV_all_avg', replace
-	restore	
-	
-	//Overall sib averages
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(sibs year OECD)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
-		tempfile PV_all_sibs_avg
-		save `PV_all_sibs_avg', replace
-	restore		
-	
-	//Country sib averages
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID sibs year OECD)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
-		tempfile PV_country_sibs_avg
-		save `PV_country_sibs_avg', replace
-	restore	
-	
-	//Country averages
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE, by(CNTRYID year)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
-		reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
-		tempfile PV_CNTRYID
-		save `PV_CNTRYID', replace
-	restore
-
-	//How is the gap by # children in each country?
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE /*[iw=SENWT]*/, by(CNTRYID year sibs)
+		tab CNTRYID
+		//  Cambodia  Guatemala   Paraguay
+		
+		*- Standardize results by base year:
 		foreach v of var PV*MATH PV*READ PV*SCIE {
-			bys CNTRYID year (sibs): gen gap_`v' = `v'-`v'[1] if _n!=1
+			sum `v' if year==2018, de
+			local m = r(mean)
+			local sd = r(sd)
+			replace `v' = (`v'-`m')/`sd'
+		}	
+		
+
+		
+		//Overall average
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(year OECD)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
+			tempfile PV_all_avg
+			save `PV_all_avg', replace
+		restore	
+		
+		//Overall sib averages
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(sibs year OECD)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
+			tempfile PV_all_sibs_avg
+			save `PV_all_sibs_avg', replace
+		restore		
+		
+		//Country sib averages
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID sibs year OECD)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
+			tempfile PV_country_sibs_avg
+			save `PV_country_sibs_avg', replace
+		restore	
+		
+		//Country averages
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE, by(CNTRYID year)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
+			reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
+			tempfile PV_CNTRYID
+			save `PV_CNTRYID', replace
+		restore
+
+		//How is the gap by # children in each country?
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE /*[iw=SENWT]*/, by(CNTRYID year sibs)
+			foreach v of var PV*MATH PV*READ PV*SCIE {
+				bys CNTRYID year (sibs): gen gap_`v' = `v'-`v'[1] if _n!=1
+				}
+			keep if sibs==1
+			tempfile gap_long_PV_CNTRYID
+			save `gap_long_PV_CNTRYID', replace		
+			drop PV*MATH PV*READ PV*SCIE		
+			reshape wide gap*, i(CNTRYID) j(year)
+			tempfile gap_wide_PV_CNTRYID
+			save `gap_wide_PV_CNTRYID', replace	
+		restore
+		
+		
+		*- 1.  Overall Trends in performance
+		preserve
+			use `PV_all_avg', clear
+			append using `PV_all_sibs_avg'
+			*- Scatter plot
+			foreach subj in "PV1MATH" "PV1READ" "PV1SCIE" {
+				twoway 	///
+						(line `subj'_all_avg year if sibs==0, lcolor("${blue_2}")) ///
+						(line `subj'_all_avg year if sibs==1, lcolor("${red_2}")) ///
+						/// (line `subj'_all_avg year if sibs==., lcolor(gs0)) ///
+						(scatter `subj'_all_avg year if sibs==0, mcolor("${blue_2}")) ///
+						(scatter `subj'_all_avg year if sibs==1, mcolor("${red_2}")) ///
+						/// (scatter `subj'_all_avg year if sibs==., mcolor(gs0)) ///
+						, /// 
+						legend(order(/*3 "Total"*/ 1 "Only childs sample" 2 "Sibling sample") col(3) pos(6)) ///
+						ytitle(`ytitle_`subj'') ///
+						xtitle(Year) ///
+						yline(0, lcolor(gs8)) ///
+						ylabel(-.5(.1).5) ///
+						xlabel(2018 2022) 
+					capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.pdf", replace
 			}
-		keep if sibs==1
-		tempfile gap_long_PV_CNTRYID
-		save `gap_long_PV_CNTRYID', replace		
-		drop PV*MATH PV*READ PV*SCIE		
-		reshape wide gap*, i(CNTRYID) j(year)
-		tempfile gap_wide_PV_CNTRYID
-		save `gap_wide_PV_CNTRYID', replace	
-	restore
-	
-	
-	*- 1.  Overall Trends in performance
-	preserve
-		use `PV_all_avg', clear
-		append using `PV_all_sibs_avg'
-		*- Scatter plot
-		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
-			twoway 	///
-					(line `subj'_all_avg year if sibs==0, lcolor("${blue_2}")) ///
-					(line `subj'_all_avg year if sibs==1, lcolor("${red_2}")) ///
-					/// (line `subj'_all_avg year if sibs==., lcolor(gs0)) ///
-					(scatter `subj'_all_avg year if sibs==0, mcolor("${blue_2}")) ///
-					(scatter `subj'_all_avg year if sibs==1, mcolor("${red_2}")) ///
-					/// (scatter `subj'_all_avg year if sibs==., mcolor(gs0)) ///
-					, /// 
-					legend(order(/*3 "Total"*/ 1 "Only childs sample" 2 "Sibling sample") col(3) pos(6)) ///
-					ytitle(`ytitle_`subj'') ///
-					xtitle(Year) ///
-					yline(0, lcolor(gs8)) ///
-					ylabel(-.5(.1).5) ///
-					xlabel(2018 2022) 
-				capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.pdf", replace
-		}
-	restore	
-	
-	*- 2. Country sibling averages
-	preserve
-		use `PV_country_sibs_avg', clear
-		//append using `PV_all_sibs_avg'
-		*- Scatter plot
-		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
-			twoway 	///
-					(line `subj'_avg year if sibs==0, lcolor("${blue_2}")) ///
-					(line `subj'_avg year if sibs==1, lcolor("${red_2}")) ///
-					/// (line `subj'_avg year if sibs==., lcolor(gs0)) ///
-					(scatter `subj'_avg year if sibs==0, mcolor("${blue_2}")) ///
-					(scatter `subj'_avg year if sibs==1, mcolor("${red_2}")) ///
-					/// (scatter `subj'_avg year if sibs==., mcolor(gs0)) ///
-					, /// 
-					legend(order(/*3 "Total"*/ 1 "Only childs sample" 2 "Sibling sample") col(3)) ///
-					ytitle(`ytitle_`subj'') ///
-					xtitle(Year) ///
-					yline(0, lcolor(gs8)) ///
-					ylabel(-.5(.1).5) ///
-					xlabel(2018 2022) ///
-					by(CNTRYID, col(3) legend(pos(6)) note(""))
-				capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.pdf", replace
-		}
-	restore	
+		restore	
+		
+		*- 2. Country sibling averages
+		preserve
+			use `PV_country_sibs_avg', clear
+			//append using `PV_all_sibs_avg'
+			
+			local ytitle_PV1MATH = "Mathematics"
+			local ytitle_PV1READ = "Reading"
+			local ytitle_PV1SCIE = "Science"		
+		
+			*- Scatter plot
+			foreach subj in "PV1MATH" "PV1READ" "PV1SCIE" {
+				twoway 	///
+						(line `subj'_avg year if sibs==0, lcolor("${blue_2}")) ///
+						(line `subj'_avg year if sibs==1, lcolor("${red_2}")) ///
+						/// (line `subj'_avg year if sibs==., lcolor(gs0)) ///
+						(scatter `subj'_avg year if sibs==0, mcolor("${blue_2}")) ///
+						(scatter `subj'_avg year if sibs==1, mcolor("${red_2}")) ///
+						/// (scatter `subj'_avg year if sibs==., mcolor(gs0)) ///
+						, /// 
+						legend(order(/*3 "Total"*/ 1 "Only childs sample" 2 "Sibling sample") col(3)) ///
+						ytitle(`ytitle_`subj'') ///
+						xtitle(Year) ///
+						yline(0, lcolor(gs8)) ///
+						ylabel(-.5(.1).5) ///
+						xlabel(2018 2022) ///
+						by(CNTRYID, col(3) legend(pos(6)) note(""))
+					capture qui graph export "$FIGURES\Descriptive\PISA_country_`subj'_2018_2022.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2018_2022.pdf", replace
+			}
+		restore	
 	
 	preserve
 		
@@ -2268,7 +2273,7 @@ program define analyze_2018_D_vs_2022
 		
 		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
 			
-			local subj = "PV1MATH"
+			//local subj = "PV1MATH"
 		
 			local ytitle_gap_PV1MATH = "Siblings - Only Child Gap (Mathematics)"
 			local ytitle_gap_PV1READ = "Siblings - Only Child Gap (Reading)"
