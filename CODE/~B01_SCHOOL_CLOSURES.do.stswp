@@ -1,0 +1,19 @@
+*- School closures: UNESCO
+
+
+import excel "$IN\UNESCO\school_closures\UNESCO_school_closures_database.xlsx", sheet("database") firstrow allstring clear
+
+
+destring Weekspartiallyopen Weeksfullyclosed, replace
+
+gen weeks_not_fully_open = Weekspartiallyopen + Weeksfullyclosed
+
+bys Country: keep if _n==1
+
+rename CountryID CN
+
+graph hbar (mean) Weeksfullyclosed if Weeksfullyclosed>=30, over(Country, sort(1) label(labsize(*0.3)))  
+graph hbar (mean) weeks_not_fully_open if weeks_not_fully_open>=70, over(Country, sort(1) label(labsize(*0.3)))  
+
+compress
+save "$TEMP\COVID\school_closure_country", replace

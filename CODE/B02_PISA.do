@@ -2102,6 +2102,75 @@ program define analyze_2009_2012_vs_2022
 			}
 		
 	restore
+	
+
+	*- 3. DID raw vs school closure
+	preserve	
+		bys CNTRYID year: keep if _n==1
+		keep CNT CNTRYID OECD year
+		merge m:1 CNTRYID  using `PV_CNTRYID', keep(master match) nogen	
+		merge m:1 CNTRYID year using `gap_long_PV_CNTRYID', keep(master match) nogen	
+		
+		keep CNT CNTRYID OECD year gap_PV1MATH gap_PV1READ
+		reshape wide gap*, i(CNTRYID OECD) j(year)
+		
+		merge 1:1 CNT using "$TEMP\COVID\school_closure_country", keep(master match)
+		
+		order CNT, first
+		
+		
+		
+		rename Weeksfullyclosed 	weeks_full
+		rename Weekspartiallyopen 	weeks_partial
+		
+		foreach subj in "PV1MATH" "PV1READ" {
+			gen did_`subj' = gap_`subj'2022 - gap_`subj'2012
+			foreach policy in "full" "partial" "not_fully_open" {
+				twoway 	///
+						(scatter did_`subj' weeks_`policy' if CNT!="PER", mlabel(CNT)) ///
+						(scatter did_`subj' weeks_`policy' if inlist(CNT,"NLD","USA","CHL","COL","PER"), mlabel(CNT)) ///
+						, ///
+						xtitle("Weeks schools fully closed") ///
+						ytitle("Raw DID `ytitle_`subj'' (Change in sibling - only child gap)") ///
+						yline(0, lcolor(gs8)) ///
+						by(OECD, legend(off) note(""))
+				capture qui graph export "$FIGURES\Descriptive\PISA_raw_DID_`subj'_`policy'.png", replace			
+				capture qui graph export "$FIGURES\Descriptive\PISA_raw_DID_`subj'_`policy'.pdf", replace		
+			}
+		}
+	restore	
+	
+	*- Scatter by country
+	preserve
+		//foreach year in "2009" "2012" {
+		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
+			
+			//local subj = "PV1MATH"
+			*- Box plot
+			graph box gap_`subj', over(year) by(OECD) yline(0, lcolor(gs8))
+				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_box_2009_2022.png", replace			
+				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_box_2009_2022.pdf", replace		
+	
+			*- Scatter plot
+			twoway 	///
+					(scatter gap_`subj' year if CNT!="PER", mcolor("${blue_2}%20")) ///
+					(scatter gap_`subj' year if CNT=="PER", mcolor("${red_2}")) ///
+					, ///
+					/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
+					legend(off) ///
+					ytitle(`ytitle_gap_`subj'') ///
+					yline(0, lcolor(gs8)) ///
+					ylabel(-.5(.1).5) ///
+					xlabel(2009 2012 2022) ///
+					xtitle("Year") ///
+					note("")
+				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.png", replace			
+				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.pdf", replace		
+			}
+		
+	restore
+
+		
 
 	
 	capture erase "$TEMP\COVID\erase_test.dta"
