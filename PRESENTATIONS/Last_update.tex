@@ -164,12 +164,84 @@
     \label{update_scott}
     \frametitle{Some updates}
     \begin{itemize}
-        \item Adjusting for grading criteria change
-        \item Evidence from other countries
-        \item Parallel trends
-        \item Thinking about the model
+        \item Scheduling Job Talk
+        \item Raw DID vs closure 
+        \item American Time Use
+        %\item PISA 2000, 2003, 2006?
+        \item Other TWFE: Age gap, same sex, middle child, school size
+        \item Entry-age cutoff and exposure to school closures in covid? School starting age
+        %\item Model
+        %\item Literature
+        %\item ECE Survey on parents
+        %\item Colombia Saber
     \end{itemize}
 \end{frame}
+
+
+
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Job Talk}
+    \begin{enumerate}
+        \item 8/29 (internal DLP); 9/15 (department-wide)
+        \item 9/12 (internal DLP); 9/29 (department-wide)
+        \item 9/19 (internal DLP); 10/6 (department-wide)
+        \item 9/26 (internal DLP); 10/13 (department-wide)
+    \end{enumerate}
+\end{frame}
+
+
+\section{American Time Use Survey}
+
+
+\section{Other TWFE: Age gap, same sex, middle child, school size}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Thinking about the literature/models}
+    \begin{itemize}
+        \item If parents are replacing teachers, we could expect a bigger role where teachers had a bigger share (small class size, teacher/student ration)
+        \item Middle child is more affected than older/younger
+        \item Age gap and fight for resources
+    \end{itemize}
+\end{frame}
+
+
+
+\section{School entry cutoff as exogeneity}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Exposure to school closures}
+    \begin{itemize}
+        \item There is an age-entry cutoff in schools. Some kids are delayed and others have to enroll in 1st grade.
+        \item Can this be a source of variation? Not only of the effects of the pandemic but also as source of variation in 'siblings in school' that may require extra parental attention.
+        %but a DID of family size and exposure to pandemic?
+        \item $\approx$ 1500 students per day
+        \item I know how Covid was dealt with for elementary (1-6), but not sure what K and below meant. Some students are in the data 3 years before elementary. Was there services during COVID?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Potential variations}
+    \begin{itemize}
+        \item Exposure to the pandemic and future outcomes
+        \item Having a younger sibling start school during pandemic. (randomness over +1 sibling in school).
+        \item Exposure to covid while having siblings or not (Is this the same as my diff in diff?). The randomness is in being exposed to pandemic or not, not in having a sibling.
+    \end{itemize}
+\end{frame}
+
+
+
+
+
+\section{Grade change criteria}
+
+
+
 
 
 \section{Grade change criteria}
@@ -204,97 +276,6 @@
 
 
 
-\section{Evidence from other countries}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Is this just an issue in Peru?}
-    \begin{itemize}
-        \item Some evidence from the Netherlands suggests it is not an issue there: No heterogeneity by number of children.
-        \item I need data on:
-            \begin{itemize}
-                \item Educational outcomes
-                \item Siblings (e.g. Do you have any?, Household size, etc)
-                \item pre and post covid
-            \end{itemize}
-    \end{itemize}
-\end{frame}
-
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{International Achievement surveys}
-    \begin{itemize}
-        \item PISA
-            \begin{itemize}
-                \item 15 y.o.
-                \item 2009-2012 and 2022 allow for sibling identification
-                \item 2018 includes it for some developing countries
-                \item I look at countries with observations both pre-post covid
-            \end{itemize}            
-    \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{PISA: From 2009/2012 to 2022}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_PV1MATH_2009_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Similar Socio Economic Status}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_SES_2022.pdf}
-      }
-    }
-\end{frame}
-
-
-
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{The distribution of gaps moves down}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_scatter_2009_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{PISA-D: 2018 vs 2022 (Mathematics)}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_country_PV1MATH_2018_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{PISA-D: 2018 vs 2022 (Reading)}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_country_PV1READ_2018_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw DID vs school closures}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
-      }
-    }
-\end{frame}
 
 
 \section{Parallel Trends}
@@ -517,6 +498,97 @@
     \frametitle{Grade distributions post-covid: Secondary}
  {\resizebox{0.9\textwidth}{!}{
        \includegraphics{./FIGURES/Descriptive/histogram_post_9-10.png}
+      }
+    }
+\end{frame}
+
+
+\section{International Evidence}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Is this just an issue in Peru?}
+    \begin{itemize}
+        \item Some evidence from the Netherlands suggests it is not an issue there: No heterogeneity by number of children.
+        \item I need data on:
+            \begin{itemize}
+                \item Educational outcomes
+                \item Siblings (e.g. Do you have any?, Household size, etc)
+                \item pre and post covid
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{International Achievement surveys}
+    \begin{itemize}
+        \item PISA
+            \begin{itemize}
+                \item 15 y.o.
+                \item 2009-2012 and 2022 allow for sibling identification
+                \item 2018 includes it for some developing countries
+                \item I look at countries with observations both pre-post covid
+            \end{itemize}            
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{PISA: From 2009/2012 to 2022}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_PV1MATH_2009_2022.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Similar Socio Economic Status}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_SES_2022.pdf}
+      }
+    }
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{The distribution of gaps moves down}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_scatter_2009_2022.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{PISA-D: 2018 vs 2022 (Mathematics)}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_country_PV1MATH_2018_2022.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{PISA-D: 2018 vs 2022 (Reading)}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_country_PV1READ_2018_2022.pdf}
+      }
+    }
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
       }
     }
 \end{frame}
