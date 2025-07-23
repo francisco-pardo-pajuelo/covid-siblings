@@ -1985,6 +1985,15 @@ program define analyze_2009_2012_vs_2022
 		save `PV_CNTRYID', replace
 	restore
 
+	//Country sib averages
+	preserve
+		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID sibs year)
+		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
+		//reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
+		tempfile PV_CNTRYID_sibs
+		save `PV_CNTRYID_sibs', replace
+	restore
 
 	//How is the gap by # children in each country?
 	preserve
@@ -2067,7 +2076,7 @@ program define analyze_2009_2012_vs_2022
 		histogram gap_PV1MATH_12_22
 		*/
 	restore
-
+	
 	*- 3. Gap plot
 	preserve
 		
@@ -2103,7 +2112,6 @@ program define analyze_2009_2012_vs_2022
 		
 	restore
 	
-
 	*- 3. DID raw vs school closure
 	preserve	
 		bys CNTRYID year: keep if _n==1
@@ -2126,11 +2134,16 @@ program define analyze_2009_2012_vs_2022
 		foreach subj in "PV1MATH" "PV1READ" {
 			gen did_`subj' = gap_`subj'2022 - gap_`subj'2012
 			foreach policy in "full" "partial" "not_fully_open" {
+				
+				local xtitle_full = "Weeks schools fully closed"
+				local xtitle_partial = "Weeks schools partially closed"
+				local xtitle_not_fully_open = "Weeks of full or partial closure"
+				
 				twoway 	///
 						(scatter did_`subj' weeks_`policy' if CNT!="PER", mlabel(CNT)) ///
 						(scatter did_`subj' weeks_`policy' if inlist(CNT,"NLD","USA","CHL","COL","PER"), mlabel(CNT)) ///
 						, ///
-						xtitle("Weeks schools fully closed") ///
+						xtitle("`xtitle_`policy''") ///
 						ytitle("Raw DID `ytitle_`subj'' (Change in sibling - only child gap)") ///
 						yline(0, lcolor(gs8)) ///
 						by(OECD, legend(off) note(""))
@@ -2140,11 +2153,13 @@ program define analyze_2009_2012_vs_2022
 		}
 	restore	
 	
+/*
 	*- Scatter by country
 	preserve
+		
+		use `gap_long_PV_CNTRYID', clear
 		//foreach year in "2009" "2012" {
 		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
-			
 			//local subj = "PV1MATH"
 			*- Box plot
 			graph box gap_`subj', over(year) by(OECD) yline(0, lcolor(gs8))
@@ -2169,7 +2184,7 @@ program define analyze_2009_2012_vs_2022
 			}
 		
 	restore
-
+*/
 		
 
 	
@@ -2229,6 +2244,8 @@ program define analyze_2018_D_vs_2022
 			save `PV_country_sibs_avg', replace
 		restore	
 		
+		//use `PV_country_sibs_avg',clear
+		
 		//Country averages
 		preserve
 			collapse PV*MATH PV*READ PV*SCIE, by(CNTRYID year)
@@ -2241,7 +2258,7 @@ program define analyze_2018_D_vs_2022
 
 		//How is the gap by # children in each country?
 		preserve
-			collapse PV*MATH PV*READ PV*SCIE /*[iw=SENWT]*/, by(CNTRYID year sibs)
+			collapse PV*MATH PV*READ PV*SCIE /*[iw=SENWT]*/, by(OECD CNTRYID year sibs)
 			foreach v of var PV*MATH PV*READ PV*SCIE {
 				bys CNTRYID year (sibs): gen gap_`v' = `v'-`v'[1] if _n!=1
 				}
