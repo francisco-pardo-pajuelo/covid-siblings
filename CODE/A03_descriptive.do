@@ -5,15 +5,15 @@
 capture program drop main 
 program define main 
 
-	setup_COVID
+	setup_PARENTAL
 	
 	parental_investment
-	
+		
 end
 
 
-capture program drop setup_COVID
-program define setup_COVID
+capture program drop setup_PARENTAL
+program define setup_PARENTAL
 
 	global covid_test = 0
 	global covid_data = ""
@@ -238,55 +238,11 @@ foreach g in "2p" "2s" {
 
 
 
-if "`g'" == "2p" graph bar std_index if inlist(year,2015,2022,2023)==1, over(fam_total_${fam_type}) by(year)
-if "`g'" == "2s" graph bar std_index if inlist(year,2015,2023)==1, over(fam_total_${fam_type}) by(year)
-
-
-
-if "`g'" == "2p" twoway 	///
-					(kdensity index if year==2015) 	///
-					(kdensity index if year==2022)	///
-					(kdensity index if year==2023)	///
-					, ///
-					legend(order(1 "2015" 2 "2022" 3 "2023") col(3) pos(6))
-					
-
-//tab n_work fam_total_2 if n_work<=5 & fam_total_2<=5, col nofreq
-
-
-
-
-
-
-
-
-
-
-	*- Match ECE survey
-	merge m:1 id_estudiante_2p year using "$TEMP\ece_family_2p", keep(master match) keepusing(aspiration_2p internet_2p pc_2p laptop_2p radio_2p) //m:1 because there are missings
-	rename _m merge_ece_survey_fam_2p
-	rename aspiration_2p aspiration_fam_2p
-	
-	merge m:1 id_estudiante_4p year using "$TEMP\ece_family_4p", keep(master match) keepusing(aspiration_4p gender_subj_?_4p internet_4p pc_4p laptop_4p radio_4p study_desk_4p quiet_room_4p pc_hw_4p) //m:1 because there are missings
-	rename _m merge_ece_survey_fam_4p
-	rename aspiration_4p aspiration_fam_4p
-	
-	merge m:1 id_estudiante_6p year using "$TEMP\ece_family_6p", keep(master match) keepusing(aspiration_6p gender_subj_?_6p) //m:1 because there are missings
-	rename _m merge_ece_survey_fam_6p	
-	rename aspiration_6p aspiration_fam_6p
-	
-	merge m:1 id_estudiante_6p year using "$TEMP\ece_student_6p", keep(master match) keepusing(aspiration_6p) //m:1 because there are missings
-	rename _m merge_ece_survey_stud_6p	
-	rename aspiration_6p aspiration_stu_6p	
-	
-	merge m:1 id_estudiante_2s year using "$TEMP\ece_student_2s", keep(master match) keepusing(aspiration_2s lives_with_*_2s total_siblings_2s pc_2s internet_2s laptop_2s radio_2s) //m:1 because there are missings
-	rename _m merge_ece_survey_stud_2s
-	rename aspiration_2s aspiration_stu_2s
-
-
-
-
-
 
 
 end
+
+*********************
+*********************
+
+main
