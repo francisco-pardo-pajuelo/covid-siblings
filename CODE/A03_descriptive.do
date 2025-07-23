@@ -103,7 +103,6 @@ foreach g in "2p" "2s" {
 
 }
 
-estout index*, cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) 
 
 
 
