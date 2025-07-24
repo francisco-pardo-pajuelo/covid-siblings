@@ -20,7 +20,12 @@ program define main
 	
 	*analysis
 	
+	//first_stage_1
+	//first_stage_size2
+	//first_stage_size3_mid
+	
 	ece_dob_prepare
+	ece_dob_analysis_trend
 	ece_dob_analysis_sibling
 	ece_dob_analysis_own
 	
@@ -125,7 +130,7 @@ local lab_text = "03/31/"
 twoway 						///
 		(scatter grade dob_siagie) ///
 		, 					///
-		xlabel(17622 "`lab_text'08" 17987 "03/31/09" 18352 "03/31/10" 18717 "03/31/11" 19083 "03/31/12" 19448 "03/31/13" 19813 "03/31/14" 20178 "03/31/15" 20544 "03/31/16" 20909 "03/31/17" 21274 "03/31/18" , angle(45)) ///
+		xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
 		xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
 		xtitle(Date of Birth) ///
 		ylabel(0(1)11) ///
@@ -156,7 +161,7 @@ program define prepare_data
 
 
 	*- Let's look at those who should've started 1st grade in 2020
-
+/*
 	use "$TEMP\siagie_2024", clear
 
 	//gen dob_num=dob_siagie
@@ -167,14 +172,31 @@ program define prepare_data
 	save `dobs', replace
 	
 	use "$TEMP\siagie_append", clear
+
 	keep id_per_umc
 	sort id_per_umc
 	by id_per_umc: keep if _n==1
 
 	merge 1:1 id_per_umc using `dobs', keep(master match)
 	drop _m
+	*/
+	use "$TEMP\siagie_append", clear
+	sort id_per_umc
+	keep id_per_umc 
+	by id_per_umc: keep if _n==1
 	
-	gen dob_num=dob_siagie
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie) 
+	rename _m merge_siblings	
+	
+gen dob_num=dob_siagie
 
 	gen year_entry_1st = .
 	gen year_entry_K = .
@@ -188,17 +210,7 @@ program define prepare_data
 	forvalues y = 2015(1)2027 {
 		gen around_cutoff_`y' = abs(dob_num-${cutoff_last_1_`y'})<${cutoff_window}
 	}	
-	   
-	preserve
-			use "$TEMP\id_siblings", clear
-			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year
-			tempfile id_siblings_sample
-			save `id_siblings_sample', replace
-	restore
-
-	*- Match Family info
-	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year) 
-	rename _m merge_siblings	  
+	   	
 	  
 	*- Relevant sample
 	forvalues y = 2015(1)2027 {
@@ -369,6 +381,265 @@ program define sibling_spillover_1st
 end
 
 
+capture program drop student_sibling_combinations_dob
+program define student_sibling_combinations_dob
+
+	*- For those families, we create all potential student-sibling-ece combinations
+	use "$TEMP\id_dob", clear
+	keep id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} year_entry* dob_siagie
+
+	keep if fam_total_${fam_type} <=5
+	
+	*- Create all sibling combinations
+	expand 5
+	bys id_fam_${fam_type} fam_order_${fam_type}: gen fam_order_${fam_type}_sib = _n
+	drop if fam_order_${fam_type}_sib>fam_total_${fam_type} //We did 5 as an upper bound, but some of them don't have that many.
+
+	*- Recover ID_per_umc from siblings family order
+	//rename (id_per_umc fam_order_${fam_type}) (aux_id_per_umc aux_fam_order_${fam_type})
+	
+	rename fam_order_${fam_type} 	aux_fam_order_${fam_type}
+	rename dob_siagie				aux_dob_siagie
+	rename year_entry*				aux_year_entry*
+	
+	rename fam_order_${fam_type}_sib fam_order_${fam_type}
+	merge m:1 id_fam_${fam_type} fam_order_${fam_type} using "$TEMP\id_dob", keepusing(dob_relative stack_year* year_entry* dob_siagie) keep(master match) 
+	rename (dob_relative year_entry* stack* dob_siagie) (dob_relative_sib year_entry*_sib stack*_sib  dob_siagie_sib)
+	drop _m
+	rename fam_order_${fam_type} fam_order_${fam_type}_sib
+	rename aux_* *
+	
+	compress
+	
+	save "$TEMP\student_sibling_combinations_dob", replace
+	
+end
+
+
+capture program drop first_stage_1
+program define first_stage_1
+
+
+	use if year==2020 using "$TEMP\siagie_append", clear
+	keep id_per_umc std_gpa_m_adj
+	tempfile info_siagie
+	save `info_siagie'
+
+	use "$TEMP\student_sibling_combinations_dob", clear
+	
+	drop if fam_order_${fam_type}==fam_order_${fam_type}_sib
+	keep if fam_total_${fam_type}==2
+	
+	keep if year_entry_1st==2018
+	
+	//keep if fam_order_${fam_type}==1
+	//assert fam_order_${fam_type}_sib==2
+	
+	format dob_siagie_sib %td
+	
+	keep if year_entry_1st_sib>=2015 & year_entry_1st_sib<=2025
+	
+	local lab_text = "03/31/"	
+	binsreg year_entry_1st_sib	dob_siagie_sib if abs(dob_siagie_sib-dob_siagie)>365 ///if dob_siagie_sib>=19083 ///
+	, ///
+		xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
+		xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
+		xtitle(Date of Birth) ///
+		ylabel(2015(1)2025) 
+	capture qui graph export "$FIGURES\Descriptive\fs_age_cutoff_sample.png", replace			
+	capture qui graph export "$FIGURES\Descriptive\fs_age_cutoff_sample.pdf", replace	
+	
+	
+	histogram dob_siagie_sib if abs(dob_siagie_sib-dob_siagie)>365
+	capture qui graph export "$FIGURES\Descriptive\histogra_age_cutoff_sample.png", replace			
+	capture qui graph export "$FIG2RES\Descriptive\histogra_age_cutoff_sample.pdf", replace	
+		
+	*- Attach grades
+	merge 1:1 id_per_umc using `info_siagie', keep(master match) keepusing(std_gpa_m_adj)
+	
+	local lab_text = "03/31/"	
+	binsreg std_gpa_m_adj	dob_siagie_sib if abs(dob_siagie_sib-dob_siagie)>365 ///if dob_siagie_sib>=19083 ///
+	, ///
+		nbins(100) ///
+		xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
+		xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
+		xtitle(Sibling Date of Birth)
+	
+	
+end
+
+
+capture program drop first_stage_size2
+program define first_stage_size2
+
+
+	use "$TEMP\student_sibling_combinations_dob", clear
+	
+	drop if fam_order_${fam_type}==fam_order_${fam_type}_sib
+	keep if fam_total_${fam_type}==2
+	//keep if fam_order_${fam_type}==2 & fam_order_${fam_type}_sib==
+	tempfile dob_sib
+	save `dob_sib'
+	
+	use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_append", clear
+	keep id_per_umc grade year std_gpa_?_adj
+	merge m:1 id_per_umc using `dob_sib', keep(master match) keepusing(year_entry_1st dob_siagie year_entry_1st_sib dob_siagie_sib)
+	beep
+	
+	
+	keep if year_entry_1st_sib>=2015 & year_entry_1st_sib<=2025
+	
+	*- Example of first stage
+	
+	*-- Pre COVID
+	preserve
+		keep if grade==4 & year==2018
+		keep if year_entry_1st_sib>=2018 & year_entry_1st_sib<=2019
+		//binsreg year_entry_1st_sib dob_siagie_sib
+		
+		gen y = 2018.5 + rnormal()/5
+		replace y = y - 0.2 if year_entry_1st_sib>=2019
+		//binsreg y dob_siagie_sib
+		
+		collapse year_entry_1st_sib y, by(dob_siagie_sib)
+		
+		twoway /// 
+				(scatter year_entry_1st_sib dob_siagie_sib) ///
+				(scatter y dob_siagie_sib) ///
+				, ///
+				xtitle("Sibling DOB") ///
+				ytitle("Standardized GPA Mathematics") ///
+				ylabel(2018(1)2019) ///
+				legend(order(1 "Sibling year of school start" 2 "Focal Child GPA in 2018") pos(6) col(2))
+					capture qui graph export "$FIGURES\Descriptive\example_pre_covid.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\example_pre_covid.pdf", replace	
+		
+	restore	
+	
+	*-- During COVID
+	preserve
+		keep if grade==4 & year==2020
+		keep if year_entry_1st_sib>=2020 & year_entry_1st_sib<=2021
+		//binsreg year_entry_1st_sib dob_siagie_sib
+		
+		gen y = 2020.5 + rnormal()/5
+		replace y = y + 0.2 if year_entry_1st_sib>=2021
+		//binsreg y dob_siagie_sib
+		
+		collapse year_entry_1st_sib y, by(dob_siagie_sib)
+		
+		twoway /// 
+				(scatter year_entry_1st_sib dob_siagie_sib) ///
+				(scatter y dob_siagie_sib) ///
+				, ///
+				xtitle("Sibling DOB") ///
+				ytitle("Standardized GPA Mathematics") ///
+				ylabel(2020(1)2021) ///
+				legend(order(1 "Sibling year of school start" 2 "Focal Child GPA in 2020") pos(6) col(2))
+					capture qui graph export "$FIGURES\Descriptive\example_post_covid.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\example_post_covid.pdf", replace	
+		
+	restore
+	
+	
+	forvalues g = 1(1)8 {
+		forvalues y = 2017(1)2023 {
+			preserve
+				drop if year_entry_1st_sib==year_entry_1st
+				local g = `g'
+				local y = `y'
+				local lab_text = "03/31/"	
+				sum dob_siagie if grade==`g' & year==`y'
+				binsreg std_gpa_m_adj dob_siagie_sib if grade==`g' & year==`y' & abs(dob_siagie_sib-dob_siagie)>365 ///if dob_siagie_sib>=19083 ///
+				, ///
+					nbins(50) ///
+					xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
+					xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
+					xtitle(Sibling Date of Birth) ///
+					ytitle("Standardized GPA Mathematics")
+					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.pdf", replace			
+	
+					
+			restore
+		}
+		
+	}
+	
+	
+	preserve
+		local g = 2
+		local y = 2022
+					//drop if year_entry_1st_sib==year_entry_1st
+					local g = `g'
+					local y = `y'
+					local lab_text = "03/31/"	
+					sum dob_siagie if grade==`g' & year==`y'
+		histogram dob_siagie_sib if grade==`g' & year==`y'	
+	restore
+	
+end
+
+
+capture program drop first_stage_size3_mid
+program define first_stage_size3_mid
+
+
+	use "$TEMP\student_sibling_combinations_dob", clear
+	
+	drop if fam_order_${fam_type}==fam_order_${fam_type}_sib
+	keep if fam_total_${fam_type}==3
+	keep if fam_order_${fam_type}==2
+	//keep if fam_order_${fam_type}==2 & fam_order_${fam_type}_sib==
+	tempfile dob_sib
+	save `dob_sib'
+	
+	use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_append", clear
+	keep id_per_umc grade year std_gpa_?_adj
+	merge m:1 id_per_umc using `dob_sib', keep(master match) keepusing(year_entry_1st dob_siagie year_entry_1st_sib dob_siagie_sib)
+	beep
+	
+	
+	keep if year_entry_1st_sib>=2015 & year_entry_1st_sib<=2025
+	forvalues g = 1(1)8 {
+		forvalues y = 2017(1)2023 {
+			preserve
+				drop if year_entry_1st_sib==year_entry_1st
+				local g = `g'
+				local y = `y'
+				local lab_text = "03/31/"	
+				sum dob_siagie if grade==`g' & year==`y'
+				binsreg std_gpa_m_adj dob_siagie_sib if grade==`g' & year==`y' & abs(dob_siagie_sib-dob_siagie)>365 ///if dob_siagie_sib>=19083 ///
+				, ///
+					nbins(50) ///
+					xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
+					xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
+					xtitle(Sibling Date of Birth)
+					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.pdf", replace			
+	
+					
+			restore
+		}
+		
+	}
+	
+	
+	preserve
+		local g = 2
+		local y = 2022
+					//drop if year_entry_1st_sib==year_entry_1st
+					local g = `g'
+					local y = `y'
+					local lab_text = "03/31/"	
+					sum dob_siagie if grade==`g' & year==`y'
+		histogram dob_siagie_sib if grade==`g' & year==`y'	
+	restore
+	
+end
+
+
+
 capture program drop ece_dob_prepare
 program define ece_dob_prepare
 
@@ -496,6 +767,36 @@ program define ece_dob_prepare
 	//Why is there one observation _m==1?
 
 end 
+
+capture program drop ece_dob_analysis_trend
+program define ece_dob_analysis_trend
+
+
+use "$TEMP\siagie_append_TEST", clear
+
+
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie) 
+	rename _m merge_siblings	
+
+	keep if fam_total_${fam_type}==2
+	
+	
+	bys id_fam_${fam_type}: 
+
+keep if year==2020
+keep if grade==3
+
+
+end
+
 
 
 capture program drop ece_dob_analysis_own

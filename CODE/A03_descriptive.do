@@ -129,7 +129,7 @@ foreach g in "2p" "2s" {
 	using "$TABLES\parental_investment_2p.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(2.fam_total_${fam_type} 3.fam_total_${fam_type} 4.fam_total_${fam_type}) varlabels(2.fam_total_${fam_type} "2 Children" 3.fam_total_${fam_type} "3 Children" 4.fam_total_${fam_type} "4 Children") ///
+	keep(_cons 2.fam_total_${fam_type} 3.fam_total_${fam_type} 4.fam_total_${fam_type}) varlabels(2.fam_total_${fam_type} "2 Children" 3.fam_total_${fam_type} "3 Children" 4.fam_total_${fam_type} "4 Children") ///
 	///stats(blank_line N ymean bandwidth fstage FE , fmt(%9.0fc %9.0fc %9.3f %9.3f %9.0fc %9.0fc) labels(" " "Observations" "Counterfactual mean" "Bandwidth" "\textit{F}-statistic" "FE: college-major-year")) ///
 	indicate("Controls = score_math") ///
 	stats(blank_line N, fmt(%9.0fc %9.0fc ) labels(" " "Observations" )) ///
