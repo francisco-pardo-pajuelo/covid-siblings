@@ -168,8 +168,9 @@
         \item Raw DID vs closure 
         \item Change in parental investments
         %\item PISA 2000, 2003, 2006?
-        \item Other TWFE: Age gap, same sex, middle child, school size
         \item Entry-age cutoff and exposure to school closures in covid? School starting age
+        \item Other TWFE: Age gap, same sex, middle child, school size
+        
         %\item Model
         %\item Literature
         %\item ECE Survey on parents
@@ -193,30 +194,89 @@
 \end{frame}
 
 
-\section{Change in parental investments}
+\section{Raw DID - PISA}
+
 
 \begin{frame}
-    \frametitle{Parental investment vs $#$ of children}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_not_fully_open.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1READ_not_fully_open.pdf}
+      }
+    }
+\end{frame}
+
+\section{Change in parental investments}
+
+
+\begin{frame}
+    \frametitle{Parental Investment mechanism}
+    \begin{itemize}
+        \item Current Hypothesis: During Covid, education relied more on parents than on school
+        \item Given limited parent's time, more children means less quality of education
+        \item A persistent gap might also be explained by persistent changes in the education production function. 
+        \item Did parental input increased during COVID? 
+        \item Is it still higher than before COVID?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Increase in parental Home-schooling (USA)}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/ATU_B_0-5.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Total time spent in care}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/ATU_summary_0-5.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental Investment vs $\#$ of children}
+    \begin{itemize}
+        \item Using Peru surveys, I look at the relation between a standardized index of parental investment in education and number of children
+        \item Relation becomes more negative after COVID
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental investment vs $\#$ of children - 2nd grade}
     \input{./TABLES/parental_investment_2p.tex}
 \end{frame}
 
 \begin{frame}
-    \frametitle{American Time Use Survey}
-    %\input{./TABLES/parental_investment_2p.tex}
+    \frametitle{Parental investment vs $\#$  of children - 8th grade}
+    \input{./TABLES/parental_investment_2s.tex}
 \end{frame}
 
 
-\section{Other TWFE: Age gap, same sex, middle child, school size}
 
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Thinking about the literature/models}
-    \begin{itemize}
-        \item If parents are replacing teachers, we could expect a bigger role where teachers had a bigger share (small class size, teacher/student ration)
-        \item Middle child is more affected than older/younger
-        \item Age gap and fight for resources
-    \end{itemize}
-\end{frame}
+
 
 
 
@@ -244,11 +304,51 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}
+    \label{update_scott}
+    \frametitle{School age entry cutoffs}
+ {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/dob_cutoffs.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{A delay in school start pre-covid means more childcare}
+ {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/example_pre_covid.png}
+      }
+    }
+\end{frame}
 
 
 
+\begin{frame}
+    \label{update_scott}
+    \frametitle{A delay in school start pre-covid means more time in education}
+ {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/example_post_covid.png}
+      }
+    }
+\end{frame}
 
-\section{Grade change criteria}
+
+\section{Other TWFE: Age gap, same sex, middle child, school size}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Thinking about the literature/models}
+    \begin{itemize}
+        \item If parents are replacing teachers, we could expect a bigger role where teachers had a bigger share (small class size, teacher/student ration)
+        \item Middle child is more affected than older/younger
+        \item Age gap and fight for resources
+    \end{itemize}
+\end{frame}
+
+
+\section{Thanks!}
+
 
 
 
@@ -330,6 +430,9 @@
         \item $\Rightarrow$ Less education for children in bigger households.
     \end{itemize}
 \end{frame}
+
+
+
 
 \section{Thinking about the model}
 \begin{frame}
@@ -594,14 +697,15 @@
 \end{frame}
 
 
+\begin{comment}
 \begin{frame}
     \label{update_scott}
-    \frametitle{Raw DID vs school closures}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
-      }
-    }
+    \frametitle{List of Countries}
+       \begin{itemize}
+           
+       \end{itemize}
+    
 \end{frame}
-
+\end{comment}
 
 \end{document}
