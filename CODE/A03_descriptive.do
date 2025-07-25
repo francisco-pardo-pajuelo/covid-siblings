@@ -8,6 +8,8 @@ program define main
 	setup_PARENTAL
 	
 	parental_investment
+	
+
 		
 end
 
@@ -26,13 +28,14 @@ program define setup_PARENTAL
 	global x_all = "male_siagie urban_siagie public_siagie"
 	global x_nohigher_ed = "male_siagie urban_siagie public_siagie"
 	
-	colorpalette  HCL blues, selec(2 5 8 11) nograph
+	colorpalette  HCL blues, selec(2 5 8 11 13) nograph
 	return list
 
 	global blue_1 = "`r(p1)'"
 	global blue_2 = "`r(p2)'"
 	global blue_3 = "`r(p3)'"
 	global blue_4 = "`r(p4)'"
+	global blue_5 = "`r(p5)'"
 	//local blue_5 = "`r(p5)'"
 	//local blue_6 = "`r(p6)'"
 

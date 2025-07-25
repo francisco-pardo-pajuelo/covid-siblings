@@ -14,16 +14,24 @@ program define main
 
 	setup_AGE_CUTOFF
 	
-	*DOB_scatter
+	*DOB_scatter //Shows figure of cutoffdates
 	
 	prepare_data 
 	
+	*exposure_covid //attempt to asses impact of covid by cutoff dates
+	*sibling_spillover_1st //First attempt of sibling spillover with GPA
 	*analysis
+	
+	
+	student_sibling_combinations_dob
 	
 	//first_stage_1
 	//first_stage_size2
 	//first_stage_size3_mid
 	
+	*- RD with GPA
+	
+	*- RD with ECE
 	ece_dob_prepare
 	ece_dob_analysis_trend
 	ece_dob_analysis_sibling
@@ -590,52 +598,92 @@ program define first_stage_size3_mid
 	drop if fam_order_${fam_type}==fam_order_${fam_type}_sib
 	keep if fam_total_${fam_type}==3
 	keep if fam_order_${fam_type}==2
-	//keep if fam_order_${fam_type}==2 & fam_order_${fam_type}_sib==
+	keep if fam_order_${fam_type}_sib==3
+	keep if year_entry_1st_sib>=2018 & year_entry_1st_sib<=2023
+	histogram dob_siagie_sib
 	tempfile dob_sib
-	save `dob_sib'
+	save `dob_sib', replace
 	
 	use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_append", clear
 	keep id_per_umc grade year std_gpa_?_adj
-	merge m:1 id_per_umc using `dob_sib', keep(master match) keepusing(year_entry_1st dob_siagie year_entry_1st_sib dob_siagie_sib)
+	merge m:1 id_per_umc using `dob_sib', keep(master match) keepusing(year_entry_1st dob_siagie year_entry_1st_sib dob_siagie_sib dob_relative_sib)
 	beep
 	
 	
-	keep if year_entry_1st_sib>=2015 & year_entry_1st_sib<=2025
-	forvalues g = 1(1)8 {
+	
+	
+	forvalues g = 2(1)8 {
 		forvalues y = 2017(1)2023 {
+			//local g=2
+			//local y=2020
 			preserve
-				drop if year_entry_1st_sib==year_entry_1st
-				local g = `g'
-				local y = `y'
+				drop dob_relative_sib 
+				gen dob_relative_sib = dob_siagie_sib - ${cutoff_last_1_`y'}
+				gen ABOVE= dob_relative_sib>0
+				gen ABOVE_dob_relative_sib = dob_relative_sib*ABOVE
+				
+				//drop if year_entry_1st_sib==year_entry_1st
+				keep if year_entry_1st_sib>=`y' & year_entry_1st_sib<=`y'+1
+				keep if grade==`g' & year==`y'
 				local lab_text = "03/31/"	
-				sum dob_siagie if grade==`g' & year==`y'
-				binsreg std_gpa_m_adj dob_siagie_sib if grade==`g' & year==`y' & abs(dob_siagie_sib-dob_siagie)>365 ///if dob_siagie_sib>=19083 ///
+				//sum dob_siagie if grade==`g' & year==`y'
+				histogram dob_siagie_sib
+				capture qui graph export "$FIGURES\RD_age\histogram_2_3_m_`g'_`y'.png", replace			
+				capture qui graph export "$FIGURES\RD_age\histogram_2_3_m_`g'_`y'.pdf", replace				
+				binsreg std_gpa_m_adj dob_siagie_sib ///
 				, ///
 					nbins(50) ///
-					xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
-					xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
+					xlabel(${cutoff_last_1_`y'} "`lab_text'`y'") ///
+					///xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
+					xline(${cutoff_last_1_`y'}, lcolor(gs12)) ///
 					xtitle(Sibling Date of Birth)
-					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.png", replace			
-					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.pdf", replace			
-	
+					capture qui graph export "$FIGURES\RD_age\first_stage_2_3_m_`g'_`y'.png", replace			
+					capture qui graph export "$FIGURES\RD_age\first_stage_2_3_m_`g'_`y'.pdf", replace			
+				
+				eststo rd_2_3_`g'_`y': reg std_gpa_m_adj ABOVE dob_relative_sib ABOVE_dob_relative_sib
 					
 			restore
 		}
 		
 	}
 	
+	erase "$TABLES\rd_2_3.tex"
 	
+	estout   rd* ///
+	using "$TABLES\rd_2_3.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(ABOVE) ///
+	stats(blank_line N, fmt(%9.0fc %9.0fc ) labels(" " "Observations" )) 
+	
+	
+	
+	///
+	keep(_cons 2.fam_total_${fam_type} 3.fam_total_${fam_type} 4.fam_total_${fam_type}) varlabels(2.fam_total_${fam_type} "2 Children" 3.fam_total_${fam_type} "3 Children" 4.fam_total_${fam_type} "4 Children") ///
+	///stats(blank_line N ymean bandwidth fstage FE , fmt(%9.0fc %9.0fc %9.3f %9.3f %9.0fc %9.0fc) labels(" " "Observations" "Counterfactual mean" "Bandwidth" "\textit{F}-statistic" "FE: college-major-year")) ///
+	indicate("Controls = score_math") ///
+	stats(blank_line N, fmt(%9.0fc %9.0fc ) labels(" " "Observations" )) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)		
+	
+	
+	
+		
+	/*
 	preserve
-		local g = 2
-		local y = 2022
-					//drop if year_entry_1st_sib==year_entry_1st
+		local g = 3
+		local y = 2021
+		//drop if year_entry_1st_sib==`y'-`g'
+		keep if year_entry_1st_sib>=2021 & year_entry_1st_sib<=2022
+		//drop if dob_siagie_sib<=${cutoff_last_1_2019}
 					local g = `g'
 					local y = `y'
 					local lab_text = "03/31/"	
 					sum dob_siagie if grade==`g' & year==`y'
-		histogram dob_siagie_sib if grade==`g' & year==`y'	
+		//histogram dob_siagie_sib if grade==`g' & year==`y'	
+		//binsreg year_entry_1st_sib dob_siagie_sib if grade==`g' & year==`y'	, nbins(50)	 xline(${cutoff_last_1_2020})
+		binsreg std_gpa_m_adj dob_siagie_sib if grade==`g' & year==`y', nbins(100)	xline(${cutoff_last_1_2020})
 	restore
-	
+	*/
 end
 
 

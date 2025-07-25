@@ -14,6 +14,17 @@ program define setup_ATU
 
 
 	di "Setup ATU"
+	
+	colorpalette  HCL blues, selec(2 5 8 11 13) nograph
+	return list
+
+	global blue_1 = "`r(p1)'"
+	global blue_2 = "`r(p2)'"
+	global blue_3 = "`r(p3)'"
+	global blue_4 = "`r(p4)'"
+	global blue_5 = "`r(p5)'"
+	//local blue_5 = "`r(p5)'"
+	//local blue_6 = "`r(p6)'"	
 
 end
 
@@ -1130,24 +1141,25 @@ program define analyze
 			
 			
 			twoway ///
-				(line t030201 tuyear if tuyear>=2010) ///
-				(line t030202 tuyear if tuyear>=2010) ///
-				(line t030203 tuyear if tuyear>=2010) ///
-				(line t030204 tuyear if tuyear>=2010) ///
+				(line t0302		tuyear if tuyear>=2010, lcolor(gs0)) ///
+				(line t030201 	tuyear if tuyear>=2010, lcolor("${blue_1}")) ///
+				(line t030202 	tuyear if tuyear>=2010, lcolor("${blue_2}")) ///
+				(line t030203 	tuyear if tuyear>=2010, lcolor("${blue_3}")) ///
+				(line t030204 	tuyear if tuyear>=2010, lcolor("${blue_4}")) ///
 				, /// 
 				xlabel(2010(1)2024) ///
 				xtitle("Year") ///
 				ytitle("Minutes per day") ///
-				legend(order(1 "Homework" 2 "Meetings and school conferences" 3 "Home schooling" 4 "Waiting associated with hh children's education") pos(6) col(2))
+				legend(order(1 "Activities Related to HH Children's Education" 2 "Homework" 3 "Meetings and school conferences" 4 "Home schooling" 5 "Waiting associated with hh children's education") pos(6) col(2))
 			capture qui graph export "$FIGURES\Descriptive\ATU_B_`age_cat'.png", replace			
 			capture qui graph export "$FIGURES\Descriptive\ATU_B_`age_cat'.pdf", replace	
 			
 			
 			twoway ///
-				(line t03 	tuyear if tuyear>=2010) ///
-				(line t0301 tuyear if tuyear>=2010) ///
-				(line t0302 tuyear if tuyear>=2010) ///
-				(line t0303 tuyear if tuyear>=2010) ///
+				(line t03 	tuyear if tuyear>=2010, lcolor(gs0)) ///
+				(line t0301 tuyear if tuyear>=2010, lcolor("${blue_1}")) ///
+				(line t0302 tuyear if tuyear>=2010, lcolor("${blue_2}")) ///
+				(line t0303 tuyear if tuyear>=2010, lcolor("${blue_3}")) ///
 				, /// 
 				xlabel(2010(1)2024) ///
 				xtitle("Year") ///
@@ -1157,6 +1169,15 @@ program define analyze
 			capture qui graph export "$FIGURES\Descriptive\ATU_summary_`age_cat'.pdf", replace		
 			
 			
+			twoway ///
+				(line t03 	tuyear if tuyear>=2010, lcolor(gs0)) ///
+				, /// 
+				xlabel(2010(1)2024) ///
+				xtitle("Year") ///
+				ytitle("Minutes per day") ///
+				legend(order(1 "Total") pos(6) col(2))
+			capture qui graph export "$FIGURES\Descriptive\ATU_`age_cat'.png", replace			
+			capture qui graph export "$FIGURES\Descriptive\ATU_`age_cat'.pdf", replace					
 
 		restore
 	}
