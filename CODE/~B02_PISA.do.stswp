@@ -1963,7 +1963,7 @@ program define descriptive
 	
 	merge m:1 CNT using "$TEMP\COVID\school_closure_country", keep(master match)
 	
-	scatter not_fully_open
+	scatter weeks_not_fully_open std_parental_involvement
 	
 	
 end 
