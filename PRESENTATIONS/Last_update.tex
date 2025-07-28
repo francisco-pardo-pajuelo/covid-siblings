@@ -166,12 +166,12 @@
     \begin{itemize}
         \item Refresh 
         \item International Evidence 
-        \item Change in parental investments
         \item School Start Age cutoff
+        \item Change in parental investments
         %\item PISA 2000, 2003, 2006?
         %\item Entry-age cutoff and exposure to school closures in covid? School starting age
         %\item Other TWFE: Age gap, same sex, middle child, school size
-        \item Scheduling Job Talk
+        \item Job Market
         %\item Model
         %\item Literature
         %\item ECE Survey on parents
@@ -195,6 +195,25 @@
           \item Is it just heterogeneous effects correlated with income or other demographic characteristic?
           \end{itemize}
       \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{\% of A's in Mathematics}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/raw_total_elm_pass_math.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Standardized GPA in Mathematics}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/raw_total_elm_std_gpa_m_adj.pdf}
+      }
+    }
 \end{frame}
 
 \begin{frame}
@@ -244,23 +263,31 @@
 
 \section{International Evidence - PISA}
 
+\begin{itemize}
+    \item International examination to 15 year olds
+    \item 81 countries (37 OECD and 44 non-OECD).
+    \item In 2009, 2012 and 2022, I am able to identify only-child and sibling sample.
+    \item I estimate the gap in achievement between both for each of these years.
+\end{itemize}
+
 \begin{frame}
     \label{update_scott}
     \frametitle{The distribution of gaps moves down}
         {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2022.pdf}
+       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2012.png}
       }
     }
 \end{frame}
 
 \begin{frame}
     \label{update_scott}
-    \frametitle{Raw DID vs school closures}
+    \frametitle{The distribution of gaps moves down}
         {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
+       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2022.png}
       }
     }
 \end{frame}
+
 
 \begin{frame}
     \label{update_scott}
@@ -269,65 +296,6 @@
        \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_not_fully_open.pdf}
       }
     }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw DID vs school closures}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1READ_not_fully_open.pdf}
-      }
-    }
-\end{frame}
-
-\section{Change in parental investments}
-
-
-\begin{frame}
-    \frametitle{Parental Investment mechanism}
-    \begin{itemize}
-        \item Current Hypothesis: During Covid, education relied more on parents than on school
-        \item Given limited parent's time, more children means less quality of education
-        \item A persistent gap might also be explained by persistent changes in the education production function. 
-        \item Did parental input increase during COVID? 
-        \item Is it still higher than before COVID?
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Increase in parental Home-schooling (USA)}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/ATU_B_0-5.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Total time spent in care}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/ATU_summary_0-5.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \frametitle{Parental Investment vs $\#$ of children}
-    \begin{itemize}
-        \item Using Peru surveys, I look at the relation between a standardized index of parental investment in education and number of children
-        \item Relation becomes more negative after COVID
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Parental investment vs $\#$ of children - 2nd grade}
-    \input{./TABLES/parental_investment_2p.tex}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Parental investment vs $\#$  of children - 8th grade}
-    \input{./TABLES/parental_investment_2s.tex}
 \end{frame}
 
 
@@ -398,20 +366,136 @@
 
 
 \begin{frame}
-    \frametitle{RD results for HH = 2 children}
-    %\input{./TABLES/rd_s2_1_2.tex}
+    \frametitle{Effects of delaying School Entry}
+    \input{./TABLES/rd_summ_1_m_a_365.tex}
 \end{frame}
 
 \begin{frame}
-    \frametitle{RD results for HH = 3 children (oldest-middle}
-    %\input{./TABLES/rd_s3_1_2.tex}
+    \frametitle{Effects of delaying K-Entry}
+    \input{./TABLES/rd_summ_K_m_a_100.tex}
 \end{frame}
 
 
 \begin{frame}
-    \frametitle{RD results for HH = 3 children (middle-youngest}
-    %\input{./TABLES/rd_s3_2_3.tex}
+    \frametitle{Effects of delaying 2nd grade}
+    \input{./TABLES/rd_summ_2_m_a_100.tex}
 \end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Pre-Covid}
+ {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/RD_age/1_m_a_365_18_19.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Covid}
+ {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/RD_age/K_m_a_365_20_21.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Post-Covid}
+ {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/RD_age/1_m_a_365_22_23.png}
+      }
+    }
+\end{frame}
+
+
+\section{Change in parental investments}
+
+
+\begin{frame}
+    \frametitle{Parental Investment mechanism}
+    \begin{itemize}
+        \item Current Hypothesis: During Covid, education relied more on parents than on school
+        \item Given limited parent's time, more children means less quality of education
+        \item A persistent gap might also be explained by persistent changes in the education production function. 
+        \item Did parental input increase during COVID? 
+        \item Is it still higher than before COVID?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Increase in parental Home-schooling (USA)}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/ATU_B_0-5.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Total time spent in care}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/ATU_summary_0-5.png}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental Investment vs $\#$ of children}
+    \begin{itemize}
+        \item Using Peru surveys, I look at the relation between a standardized index of parental investment in education and number of children
+        \item Relation becomes more negative after COVID
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental investment vs $\#$ of children - 2nd grade}
+    \input{./TABLES/parental_investment_2p.tex}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental investment vs $\#$  of children - 8th grade}
+    \input{./TABLES/parental_investment_2s.tex}
+\end{frame}
+
+
+
+\section{Next Steps}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Next Steps}
+    \begin{itemize}
+        \item Other cutoffs? Primary and HS graduation cutoffs.
+        \item Having a sibling born during COVID vs non-COVID?
+    \end{itemize}
+\end{frame}
+
+\section{Job Market}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Job Talk}
+    \begin{enumerate}
+        \item 8/29 (internal DLP); 9/15 (department-wide)
+        \item 9/12 (internal DLP); 9/29 (department-wide)
+        \item 9/19 (internal DLP); 10/6 (department-wide)
+        \item 9/26 (internal DLP); 10/13 (department-wide)
+    \end{enumerate}
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Job Market Paper}
+    \begin{enumerate}
+        \item Thoughts on pursuing this or focusing on my previous research on sibling spillovers?
+    \end{enumerate}
+\end{frame}
+
+\section{Thanks!}
+
 
 
 
@@ -463,44 +547,6 @@
       }
     }
 \end{frame}
-
-
-
-\section{Next Steps}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Next Steps}
-    \begin{itemize}
-        \item Other cutoffs? Primary and HS graduation cutoffs.
-        \item Having a sibling born during COVID vs non-COVID?
-    \end{itemize}
-\end{frame}
-
-\section{Job Market}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Job Talk}
-    \begin{enumerate}
-        \item 8/29 (internal DLP); 9/15 (department-wide)
-        \item 9/12 (internal DLP); 9/29 (department-wide)
-        \item 9/19 (internal DLP); 10/6 (department-wide)
-        \item 9/26 (internal DLP); 10/13 (department-wide)
-    \end{enumerate}
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Job Market Paper}
-    \begin{enumerate}
-        \item Thoughts on pursuing this or focusing on my previous research on sibling spillovers?
-    \end{enumerate}
-\end{frame}
-
-\section{Thanks!}
-
 
 
 
@@ -873,7 +919,23 @@
 
 
 
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
+      }
+    }
+\end{frame}
 
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1READ_not_fully_open.pdf}
+      }
+    }
+\end{frame}
 
 
 \begin{comment}
