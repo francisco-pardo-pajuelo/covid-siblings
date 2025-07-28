@@ -145,8 +145,8 @@ twoway 						///
 		ylabel(0(1)11) ///
 		ytitle("Average Grade in 2024 by DOB") 
 
-	capture qui graph export "$FIGURES\Descriptive\dob_cutoffs.png", replace			
-	capture qui graph export "$FIGURES\Descriptive\dob_cutoffs.pdf", replace	
+	capture qui graph export "$FIGURES_TEMP\Descriptive\dob_cutoffs.png", replace			
+	capture qui graph export "$FIGURES_TEMP\Descriptive\dob_cutoffs.pdf", replace	
 	
 	
 *- How was grade=0 in 2020?
@@ -455,12 +455,12 @@ program define first_stage_1
 		xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
 		xtitle(Date of Birth) ///
 		ylabel(2015(1)2025) 
-	capture qui graph export "$FIGURES\Descriptive\fs_age_cutoff_sample.png", replace			
-	capture qui graph export "$FIGURES\Descriptive\fs_age_cutoff_sample.pdf", replace	
+	capture qui graph export "$FIGURES_TEMP\Descriptive\fs_age_cutoff_sample.png", replace			
+	capture qui graph export "$FIGURES_TEMP\Descriptive\fs_age_cutoff_sample.pdf", replace	
 	
 	
 	histogram dob_siagie_sib if abs(dob_siagie_sib-dob_siagie)>365
-	capture qui graph export "$FIGURES\Descriptive\histogra_age_cutoff_sample.png", replace			
+	capture qui graph export "$FIGURES_TEMP\Descriptive\histogra_age_cutoff_sample.png", replace			
 	capture qui graph export "$FIG2RES\Descriptive\histogra_age_cutoff_sample.pdf", replace	
 		
 	*- Attach grades
@@ -520,8 +520,8 @@ program define first_stage_size2
 				ytitle("Standardized GPA Mathematics") ///
 				ylabel(2018(1)2019) ///
 				legend(order(1 "Sibling year of school start" 2 "Focal Child GPA in 2018") pos(6) col(2))
-					capture qui graph export "$FIGURES\Descriptive\example_pre_covid.png", replace			
-					capture qui graph export "$FIGURES\Descriptive\example_pre_covid.pdf", replace	
+					capture qui graph export "$FIGURES_TEMP\Descriptive\example_pre_covid.png", replace			
+					capture qui graph export "$FIGURES_TEMP\Descriptive\example_pre_covid.pdf", replace	
 		
 	restore	
 	
@@ -545,8 +545,8 @@ program define first_stage_size2
 				ytitle("Standardized GPA Mathematics") ///
 				ylabel(2020(1)2021) ///
 				legend(order(1 "Sibling year of school start" 2 "Focal Child GPA in 2020") pos(6) col(2))
-					capture qui graph export "$FIGURES\Descriptive\example_post_covid.png", replace			
-					capture qui graph export "$FIGURES\Descriptive\example_post_covid.pdf", replace	
+					capture qui graph export "$FIGURES_TEMP\Descriptive\example_post_covid.png", replace			
+					capture qui graph export "$FIGURES_TEMP\Descriptive\example_post_covid.pdf", replace	
 		
 	restore
 	
@@ -566,8 +566,8 @@ program define first_stage_size2
 					xline(17622 17987  18352 18717 19083  19448 19813 20178 20544  20909  21274, lcolor(gs12)) ///
 					xtitle(Sibling Date of Birth) ///
 					ytitle("Standardized GPA Mathematics")
-					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.png", replace			
-					capture qui graph export "$FIGURES\Descriptive\first_stage_m_`g'_`y'.pdf", replace			
+					capture qui graph export "$FIGURES_TEMP\Descriptive\first_stage_m_`g'_`y'.png", replace			
+					capture qui graph export "$FIGURES_TEMP\Descriptive\first_stage_m_`g'_`y'.pdf", replace			
 	
 					
 			restore
@@ -659,15 +659,15 @@ estimates clear
 						*- First stage
 						di as result "***************"  _n "First Stage" _n "***************" 
 						binsreg year_entry_1st_sib dob_siagie_sib
-						capture qui graph export "$FIGURES\RD_age\first_stage_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
-						capture qui graph export "$FIGURES\RD_age\first_stage_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace	
+						capture qui graph export "$FIGURES_TEMP\RD_age\first_stage_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
+						capture qui graph export "$FIGURES_TEMP\RD_age\first_stage_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace	
 						
 						*- Histogram
 						di as result "***************"  _n "Histogram" _n "***************" 
 						
 						histogram dob_siagie_sib
-						capture qui graph export "$FIGURES\RD_age\histogram_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
-						capture qui graph export "$FIGURES\RD_age\histogram_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace				
+						capture qui graph export "$FIGURES_TEMP\RD_age\histogram_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
+						capture qui graph export "$FIGURES_TEMP\RD_age\histogram_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace				
 						
 						*- Outcome
 						di as result "***************"  _n "Plot" _n "***************" 
@@ -679,8 +679,8 @@ estimates clear
 							///xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
 							xline(0, lcolor(gs12)) ///
 							xtitle(Sibling Date of Birth)
-							capture qui graph export "$FIGURES\RD_age\\`subj'_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
-							capture qui graph export "$FIGURES\RD_age\\`subj'_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace			
+							capture qui graph export "$FIGURES_TEMP\RD_age\\`subj'_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
+							capture qui graph export "$FIGURES_TEMP\RD_age\\`subj'_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace			
 						
 						di as result "***************"  _n "Reg" _n "***************" 
 						
@@ -690,15 +690,15 @@ estimates clear
 				}
 				
 
-			capture erase "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex"
+			capture erase "$TABLES_TEMP\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex"
 			
-			file open  table_tex	using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", replace write
+			file open  table_tex	using "$TABLES_TEMP\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", replace write
 			file write table_tex	/// HEADER OPTIONS OF TABLE
 							"\makebox[0.1\width][l]{" _n ///
 							"\resizebox{`scale'\textwidth}{!}{" _n
 			file close table_tex
 			
-			file open  table_tex	using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", append write
+			file open  table_tex	using "$TABLES_TEMP\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", append write
 			file write table_tex	/// HEADER OPTIONS OF TABLE
 							"\begin{tabular}{lcccc}" _n ///
 							/// HEADER OF TABLE
@@ -711,14 +711,14 @@ estimates clear
 			file close table_tex			
 			
 			estout   rd_s`size'_`foc_order'_`sib_order'_???? ///
-			using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", ///
+			using "$TABLES_TEMP\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", ///
 			append style(tex) ///
 			cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 			keep(ABOVE) ///
 			stats(blank_line N, fmt(%9.0fc %9.0fc ) labels(" " "Observations" ))  ///
 			starlevels(* 0.10 ** 0.05 *** 0.001)
 			
-			file open  table_tex	using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", append write
+			file open  table_tex	using "$TABLES_TEMP\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", append write
 			file write table_tex	/// HEADER OPTIONS OF TABLE							
 			_n "\bottomrule" _n ///
 				"\end{tabular}" _n ///
@@ -831,8 +831,8 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 									di as result "***************"  _n "First Stage" _n "***************" 
 									capture binsreg year_entry_1st_sib dob_siagie_sib
 									if _rc==0 { //If no error
-										capture qui graph export "$FIGURES\RD_age\first_stage_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
-										capture qui graph export "$FIGURES\RD_age\first_stage_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace	
+										capture qui graph export "$FIGURES_TEMP\RD_age\first_stage_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
+										capture qui graph export "$FIGURES_TEMP\RD_age\first_stage_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace	
 										}
 									*- Histogram
 									di as result "***************"  _n "Histogram" _n "***************" 
@@ -841,8 +841,8 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 									histogram dob_relative_sib, xtitle("DOB relative to school entry cutoff") name(histog_rel, replace)
 									
 									graph combine histog_dob histog_rel
-									capture qui graph export "$FIGURES\RD_age\histogram_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
-									capture qui graph export "$FIGURES\RD_age\histogram_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace		
+									capture qui graph export "$FIGURES_TEMP\RD_age\histogram_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
+									capture qui graph export "$FIGURES_TEMP\RD_age\histogram_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace		
 									
 									*- Outcome
 									di as result "***************"  _n "Plot" _n "***************" 
@@ -855,8 +855,8 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 										xline(0, lcolor(gs12)) ///
 										xtitle(Sibling Date of Birth)
 										if _rc==0 { //If no error
-										capture qui graph export "$FIGURES\RD_age\\`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
-										capture qui graph export "$FIGURES\RD_age\\`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace			
+										capture qui graph export "$FIGURES_TEMP\RD_age\\`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
+										capture qui graph export "$FIGURES_TEMP\RD_age\\`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace			
 										}
 									di as result "***************"  _n "Reg" _n "***************" 					
 									sum std_gpa_`subj'_adj if ABOVE==0 //Counterfactual Mean
@@ -873,15 +873,15 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 							}
 							
 
-						capture erase "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex"
+						capture erase "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex"
 						
-						file open  table_tex	using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", replace write
+						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", replace write
 						file write table_tex	/// HEADER OPTIONS OF TABLE
 										"\makebox[0.1\width][l]{" _n ///
 										"\resizebox{`scale'\textwidth}{!}{" _n
 						file close table_tex
 						
-						file open  table_tex	using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
+						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
 						file write table_tex	/// HEADER OPTIONS OF TABLE
 										"\begin{tabular}{lccc}" _n ///
 										/// HEADER OF TABLE
@@ -895,7 +895,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 						file close table_tex			
 						
 						estout   rd_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_??_?? ///
-						using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", ///
+						using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", ///
 						append style(tex) ///
 						cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 						keep(ABOVE) ///
@@ -903,7 +903,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 						stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
 						mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 						
-						file open  table_tex	using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
+						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
 						file write table_tex	/// HEADER OPTIONS OF TABLE							
 						_n "\bottomrule" _n ///
 							"\end{tabular}" _n ///
@@ -1027,7 +1027,7 @@ program define ece_dob_prepare
 
 	//Check histograms
 	histogram dob_relative_sib if  year==2022 & fam_order_2!= fam_order_2_sib, discrete
-	capture qui graph export "$FIGURES\Descriptive\histogram_dob_siblings_2022.png", replace
+	capture qui graph export "$FIGURES_TEMP\Descriptive\histogram_dob_siblings_2022.png", replace
 	histogram dob_relative_sib if  year==2023 & fam_order_2!= fam_order_2_sib, discrete
 	histogram dob_relative_sib if  year==2024 & fam_order_2!= fam_order_2_sib, discrete	
 
