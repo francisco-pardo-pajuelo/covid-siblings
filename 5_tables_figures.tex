@@ -2,60 +2,33 @@
 
 
 
-
-\begin{figure*}
+\begin{figure}[htbp]
     \centering
-    \begin{subfigure}[b]{0.475\textwidth}
+    
+    \begin{subfigure}{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{./FIGURES/pdf/first_stage_admitted.pdf}
-        \caption[]%
-        {{\small First Stage: Admission into target college-major}}    
-        \label{fig:first_stage_a}
+        \includegraphics[width=0.8\textwidth]{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2022.pdf}
+        \caption{Caption for figure A}
+        \label{fig:1a}
     \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.475\textwidth}  
-        \centering 
-        \includegraphics[width=\textwidth]{./FIGURES/pdf/first_stage_enroll_uni_major.pdf}
-        \caption[]%
-        {{\small Enrolled in target college-major}}    
-        \label{fig:first_stage_b}
+    
+    \vspace{1em} % Add some vertical space between subfigures
+    
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_not_fully_open.pdf}
+        \caption{Caption for figure B}
+        \label{fig:1b}
     \end{subfigure}
-    \vskip\baselineskip
-    \begin{subfigure}[b]{0.475\textwidth}   
-        \centering 
-        \includegraphics[width=\textwidth]{./FIGURES/pdf/first_stage_enroll.pdf}
-        \caption[]%
-        {{\small Enrolled in any college ever}}    
-        \label{fig:first_stage_c}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.475\textwidth}   
-        \centering 
-        \includegraphics[width=\textwidth]{./FIGURES/pdf/fs_private.pdf}
-        \caption[]%
-        {{\small Enrolled in Private college ever}}    
-        \label{fig:first_stage_d}
-    \end{subfigure}
-    \caption[First stage and change in college enrollment of older sibling]
-    {\small First stage and effect in college enrollment of older sibling} 
-    \label{fig:first_stage}
-\end{figure*}
+    
+    \caption{Overall caption for the combined figure}
+    \label{fig:combined}
+\end{figure}
+
 
 
 \newpage
-\newpage
 
-%College applications, admissions and enrollments increase by more than 10\% 
-\input{./TABLES/t_sib_univ_1_first_bwoptimal_2.tex}
 
-%Math scores improve during middle school
-\input{./TABLES/t_sib_school_first_bwoptimal_2.tex}
-
-%Parents expectations on educational attainment increase
-\input{./TABLES/t_sib_asp_first_bwoptimal_2.tex}
-
-%This could be driven by parents with no higher education
-\input{./TABLES/t_sib_heterog_asp_gen_pared_first_bwoptimal_2.tex}
-
-%Although effects on enrollment are higher among those with higher education
-\input{./TABLES/t_sib_heterog_pared_first_bwoptimal_2.tex}
+%RD-first grade
+\input{./TABLES/rd_summ_1_m_a_365.tex}
