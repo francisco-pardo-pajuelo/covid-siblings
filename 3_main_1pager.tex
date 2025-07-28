@@ -22,28 +22,9 @@
 \textbf{Strategy:} I do fuzzy regression discontinuity using college-major-semester (cell) cutoffs. (i) I estimate the likely cutoff for each cell, (ii) stack all applications, (iii) estimate an RD model with cell fixed effects. This is done with for the oldest sibling, with effects estimated on their younger siblings (after the application). This is done for all public universities in the country from 2017-2023.
 
 \textbf{Results:}
-     The first stage is quite big. Being above the cutoff means a 70\% increased chance of admission and 50\% of enrollment to the applied cutoff. Being above the cutoff also increases enrollment in ANY university EVER by 18\%. \hyperref[fig:first_stage]{Figure \ref{fig:first_stage}}. Results for the full sample are as follow:
-
-\begin{itemize}    
-    \item College choices: \hyperref[tab:table_sib_choices_all_1_2]{Table \ref{tab:table_sib_choices_all_1_2}}
-    \item School progression:  \hyperref[tab:table_sib_school_outcomes_all_1_2]{Table \ref{tab:table_sib_school_outcomes_all_1_2}}
-    \item College aspirations: \hyperref[tab:table_sib_univ_outcomes_all_1_2]{Table \ref{tab:table_sib_univ_outcomes_all_1_2}}
-    \item Heterogeneous analysis: \hyperref[tab:table_sib_heterog_all_1_2]{Table \ref{tab:table_sib_heterog_all_1_2}}
-    \item Balance test: \hyperref[tab:table_foc_balance_all_1_2]{Table \ref{tab:table_foc_balance_all_1_2}}
-\end{itemize}    
-
-\begin{itemize}  
-    \item When restricting only for the first semester each focal child applies results look stronger but possibly caused by unbalanced sample: \hyperref[tab:table_sib_choices_first_1_2]{Table \ref{tab:table_sib_choices_first_1_2}}, \hyperref[tab:table_sib_school_outcomes_first_1_2]{Table \ref{tab:table_sib_school_outcomes_first_1_2}}, \hyperref[tab:table_sib_univ_outcomes_first_1_2]{Table \ref{tab:table_sib_univ_outcomes_first_1_2}}, \hyperref[tab:table_sib_heterog_first_1_2]{Table \ref{tab:table_sib_heterog_first_1_2}}, \hyperref[tab:table_foc_balance_first_1_2]{Table \ref{tab:table_foc_balance_first_1_2}}.
-\end{itemize}   
-
+     The
 \newpage
-\textbf{Issues:}
-\begin{itemize}
-    \item In centralized settings, it is common to keep the first set of choices/application. It is not clear I can do the same here since I don't (currently) have dates of exams, but even then, that would mean only keep 1 exam.
-    \item I am considering 2 options: Use full sample and use only first semester of applications. I also considered using only those who apply once but sample is too small.
-    \item I am not sure if using the full sample is methodologically correct, although it seems balanced. Results there however look very similar to \cite{altmejd_o_2021} in the case of choices.
-    \item Main problem now is the balance is not working properly for 8th grade exams when keeping only the first semester.
-\end{itemize}
+
 
 
 

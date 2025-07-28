@@ -664,7 +664,7 @@
 \long\gdef\@abstract{}
 \long\def\xabstract#1{\long\gdef\@abstract{#1}}
 
-\def\@shortTitle{Behavioral biases in health insurance plan choices}
+\def\@shortTitle{School closures and family size}
 \def\shortTitle#1{\gdef\@shortTitle{#1}}
 
 % frontmatter
