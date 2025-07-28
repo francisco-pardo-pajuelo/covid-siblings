@@ -2148,18 +2148,17 @@ program define analyze_2009_2012_vs_2022
 					note("")
 				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.png", replace			
 				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.pdf", replace		
-				
+			
 			twoway 	///
-					(histogram gap_`subj' if year==2009,	fcolor("${blue_1}%20") 	lcolor("${blue_1}%20")	) ///
-					(histogram gap_`subj' if year==2012, 	fcolor("${red_4}%20")	lcolor("${red_4}%20")	) ///
-					(histogram gap_`subj' if year==2022, 	fcolor("${red_2}%20")	lcolor("${red_2}%20")) ///
+					(kdensity gap_`subj' if year==2009, 	lcolor("${blue_1}%80")	) ///
+					(kdensity gap_`subj' if year==2012, 	lcolor("${blue_3}%80")	) ///
+					(kdensity gap_`subj' if year==2022, 	lcolor("${red_2}%80")) ///
 					, ///
 					/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
 					legend(order(1 "2009" 2 "2012" 3 "2022") col(3) pos(6)) ///
 					ytitle(`ytitle_gap_`subj'') ///
-					yline(0, lcolor(gs8)) ///
-					ylabel(-.5(.1).5) ///
-					xlabel(2009 2012 2022) ///
+					xline(0, lcolor(gs8)) ///
+					xlabel(-.3(.1).4) ///
 					xtitle("Gap between sibling sample and only child sample") ///
 					note("")
 				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2022.png", replace			
