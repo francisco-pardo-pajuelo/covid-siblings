@@ -1972,216 +1972,216 @@ end
 capture program drop analyze_2009_2012_vs_2022
 program define analyze_2009_2012_vs_2022
 
-	use  "$TEMP\COVID_pisa_append", clear
-	
-	tab year sibs, row nofreq
-	keep if year==2009 | year==2012 | year==2022
-	keep if sibs!=.
-	
-	*- Standardize results by base year:
-	foreach v of var PV*MATH PV*READ PV*SCIE {
-		sum `v' if year==2009, de
-		local m = r(mean)
-		local sd = r(sd)
-		replace `v' = (`v'-`m')/`sd'
-	}
-	
-	*- Has observations for 3 years
-	local n_years = 3
-
-	bysort CNT (year): 	gen tag = year != year[_n-1]   // tag unique years
-	bysort CNT (year): 	replace tag = 1 if _n == 1      // make sure first obs is tagged
-	bysort CNT:			egen n_years = total(tag)
-	keep if n_years == `n_years' 
-
-
-	//collapse PV1MATH, by(CNTRYID year)
-	
-	//Overall average
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(year OECD)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
-		tempfile PV_all_avg
-		save `PV_all_avg', replace
-	restore	
-	
-	//Overall sib averages
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(sibs year OECD)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
-		tempfile PV_all_sibs_avg
-		save `PV_all_sibs_avg', replace
-	restore		
-
-	//Country averages
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID year)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
-		reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
-		tempfile PV_CNTRYID
-		save `PV_CNTRYID', replace
-	restore
-
-	//Country sib averages
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID sibs year)
-		*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
-		//reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
-		tempfile PV_CNTRYID_sibs
-		save `PV_CNTRYID_sibs', replace
-	restore
-
-	//How is the gap by # children in each country?
-	preserve
-		collapse PV*MATH PV*READ PV*SCIE  [iw=SENWT], by(CNTRYID year sibs)
+		use  "$TEMP\COVID_pisa_append", clear
+		
+		tab year sibs, row nofreq
+		keep if year==2009 | year==2012 | year==2022
+		keep if sibs!=.
+		
+		*- Standardize results by base year:
 		foreach v of var PV*MATH PV*READ PV*SCIE {
-			bys CNTRYID year (sibs): gen gap_`v' = `v'-`v'[1] if _n!=1
-			}
-		keep if sibs==1
-		tempfile gap_long_PV_CNTRYID
-		save `gap_long_PV_CNTRYID', replace		
-		drop PV*MATH PV*READ PV*SCIE		
-		reshape wide gap*, i(CNTRYID) j(year)
-		tempfile gap_wide_PV_CNTRYID
-		save `gap_wide_PV_CNTRYID', replace	
-	restore
-
-		
-	local ytitle_PV1MATH = "Mathematics test score"
-	local ytitle_PV1READ = "Reading test score"
-	local ytitle_PV1SCIE = "Science test score"	
-
-	local ytitle_gap_PV1MATH = "Siblings - Only Child Gap (Mathematics)"
-	local ytitle_gap_PV1READ = "Siblings - Only Child Gap (Reading)"
-	local ytitle_gap_PV1SCIE = "Siblings - Only Child Gap (Science)"	
-	
-	
-	*- 1.  Overall Trends in performance
-	preserve
-		use `PV_all_avg', clear
-		append using `PV_all_sibs_avg'
-		*- Scatter plot
-		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
-			twoway 	///
-					(line `subj'_all_avg year if sibs==0, lcolor("${blue_2}")) ///
-					(line `subj'_all_avg year if sibs==1, lcolor("${red_2}")) ///
-					/// (line `subj'_all_avg year if sibs==., lcolor(gs0)) ///
-					(scatter `subj'_all_avg year if sibs==0, mcolor("${blue_2}")) ///
-					(scatter `subj'_all_avg year if sibs==1, mcolor("${red_2}")) ///
-					/// (scatter `subj'_all_avg year if sibs==., mcolor(gs0)) ///
-					, /// 
-					legend(order(/*3 "Total"*/ 1 "Only childs sample" 2 "Sibling sample") col(3)) ///
-					ytitle(`ytitle_`subj'') ///
-					xtitle(Year) ///
-					yline(0, lcolor(gs8)) ///
-					ylabel(-.5(.1).5) ///
-					xlabel(2009 2012 2022) ///
-					by(OECD, legend(pos(6)) note(""))
-				capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2009_2022.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2009_2022.pdf", replace
+			sum `v' if year==2009, de
+			local m = r(mean)
+			local sd = r(sd)
+			replace `v' = (`v'-`m')/`sd'
 		}
-	restore
-	
-	*- 2.  Gap Ranking
-	preserve
 		
-		bys CNTRYID: keep if _n==1
-		keep CNTRYID OECD
-		
-		merge m:1 CNTRYID using `PV_CNTRYID', keep(master match) nogen
-		merge m:1 CNTRYID using `gap_wide_PV_CNTRYID', keep(master match) nogen
-		
-		*graph hbar (mean) gap, over(CNTRYID, sort(1) label(labsize(*0.3)))  
-		/*
-		merge m:1 CNTRYID using `PV1MATH_CNTRYID'
+		*- Has observations for 3 years
+		local n_years = 3
+
+		bysort CNT (year): 	gen tag = year != year[_n-1]   // tag unique years
+		bysort CNT (year): 	replace tag = 1 if _n == 1      // make sure first obs is tagged
+		bysort CNT:			egen n_years = total(tag)
+		keep if n_years == `n_years' 
 
 
-		scatter gap PV1MATH_avg
-		*/
-		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
-			foreach year in "2009" "2012" "2022" {
-			graph hbar (mean) gap_`subj'`year', over(CNTRYID, sort(1) label(labsize(*0.3)))  ytitle(`ytitle_gap_`subj'')
-					capture qui graph export "$FIGURES\Descriptive\PISA_gap_ranking_`subj'_`y'.png", replace			
-					capture qui graph export "$FIGURES\Descriptive\PISA_gap_ranking_`subj'_`y'.pdf", replace	
-			}
-		}
-		/*
-		gen gap_PV1MATH_09_22 = gap_PV1MATH2022 - gap_PV1MATH2009
-		gen gap_PV1MATH_12_22 = gap_PV1MATH2022 - gap_PV1MATH2012
-		histogram gap_PV1MATH_09_22
-		histogram gap_PV1MATH_12_22
-		*/
-	restore
-	
-	*- 3. Gap plot
-	preserve
+		//collapse PV1MATH, by(CNTRYID year)
 		
-		bys CNTRYID year: keep if _n==1
-		keep CNT CNTRYID OECD year
-		merge m:1 CNTRYID  using `PV_CNTRYID', keep(master match) nogen	
-		merge m:1 CNTRYID year using `gap_long_PV_CNTRYID', keep(master match) nogen	
-		//foreach year in "2009" "2012" {
-		foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
+		//Overall average
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(year OECD)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
+			tempfile PV_all_avg
+			save `PV_all_avg', replace
+		restore	
+		
+		//Overall sib averages
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(sibs year OECD)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_all_avg PV*READ_all_avg PV*SCIE_all_avg)
+			tempfile PV_all_sibs_avg
+			save `PV_all_sibs_avg', replace
+		restore		
+
+		//Country averages
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID year)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
+			reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
+			tempfile PV_CNTRYID
+			save `PV_CNTRYID', replace
+		restore
+
+		//Country sib averages
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE [iw=SENWT], by(CNTRYID sibs year)
+			*graph hbar (mean) PV1MATH, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			rename (PV*MATH PV*READ PV*SCIE) (PV*MATH_avg PV*READ_avg PV*SCIE_avg)
+			//reshape wide PV*MATH_avg PV*READ_avg PV*SCIE_avg, i(CNTRYID) j(year)
+			tempfile PV_CNTRYID_sibs
+			save `PV_CNTRYID_sibs', replace
+		restore
+
+		//How is the gap by # children in each country?
+		preserve
+			collapse PV*MATH PV*READ PV*SCIE  [iw=SENWT], by(CNTRYID year sibs)
+			foreach v of var PV*MATH PV*READ PV*SCIE {
+				bys CNTRYID year (sibs): gen gap_`v' = `v'-`v'[1] if _n!=1
+				}
+			keep if sibs==1
+			tempfile gap_long_PV_CNTRYID
+			save `gap_long_PV_CNTRYID', replace		
+			drop PV*MATH PV*READ PV*SCIE		
+			reshape wide gap*, i(CNTRYID) j(year)
+			tempfile gap_wide_PV_CNTRYID
+			save `gap_wide_PV_CNTRYID', replace	
+		restore
+
 			
-			//local subj = "PV1MATH"
-			*- Box plot
-			graph box gap_`subj', over(year) by(OECD) yline(0, lcolor(gs8))
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_box_2009_2022.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_box_2009_2022.pdf", replace		
-	
+		local ytitle_PV1MATH = "Mathematics test score"
+		local ytitle_PV1READ = "Reading test score"
+		local ytitle_PV1SCIE = "Science test score"	
+
+		local ytitle_gap_PV1MATH = "Siblings - Only Child Gap (Mathematics)"
+		local ytitle_gap_PV1READ = "Siblings - Only Child Gap (Reading)"
+		local ytitle_gap_PV1SCIE = "Siblings - Only Child Gap (Science)"	
+		
+		
+		*- 1.  Overall Trends in performance
+		preserve
+			use `PV_all_avg', clear
+			append using `PV_all_sibs_avg'
 			*- Scatter plot
-			twoway 	///
-					(scatter gap_`subj' year if CNT!="PER", mcolor("${blue_2}%20")) ///
-					(scatter gap_`subj' year if CNT=="PER", mcolor("${red_2}")) ///
-					, ///
-					/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
-					legend(off) ///
-					ytitle(`ytitle_gap_`subj'') ///
-					yline(0, lcolor(gs8)) ///
-					ylabel(-.5(.1).5) ///
-					xlabel(2009 2012 2022) ///
-					xtitle("Year") ///
-					note("")
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.pdf", replace		
-			
-			twoway 	///
-					(kdensity gap_`subj' if year==2009, 	lcolor("${blue_1}%80")	) ///
-					(kdensity gap_`subj' if year==2012, 	lcolor("${blue_3}%80")	) ///
-					, ///
-					/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
-					legend(order(1 "2009" 2 "2012" ) col(3) pos(6)) ///
-					ytitle(`ytitle_gap_`subj'') ///
-					ylabel(0(1)5) ///
-					xline(0, lcolor(gs8)) ///
-					xlabel(-.3(.1).4) ///
-					xtitle("Gap between sibling sample and only child sample") ///
-					note("")
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2012.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2012.pdf", replace	
-				
-			twoway 	///
-					(kdensity gap_`subj' if year==2009, 	lcolor("${blue_1}%80")	) ///
-					(kdensity gap_`subj' if year==2012, 	lcolor("${blue_3}%80")	) ///
-					(kdensity gap_`subj' if year==2022, 	lcolor("${red_2}%80")) ///
-					, ///
-					/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
-					legend(order(1 "2009" 2 "2012" 3 "2022") col(3) pos(6)) ///
-					ytitle(`ytitle_gap_`subj'') ///
-					xline(0, lcolor(gs8)) ///
-					ylabel(0(1)5) ///
-					xlabel(-.3(.1).4) ///
-					xtitle("Gap between sibling sample and only child sample") ///
-					note("")
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2022.png", replace			
-				capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2022.pdf", replace					
+			foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
+				twoway 	///
+						(line `subj'_all_avg year if sibs==0, lcolor("${blue_2}")) ///
+						(line `subj'_all_avg year if sibs==1, lcolor("${red_2}")) ///
+						/// (line `subj'_all_avg year if sibs==., lcolor(gs0)) ///
+						(scatter `subj'_all_avg year if sibs==0, mcolor("${blue_2}")) ///
+						(scatter `subj'_all_avg year if sibs==1, mcolor("${red_2}")) ///
+						/// (scatter `subj'_all_avg year if sibs==., mcolor(gs0)) ///
+						, /// 
+						legend(order(/*3 "Total"*/ 1 "Only childs sample" 2 "Sibling sample") col(3)) ///
+						ytitle(`ytitle_`subj'') ///
+						xtitle(Year) ///
+						yline(0, lcolor(gs8)) ///
+						ylabel(-.5(.1).5) ///
+						xlabel(2009 2012 2022) ///
+						by(OECD, legend(pos(6)) note(""))
+					capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2009_2022.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_`subj'_2009_2022.pdf", replace
 			}
+		restore
 		
-	restore
+		*- 2.  Gap Ranking
+		preserve
+			
+			bys CNTRYID: keep if _n==1
+			keep CNTRYID OECD
+			
+			merge m:1 CNTRYID using `PV_CNTRYID', keep(master match) nogen
+			merge m:1 CNTRYID using `gap_wide_PV_CNTRYID', keep(master match) nogen
+			
+			*graph hbar (mean) gap, over(CNTRYID, sort(1) label(labsize(*0.3)))  
+			/*
+			merge m:1 CNTRYID using `PV1MATH_CNTRYID'
+
+
+			scatter gap PV1MATH_avg
+			*/
+			foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
+				foreach year in "2009" "2012" "2022" {
+				graph hbar (mean) gap_`subj'`year', over(CNTRYID, sort(1) label(labsize(*0.3)))  ytitle(`ytitle_gap_`subj'')
+						capture qui graph export "$FIGURES\Descriptive\PISA_gap_ranking_`subj'_`y'.png", replace			
+						capture qui graph export "$FIGURES\Descriptive\PISA_gap_ranking_`subj'_`y'.pdf", replace	
+				}
+			}
+			/*
+			gen gap_PV1MATH_09_22 = gap_PV1MATH2022 - gap_PV1MATH2009
+			gen gap_PV1MATH_12_22 = gap_PV1MATH2022 - gap_PV1MATH2012
+			histogram gap_PV1MATH_09_22
+			histogram gap_PV1MATH_12_22
+			*/
+		restore
+		
+		*- 3. Gap plot
+		preserve
+			
+			bys CNTRYID year: keep if _n==1
+			keep CNT CNTRYID OECD year
+			merge m:1 CNTRYID  using `PV_CNTRYID', keep(master match) nogen	
+			merge m:1 CNTRYID year using `gap_long_PV_CNTRYID', keep(master match) nogen	
+			//foreach year in "2009" "2012" {
+			foreach subj in "PV1MATH" "PV1READ" /*"PV1SCIE"*/ {
+				
+				//local subj = "PV1MATH"
+				*- Box plot
+				graph box gap_`subj', over(year) by(OECD) yline(0, lcolor(gs8))
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_box_2009_2022.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_box_2009_2022.pdf", replace		
+		
+				*- Scatter plot
+				twoway 	///
+						(scatter gap_`subj' year if CNT!="PER", mcolor("${blue_2}%20")) ///
+						(scatter gap_`subj' year if CNT=="PER", mcolor("${red_2}")) ///
+						, ///
+						/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
+						legend(off) ///
+						ytitle(`ytitle_gap_`subj'') ///
+						yline(0, lcolor(gs8)) ///
+						ylabel(-.5(.1).5) ///
+						xlabel(2009 2012 2022) ///
+						xtitle("Year") ///
+						note("")
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_scatter_2009_2022.pdf", replace		
+				
+				twoway 	///
+						(kdensity gap_`subj' if year==2009, 	lcolor("${blue_1}%80")	) ///
+						(kdensity gap_`subj' if year==2012, 	lcolor("${blue_3}%80")	) ///
+						, ///
+						/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
+						legend(order(1 "2009" 2 "2012" ) col(3) pos(6)) ///
+						ytitle(`ytitle_gap_`subj'') ///
+						ylabel(0(1)5) ///
+						xline(0, lcolor(gs8)) ///
+						xlabel(-.3(.1).4) ///
+						xtitle("Gap between sibling sample and only child sample") ///
+						note("")
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2012.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2012.pdf", replace	
+					
+				twoway 	///
+						(kdensity gap_`subj' if year==2009, 	lcolor("${blue_1}%80")	) ///
+						(kdensity gap_`subj' if year==2012, 	lcolor("${blue_3}%80")	) ///
+						(kdensity gap_`subj' if year==2022, 	lcolor("${red_2}%80")) ///
+						, ///
+						/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
+						legend(order(1 "2009" 2 "2012" 3 "2022") col(3) pos(6)) ///
+						ytitle(`ytitle_gap_`subj'') ///
+						xline(0, lcolor(gs8)) ///
+						ylabel(0(1)5) ///
+						xlabel(-.3(.1).4) ///
+						xtitle("Gap between sibling sample and only child sample") ///
+						note("")
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2022.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\PISA_gap_`subj'_histogram_2009_2022.pdf", replace					
+				}
+			
+		restore
 	
 	*- 3. DID raw vs school closure
 	preserve	
