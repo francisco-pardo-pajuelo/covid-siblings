@@ -75,7 +75,7 @@ global FIGURES 		"$DB_PROJECT\19_covid-siblings\FIGURES"
 global TABLES 		"$DB_PROJECT\19_covid-siblings\TABLES"
 global LOGS 		"$DB_PROJECT\19_covid-siblings\LOGS"
 global FIGURES_TEMP "$DB_PROJECT\19_covid-siblings\FIGURES_TEMP"
-global TABLES_TEMP 	"$DB_PROJECT\19_covid-siblings\TABLES_TEMP"
+global TABLES_TEMP 	"$DB_PROJECT\19_covid-siblings\TABLES"
 
 *-- Shaping beliefs: 
 

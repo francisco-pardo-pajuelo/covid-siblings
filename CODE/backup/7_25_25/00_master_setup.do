@@ -70,12 +70,10 @@ global DATA "$DB_PROJECT\18_aspirations_siblings_rank\DATA"
 	global TEMP "$DATA\TEMP"
 	global OUT "$DATA\OUT"
 	
-global CODE 		"$DB_PROJECT\19_covid-siblings\CODE"	
-global FIGURES 		"$DB_PROJECT\19_covid-siblings\FIGURES"
-global TABLES 		"$DB_PROJECT\19_covid-siblings\TABLES"
-global LOGS 		"$DB_PROJECT\19_covid-siblings\LOGS"
-global FIGURES_TEMP "$DB_PROJECT\19_covid-siblings\FIGURES_TEMP"
-global TABLES_TEMP 	"$DB_PROJECT\19_covid-siblings\TABLES_TEMP"
+global CODE "$DB_PROJECT\19_covid-siblings\CODE"	
+global FIGURES "$DB_PROJECT\19_covid-siblings\FIGURES"
+global TABLES "$DB_PROJECT\19_covid-siblings\TABLES"
+global LOGS "$DB_PROJECT\19_covid-siblings\LOGS"
 
 *-- Shaping beliefs: 
 

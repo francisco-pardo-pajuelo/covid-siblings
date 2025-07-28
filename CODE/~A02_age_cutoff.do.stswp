@@ -593,10 +593,17 @@ end
 capture program drop first_stage
 program define first_stage
 
+
+/*
 estimates clear
  forvalues size = 2(1)3 {
  	forvalues foc_order = 1(1)2 {
 		forvalues sib_order = 2(1)3 {
+			
+			//local size = 3
+			//local foc_order = 2
+			//local sib_order = 3
+			
 			if `foc_order'>=`sib_order' continue
 			if `size' == 2 & `foc_order'==2 continue
 			if `size' == 2 & `sib_order'==3 continue
@@ -611,7 +618,7 @@ estimates clear
 			keep if fam_total_${fam_type}==`size'
 			keep if fam_order_${fam_type}==`foc_order'
 			keep if fam_order_${fam_type}_sib==`sib_order'
-			keep if year_entry_1st_sib>=2018 & year_entry_1st_sib<=2023
+			//keep if year_entry_1st_sib>=2018 & year_entry_1st_sib<=2023
 			histogram dob_siagie_sib
 			tempfile dob_sib
 			save `dob_sib', replace
@@ -621,61 +628,77 @@ estimates clear
 			merge m:1 id_per_umc using `dob_sib', keep(master match) keepusing(year_entry_1st dob_siagie year_entry_1st_sib dob_siagie_sib dob_relative_sib)
 			beep
 			
-			
+			gen cutoff = .
+			forvalues y = 2016(1)2023 {
+				replace cutoff = ${cutoff_last_1_`y'} if year==`y'
+			}
 			
 			//forvalues g = 3(1)4 {
-				forvalues y = 2018(1)2021 {
+				forvalues y = 2016(1)2023 {
 					//local g=2
 					//local y=2020
+					
+					di "***************" _n "Year: `y'" _n "***************"
+					//local y = 2016
 					preserve
 						drop dob_relative_sib 
-						gen dob_relative_sib = dob_siagie_sib - ${cutoff_last_1_`y'}
+						gen dob_relative_sib = dob_siagie_sib - cutoff
 						gen ABOVE= dob_relative_sib>0
 						gen ABOVE_dob_relative_sib = dob_relative_sib*ABOVE
+						keep if abs(dob_relative)<365
 						
 						//drop if year_entry_1st_sib==year_entry_1st
-						keep if year_entry_1st_sib>=`y' & year_entry_1st_sib<=`y'+1
+						//keep if year_entry_1st_sib>=`y' & year_entry_1st_sib<=`y'+1
 						keep if grade>=2 & grade<=6 
 						keep if year==`y'
 						local lab_text = "03/31/"	
 						//sum dob_siagie if grade==`g' & year==`y'
 						
+						tab year year_entry_1st_sib
+						
 						*- First stage
+						di as result "***************"  _n "First Stage" _n "***************" 
 						binsreg year_entry_1st_sib dob_siagie_sib
-						capture qui graph export "$FIGURES\RD_age\first_stage_`foc_order'_`sib_order'_`y'.png", replace			
-						capture qui graph export "$FIGURES\RD_age\first_stage_`foc_order'_`sib_order'_`y'.pdf", replace	
+						capture qui graph export "$FIGURES\RD_age\first_stage_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
+						capture qui graph export "$FIGURES\RD_age\first_stage_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace	
 						
 						*- Histogram
+						di as result "***************"  _n "Histogram" _n "***************" 
+						
 						histogram dob_siagie_sib
-						capture qui graph export "$FIGURES\RD_age\histogram_`foc_order'_`sib_order'_`y'.png", replace			
-						capture qui graph export "$FIGURES\RD_age\histogram_`foc_order'_`sib_order'_`y'.pdf", replace				
+						capture qui graph export "$FIGURES\RD_age\histogram_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
+						capture qui graph export "$FIGURES\RD_age\histogram_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace				
 						
 						*- Outcome
-						binsreg std_gpa_m_adj dob_siagie_sib ///
+						di as result "***************"  _n "Plot" _n "***************" 
+						
+						binsreg std_gpa_`subj'_adj dob_relative_sib ///
 						, ///
 							nbins(50) ///
-							xlabel(${cutoff_last_1_`y'} "`lab_text'`y'") ///
+							///xlabel(${cutoff_last_1_`y'} "`lab_text'`y'") ///
 							///xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
-							xline(${cutoff_last_1_`y'}, lcolor(gs12)) ///
+							xline(0, lcolor(gs12)) ///
 							xtitle(Sibling Date of Birth)
-							capture qui graph export "$FIGURES\RD_age\math_`foc_order'_`sib_order'_`y'.png", replace			
-							capture qui graph export "$FIGURES\RD_age\math_`foc_order'_`sib_order'_`y'.pdf", replace			
+							capture qui graph export "$FIGURES\RD_age\\`subj'_s`size'_`foc_order'_`sib_order'_`y'.png", replace			
+							capture qui graph export "$FIGURES\RD_age\\`subj'_s`size'_`foc_order'_`sib_order'_`y'.pdf", replace			
 						
-						eststo rd_s`size'_`foc_order'_`sib_order'_`y': reg std_gpa_m_adj ABOVE dob_relative_sib ABOVE_dob_relative_sib
+						di as result "***************"  _n "Reg" _n "***************" 
+						
+						eststo rd_s`size'_`foc_order'_`sib_order'_`y': reg std_gpa_`subj'_adj ABOVE dob_relative_sib ABOVE_dob_relative_sib
 							
 					restore
 				}
 				
 
-			capture erase "$TABLES\rd_s`size'_`foc_order'_`sib_order'.tex"
+			capture erase "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex"
 			
-			file open  table_tex	using "$TABLES\rd_s`size'_`foc_order'_`sib_order'.tex", replace write
+			file open  table_tex	using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", replace write
 			file write table_tex	/// HEADER OPTIONS OF TABLE
 							"\makebox[0.1\width][l]{" _n ///
 							"\resizebox{`scale'\textwidth}{!}{" _n
 			file close table_tex
 			
-			file open  table_tex	using "$TABLES\rd_s`size'_`foc_order'_`sib_order'.tex", append write
+			file open  table_tex	using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", append write
 			file write table_tex	/// HEADER OPTIONS OF TABLE
 							"\begin{tabular}{lcccc}" _n ///
 							/// HEADER OF TABLE
@@ -688,14 +711,14 @@ estimates clear
 			file close table_tex			
 			
 			estout   rd_s`size'_`foc_order'_`sib_order'_???? ///
-			using "$TABLES\rd_s`size'_`foc_order'_`sib_order'.tex", ///
+			using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", ///
 			append style(tex) ///
 			cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 			keep(ABOVE) ///
 			stats(blank_line N, fmt(%9.0fc %9.0fc ) labels(" " "Observations" ))  ///
 			starlevels(* 0.10 ** 0.05 *** 0.001)
 			
-			file open  table_tex	using "$TABLES\rd_s`size'_`foc_order'_`sib_order'.tex", append write
+			file open  table_tex	using "$TABLES\rd_`subj'_s`size'_`foc_order'_`sib_order'.tex", append write
 			file write table_tex	/// HEADER OPTIONS OF TABLE							
 			_n "\bottomrule" _n ///
 				"\end{tabular}" _n ///
@@ -706,8 +729,194 @@ estimates clear
 				}
 			}
 		 }
-	
-	
+*/	
+
+*- Grouping Years	
+
+
+
+foreach bw in "365" "300" "250" "200" "150" "100" "50" {
+	foreach subj in "m" "c" {
+		foreach size in "a" "2" "3" /*"4"*/ { //a="all"={2,3}
+			foreach foc_order in "" "1" "2" "3"  {
+				foreach sib_order in "" "2" "3" "4" {
+					foreach rel_cutoff in "K" "1" "2" { //In order to consider other possible cutoffs
+							
+							
+							
+							
+						estimates clear
+						//local size = 3
+						//local foc_order = 2
+						//local sib_order = 3
+
+						if !(("`size'" == "a" & "`foc_order'"=="" & "`sib_order'"=="") | ("`size'" != "a" & "`foc_order'"!="" & "`sib_order'"!="")) continue
+						
+						if "`size'" != "a" {
+							if `foc_order'>=`sib_order' continue
+							if `foc_order'>=`size'		continue
+							if `sib_order'>`size'		continue
+							}
+							
+						di 	"**************" _n ///
+							"Cutoff: `rel_cutoff'" _n ///
+							"Subj: `subj'" _n ///
+							"Bw: `bw'" _n ///
+							"Size: `size'" _n ///
+							"Foc: `foc_order'" _n ///
+							"Sib: `sib_order'" _n ///
+							"**************"
+
+						use "$TEMP\student_sibling_combinations_dob", clear
+						
+						drop if fam_order_${fam_type}==fam_order_${fam_type}_sib
+						
+						if "`size'" != "a" {
+							keep if fam_total_${fam_type}==`size'
+							keep if fam_order_${fam_type}==`foc_order'
+							keep if fam_order_${fam_type}_sib==`sib_order'
+							}
+							
+						if "`size'" == "a" {
+							keep if fam_total_${fam_type}>=2 & fam_total_${fam_type}<=3
+							keep if fam_order_${fam_type}<fam_order_${fam_type}_sib
+							keep if fam_order_${fam_type}_sib == fam_total_${fam_type} //Base it on the youngest sibling's DOB		
+						}
+						
+						//keep if year_entry_1st_sib>=2018 & year_entry_1st_sib<=2023
+						//histogram dob_siagie_sib
+						tempfile dob_sib
+						save `dob_sib', replace
+						
+						use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_append", clear
+						keep id_per_umc grade year std_gpa_?_adj
+						merge m:1 id_per_umc using `dob_sib', keep(master match) keepusing(year_entry_1st dob_siagie year_entry_1st_sib dob_siagie_sib dob_relative_sib)
+						beep
+						
+						gen cutoff = .
+						forvalues y = 2016(1)2023 {
+							if "`rel_cutoff'" == "K" local cutoff_year = `y'+1
+							if "`rel_cutoff'" == "1" local cutoff_year = `y'
+							if "`rel_cutoff'" == "2" local cutoff_year = `y'-1	
+							replace cutoff = ${cutoff_last_1_`cutoff_year'} if year==`y'
+						}
+						
+						//forvalues g = 3(1)4 {
+							foreach pair_year in /*"2016_2017"*/"18_19" "20_21" "22_23" {
+								//local g=2
+								//local y=2020
+								
+								di "***************" _n "Year: `pair_year'" _n "***************"
+								//local y = 2016
+								preserve
+									drop dob_relative_sib 
+									gen dob_relative_sib = dob_siagie_sib - cutoff
+									gen ABOVE= dob_relative_sib>0
+									gen ABOVE_dob_relative_sib = dob_relative_sib*ABOVE
+									keep if abs(dob_relative)<`bw'
+									
+									//drop if year_entry_1st_sib==year_entry_1st
+									//keep if year_entry_1st_sib>=`y' & year_entry_1st_sib<=`y'+1
+									keep if grade>=2 & grade<=6 
+									if "`pair_year'" == "16_17" keep if inlist(year,2016,2017)
+									if "`pair_year'" == "18_19" keep if inlist(year,2018,2019)
+									if "`pair_year'" == "20_21" keep if inlist(year,2020,2021)
+									if "`pair_year'" == "22_23" keep if inlist(year,2022,2023)
+									local lab_text = "03/31/"	
+									//sum dob_siagie if grade==`g' & year==`y'
+									
+									tab year year_entry_1st_sib
+									
+									*- First stage
+									di as result "***************"  _n "First Stage" _n "***************" 
+									capture binsreg year_entry_1st_sib dob_siagie_sib
+									if _rc==0 { //If no error
+										capture qui graph export "$FIGURES\RD_age\first_stage_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
+										capture qui graph export "$FIGURES\RD_age\first_stage_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace	
+										}
+									*- Histogram
+									di as result "***************"  _n "Histogram" _n "***************" 
+									
+									histogram dob_siagie_sib, xtitle("DOB younger sibling") name(histog_dob, replace)
+									histogram dob_relative_sib, xtitle("DOB relative to school entry cutoff") name(histog_rel, replace)
+									
+									graph combine histog_dob histog_rel
+									capture qui graph export "$FIGURES\RD_age\histogram_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
+									capture qui graph export "$FIGURES\RD_age\histogram_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace		
+									
+									*- Outcome
+									di as result "***************"  _n "Plot" _n "***************" 
+									
+									capture binsreg std_gpa_`subj'_adj dob_relative_sib ///
+									, ///
+										nbins(100) ///
+										///xlabel(${cutoff_last_1_`y'} "`lab_text'`y'") ///
+										///xlabel(17622 "`lab_text'08" 17987 "`lab_text'09" 18352 "`lab_text'10" 18717 "`lab_text'11" 19083 "`lab_text'12" 19448 "`lab_text'13" 19813 "`lab_text'14" 20178 "`lab_text'15" 20544 "`lab_text'16" 20909 "`lab_text'17" 21274 "`lab_text'18" , angle(45)) ///
+										xline(0, lcolor(gs12)) ///
+										xtitle(Sibling Date of Birth)
+										if _rc==0 { //If no error
+										capture qui graph export "$FIGURES\RD_age\\`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.png", replace			
+										capture qui graph export "$FIGURES\RD_age\\`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'.pdf", replace			
+										}
+									di as result "***************"  _n "Reg" _n "***************" 					
+									sum std_gpa_`subj'_adj if ABOVE==0 //Counterfactual Mean
+									local y_below=r(mean)		
+									
+									gen local_linear = 1 
+									
+									reghdfe std_gpa_`subj'_adj ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear, a(year)
+									estadd scalar y_below `y_below'
+									estadd scalar bandwidth `bw' 
+									estimates store rd_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_`pair_year'
+										
+								restore
+							}
+							
+
+						capture erase "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex"
+						
+						file open  table_tex	using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", replace write
+						file write table_tex	/// HEADER OPTIONS OF TABLE
+										"\makebox[0.1\width][l]{" _n ///
+										"\resizebox{`scale'\textwidth}{!}{" _n
+						file close table_tex
+						
+						file open  table_tex	using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
+						file write table_tex	/// HEADER OPTIONS OF TABLE
+										"\begin{tabular}{lccc}" _n ///
+										/// HEADER OF TABLE
+										"\toprule" _n ///
+										"\cmidrule(lr){2-4}" _n ///					
+										"& Pre-Covid & Covid & Post-Covid  \\" _n ///
+										"& 2018-2019 & 2020-2021 & 2022-2023  \\" _n ///
+										"& (1) & (2) & (3)  \\" _n ///
+										"\bottomrule" _n ///
+										"&  &  &   \\" _n 
+						file close table_tex			
+						
+						estout   rd_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'_??_?? ///
+						using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", ///
+						append style(tex) ///
+						cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+						keep(ABOVE) ///
+						indicate("Local Linear" = local_linear, labels("Yes" "No")) ///
+						stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
+						mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+						
+						file open  table_tex	using "$TABLES\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
+						file write table_tex	/// HEADER OPTIONS OF TABLE							
+						_n "\bottomrule" _n ///
+							"\end{tabular}" _n ///
+							"}" _n ///
+							"}" _n
+						file close table_tex				
+					
+						}
+					}
+				 }	
+			}	
+		}	
+	}	
 end
 
 
