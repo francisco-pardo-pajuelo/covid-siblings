@@ -2156,7 +2156,7 @@ program define analyze_2009_2012_vs_2022
 					/// legend(order(1 "OECD" 2 "Non-OECD") col(2) pos(6)) ///
 					legend(order(1 "2009" 2 "2012" ) col(3) pos(6)) ///
 					ytitle(`ytitle_gap_`subj'') ///
-					ylabel(0(.1).4) ///
+					ylabel(0(1)5) ///
 					xline(0, lcolor(gs8)) ///
 					xlabel(-.3(.1).4) ///
 					xtitle("Gap between sibling sample and only child sample") ///
@@ -2173,7 +2173,7 @@ program define analyze_2009_2012_vs_2022
 					legend(order(1 "2009" 2 "2012" 3 "2022") col(3) pos(6)) ///
 					ytitle(`ytitle_gap_`subj'') ///
 					xline(0, lcolor(gs8)) ///
-					ylabel(0(.1).4) ///
+					ylabel(0(1)5) ///
 					xlabel(-.3(.1).4) ///
 					xtitle("Gap between sibling sample and only child sample") ///
 					note("")
