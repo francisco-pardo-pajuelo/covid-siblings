@@ -900,7 +900,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 										/// HEADER OF TABLE
 										"\toprule" _n ///
 										"\cmidrule(lr){2-4}" _n ///	
-										"& \multicolumn{3}{c}{Standardized GPA}" _n ///
+										"& \multicolumn{3}{c}{Standardized GPA} \\"  _n ///
 										"\cmidrule(lr){2-4}" _n ///	
 										"& Pre-Covid & Covid & Post-Covid  \\" _n ///
 										"& 2018-2019 & 2020-2021 & 2022-2023  \\" _n ///
