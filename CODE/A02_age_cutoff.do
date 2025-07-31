@@ -1559,17 +1559,42 @@ reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if
 
 foreach bw in "50" "100" "200" "300" "365" {
 	estimates clear
+	
+	sum std_math if ABOVE==0 & inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1 //Counterfactual Mean
+	local y_below=r(mean)	
 	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	estadd scalar y_below `y_below'
+	estadd scalar bandwidth `bw' 	
 	estimates store	rd_math_pre_`bw'
-	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)	
+	
+	sum std_read if ABOVE==0 & inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1 //Counterfactual Mean
+	local y_below=r(mean)	
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	estadd scalar y_below `y_below'
+	estadd scalar bandwidth `bw' 	
 	estimates store	rd_read_pre_`bw'
-	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)	
+	
+	sum std_math if ABOVE==0 //Counterfactual Mean
+	local y_below=r(mean)	
+	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	estadd scalar y_below `y_below'
+	estadd scalar bandwidth `bw' 	
 	estimates store	rd_math_post_`bw'
-	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)	
+	
+	sum std_read if ABOVE==0 //Counterfactual Mean
+	local y_below=r(mean)	
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	estadd scalar y_below `y_below'
+	estadd scalar bandwidth `bw' 	
 	estimates store	rd_read_post_`bw'
+	
+	sum std_index if ABOVE==0 //Counterfactual Mean
+	local y_below=r(mean)	
 	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
-	estimates store	rd_index_post_`bw'
-			
+	estadd scalar y_below `y_below'
+	estadd scalar bandwidth `bw' 	
+	estimates store	rd_index_post_`bw'	
+				
 	capture erase "$TABLES_TEMP\rd_ece_index_`bw'.tex"
 	
 	file open  table_tex	using "$TABLES_TEMP\rd_ece_index_`bw'.tex", replace write
@@ -1615,3 +1640,10 @@ end
 	
 	
 main
+
+
+											
+									
+									gen local_linear = 1 
+									
+									reghdfe std_gpa_`subj'_adj ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear, a(year)
