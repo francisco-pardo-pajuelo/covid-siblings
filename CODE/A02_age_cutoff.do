@@ -762,6 +762,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 						//local sib_order = 3
 
 						if !(("`size'" == "a" & "`foc_order'"=="" & "`sib_order'"=="") | ("`size'" != "a" & "`foc_order'"!="" & "`sib_order'"!="")) continue
+						if !(("`size'" == "a" & "`foc_order'"=="" & "`sib_order'"=="")  & "`bw'"!="365" continue
 						
 						if "`size'" != "a" {
 							if `foc_order'>=`sib_order' continue
