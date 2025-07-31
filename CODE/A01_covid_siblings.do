@@ -53,6 +53,12 @@ program define setup_COVID
 	global covid_test = 0
 	global covid_data = ""
 	if ${covid_test} == 1 global covid_data = "_TEST"
+	
+	*- Only analyze specific outcomes
+	global main_outcomes=1
+	global main_outcome_1 = "std_gpa_m_adj"
+	global main_outcome_2 = "prim_on_time"
+	global main_outcome_3 = ""
 
 	global fam_type=2
 	
@@ -1388,9 +1394,14 @@ no education?
 		foreach only_covid in "20-21" "all" {
 			foreach level in "all" "elm" "sec" {
 			
-			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 continue
-			if ${covid_test} == 1 & inlist("`level'","sec")==1 continue
-			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 continue
+			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
+			if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
+			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
+			if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all
+			
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
 			
 			estimates clear
 				global x = "$x_all"
@@ -1700,11 +1711,15 @@ no education?
 				
 						
 				*- All TWFE by # of siblings	
+				di as result "*******" _n as text "About to graph (Value: ${covid_data})" _n as result "*******"
+				
 				if "${covid_data}" == "_TEST" {
+					di "TEST"
 					capture qui graph export "$FIGURES_TEMP\TWFE\covid_twfe_summ_`level'_`only_covid'_`vlab'_${max_sibs}${covid_data}.png", replace	
 					capture qui graph export "$FIGURES_TEMP\TWFE\covid_twfe_summ_`level'_`only_covid'_`vlab'_${max_sibs}${covid_data}.pdf", replace	
 					}
 				if "${covid_data}" == "" {
+					di "REAL"
 					capture qui graph export "$FIGURES\TWFE\covid_twfe_summ_`level'_`only_covid'_`vlab'_${max_sibs}${covid_data}.png", replace	
 					capture qui graph export "$FIGURES\TWFE\covid_twfe_summ_`level'_`only_covid'_`vlab'_${max_sibs}${covid_data}.pdf", replace	
 					}	 
@@ -1821,9 +1836,14 @@ program define twfe_A
 		foreach only_covid in "20-21" "all" {
 			foreach level in "all" "elm" "sec" {
 			
-			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 continue
-			if ${covid_test} == 1 & inlist("`level'","sec")==1 continue
-			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 continue
+			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
+			if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
+			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
+			if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all
+			
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
 			
 			estimates clear
 			global x = "$x_all"
@@ -2304,9 +2324,15 @@ program define twfe_B
 		foreach only_covid in "20-21" "all" {
 			foreach level in "all" "elm" "sec" {
 			
-			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 continue
-			if ${covid_test} == 1 & inlist("`level'","sec")==1 continue
-			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 continue			
+			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
+			if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
+			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
+			if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all
+			
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
+			
 			estimates clear
 			global x = "$x_all"
 			if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
@@ -2608,9 +2634,14 @@ program define twfe_C
 		foreach only_covid in "20-21" "all" {
 			foreach level in "all" "elm" "sec" {
 			
-			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 continue
-			if ${covid_test} == 1 & inlist("`level'","sec")==1 continue
-			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 continue
+			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
+			if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
+			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
+			if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all
+			
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
 			
 			estimates clear
 			global x = "$x_all"
@@ -3009,9 +3040,14 @@ program define twfe_D
 		foreach only_covid in "20-21" "all" {
 			foreach level in "all" "elm" "sec" {
 			
-			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 continue
-			if ${covid_test} == 1 & inlist("`level'","sec")==1 continue
-			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 continue	
+			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
+			if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
+			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
+			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
+			if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all	
+			
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
 			
 			estimates clear
 			global x = "$x_all"

@@ -747,7 +747,7 @@ local foc_order = ""
 local sib_order = ""
 */
 
-foreach bw in "365" "300" "250" "200" "150" "100" "50" {
+foreach bw in "365" "300" "180" "120" "90" "60" "30" {
 	foreach subj in "m" "c" {
 		foreach size in "a" "2" "3" /*"4"*/ { //a="all"={2,3}
 			foreach foc_order in "" "1" "2" "3"  {
@@ -915,7 +915,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 						append style(tex) ///
 						cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 						keep(ABOVE) ///
-						varlabels(ABOVE "Delay School (After SSA)") ///
+						varlabels(ABOVE "\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}") ///
 						indicate("Local Linear" = local_linear, labels("Yes" "No")) ///
 						stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
 						mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
@@ -1444,20 +1444,25 @@ end
 capture program drop ece_parental_investment_dob
 program define ece_parental_investment_dob
 
-foreach g in "2p" "4p" "2s" {
+foreach g in "2p" "4p" "6p" "2s" {
 
 	if "`g'" == "2p" use "$TEMP\ece_family_`g'", clear
 	if "`g'" == "4p" use "$TEMP\ece_family_`g'", clear
+	if "`g'" == "6p" use "$TEMP\ece_family_`g'", clear
 	if "`g'" == "2s" use "$TEMP\ece_student_`g'", clear
 
-	merge 1:1 id_estudiante_`g' using "$TEMP\ece_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
-	rename (score_com score_math socioec_index) (_score_com _score_math _socioec_index)
-	merge 1:1 id_estudiante_`g' using "$TEMP\em_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
-	replace score_com  = _score_com if score_com==.
-	replace score_math = _score_math if score_math==.
-	replace socioec_index  = _socioec_index if socioec_index==.
-	drop _score* _socio*
-
+	if "`g'" != "6p" {
+		merge 1:1 id_estudiante_`g' using "$TEMP\ece_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
+		rename (score_com score_math socioec_index) (_score_com _score_math _socioec_index)
+		merge 1:1 id_estudiante_`g' using "$TEMP\em_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
+		replace score_com  = _score_com if score_com==.
+		replace score_math = _score_math if score_math==.
+		replace socioec_index  = _socioec_index if socioec_index==.
+		drop _score* _socio*
+		}
+		
+	if "`g'" == "6p" merge 1:1 id_estudiante_`g' using "$TEMP\em_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
+	
 	rename id_estudiante_`g' id_estudiante
 	merge m:1 id_estudiante using "$TEMP\match_siagie_ece_`g'", keep(master match)
 	keep if _m==3
@@ -1491,7 +1496,7 @@ foreach g in "2p" "4p" "2s" {
 	local rel_cutoff = "1"
 	local bw = 365
 	gen cutoff = .
-	forvalues y = 2015(1)2023 {
+	forvalues y = 2015(1)2024 {
 		if "`rel_cutoff'" == "K" local cutoff_year = `y'+1
 		if "`rel_cutoff'" == "1" local cutoff_year = `y'
 		if "`rel_cutoff'" == "2" local cutoff_year = `y'-1	
@@ -1519,6 +1524,7 @@ foreach g in "2p" "4p" "2s" {
 clear
 append using `data_2p'
 append using `data_4p'
+append using `data_6p'
 append using `data_2s'
 	
 gen local_linear = 1
@@ -1541,7 +1547,7 @@ reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if
 reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(year grade)
 	
 *- Varying Window
-foreach bw in "100" "200" "300" "365" {
+foreach bw in "365" "300" "180" "120" "90" "60" "30"  {
 	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw', a(year grade)
 	reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw', a(year grade)
 	}
@@ -1557,40 +1563,40 @@ reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if
 reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365 & inlist(grade,"2p","4p")==1, a(year grade)	
 
 
-foreach bw in "50" "100" "200" "300" "365" {
+foreach bw in "365" "300" "180" "120" "90" "60" "30" {
 	estimates clear
 	
 	sum std_math if ABOVE==0 & inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_math_pre_`bw'
 	
 	sum std_read if ABOVE==0 & inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_read_pre_`bw'
 	
 	sum std_math if ABOVE==0 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_math_post_`bw'
 	
 	sum std_read if ABOVE==0 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_read_post_`bw'
 	
 	sum std_index if ABOVE==0 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_index_post_`bw'	
@@ -1609,7 +1615,7 @@ foreach bw in "50" "100" "200" "300" "365" {
 					/// HEADER OF TABLE
 					"\toprule" _n ///
 					"& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\" _n ///
-					"& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2023}  \\" _n ///
+					"& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2024}  \\" _n ///
 					"\cmidrule(lr){2-3} \cmidrule(lr){4-6}" _n ///	
 					"& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\" _n ///
 					"& (1) & (2) & (3) & (4) & (5) \\" _n ///
@@ -1622,7 +1628,7 @@ foreach bw in "50" "100" "200" "300" "365" {
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(ABOVE) ///
-	varlabels(ABOVE "Delay School (After SSA)") ///
+	varlabels(ABOVE "\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}") ///
 	indicate("Local Linear" = local_linear, labels("Yes" "No")) ///
 	stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
