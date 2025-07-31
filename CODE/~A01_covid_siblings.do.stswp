@@ -652,7 +652,7 @@ args type
 	local g10 "10th"
 	local g11 "11th"
 
-	use id_ie std_gpa_?* pass_math pass_read id_per_umc year grade treated min_socioec_index_ie_cat urban_siagie educ_cat_mother lives_with_mother lives_with_father t_born* fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid${covid_data}", clear
+	use id_ie std_gpa_?* pass_math pass_read prim_on_time id_per_umc year grade treated min_socioec_index_ie_cat urban_siagie educ_cat_mother lives_with_mother lives_with_father t_born* fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid${covid_data}", clear
 	
 	*- School has internet
 	merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
@@ -725,13 +725,13 @@ args type
 		if "`level'" == "elm" keep if grade>=1 & grade<=6
 		if "`level'" == "sec" keep if grade>=7
 		
-		collapse std_gpa_m std_gpa_c std_gpa_m_adj std_gpa_c_adj pass_math pass_read, by(year treated)
+		collapse std_gpa_m std_gpa_c std_gpa_m_adj std_gpa_c_adj pass_math pass_read , by(year treated)
 		
 		gen areax = 2019.5 if mod(_n,2)==0
 		replace areax = 2021.5 if mod(_n,2)==1
 		
 		foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" {
-			if inlist("`type'","siblings","parent_ed","both_parents")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
+			if inlist("`type'","siblings","parent_ed","both_parents","t_born","t_born_Q2")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
 			sum `v' 
 			gen miny = r(min)
 			gen maxy = r(max)

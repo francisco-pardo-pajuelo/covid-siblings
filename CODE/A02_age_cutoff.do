@@ -28,6 +28,8 @@ program define main
 	
 	*- RD with GPA
 	
+	first_stage //Results with RD
+	
 	//first_stage_1
 	//first_stage_size2
 	//first_stage_size3_mid
@@ -897,8 +899,10 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 										"\toprule" _n ///
 										"\cmidrule(lr){2-4}" _n ///	
 										"& \multicolumn{3}{c}{Standardized GPA}" _n ///
+										"\cmidrule(lr){2-4}" _n ///	
 										"& Pre-Covid & Covid & Post-Covid  \\" _n ///
 										"& 2018-2019 & 2020-2021 & 2022-2023  \\" _n ///
+										"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}" _n ///	
 										"& (1) & (2) & (3)  \\" _n ///
 										"\bottomrule" _n ///
 										"&  &  &   \\" _n 
@@ -909,6 +913,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 						append style(tex) ///
 						cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 						keep(ABOVE) ///
+						varlabels(ABOVE "Delay School (After SSA)") ///
 						indicate("Local Linear" = local_linear, labels("Yes" "No")) ///
 						stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
 						mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
@@ -1576,9 +1581,9 @@ foreach bw in "50" "100" "200" "300" "365" {
 					"\begin{tabular}{lccccc}" _n ///
 					/// HEADER OF TABLE
 					"\toprule" _n ///
-					"\cmidrule(lr){2-3} \cmidrule(lr){4-6}" _n ///	
 					"& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\" _n ///
 					"& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2023}  \\" _n ///
+					"\cmidrule(lr){2-3} \cmidrule(lr){4-6}" _n ///	
 					"& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\" _n ///
 					"& (1) & (2) & (3) & (4) & (5) \\" _n ///
 					"\bottomrule" _n ///
@@ -1590,6 +1595,7 @@ foreach bw in "50" "100" "200" "300" "365" {
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(ABOVE) ///
+	varlabels(ABOVE "Delay School (After SSA)") ///
 	indicate("Local Linear" = local_linear, labels("Yes" "No")) ///
 	stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
