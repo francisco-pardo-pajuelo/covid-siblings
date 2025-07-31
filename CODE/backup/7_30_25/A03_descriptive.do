@@ -78,7 +78,6 @@ foreach g in "2p" "2s" {
 	replace score_com  = _score_com if score_com==.
 	replace score_math = _score_math if score_math==.
 	replace socioec_index  = _socioec_index if socioec_index==.
-	drop _score* _socio*
 
 	rename id_estudiante_`g' id_estudiante
 	merge m:1 id_estudiante using "$TEMP\match_siagie_ece_`g'", keep(master match)

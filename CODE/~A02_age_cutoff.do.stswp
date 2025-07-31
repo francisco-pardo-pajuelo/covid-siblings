@@ -38,6 +38,10 @@ program define main
 	ece_dob_analysis_sibling
 	ece_dob_analysis_own
 	
+	*- Mechanisms
+	//Reduced parental investment (in regular times)
+	ece_parental_investment_dob //Shows reduction in parental investment when school entry is delayed for a younger sibling.
+	
 end
 
 ********************************************************************************
@@ -645,7 +649,7 @@ estimates clear
 						gen dob_relative_sib = dob_siagie_sib - cutoff
 						gen ABOVE= dob_relative_sib>0
 						gen ABOVE_dob_relative_sib = dob_relative_sib*ABOVE
-						keep if abs(dob_relative)<365
+						keep if abs(dob_relative_sib)<365
 						
 						//drop if year_entry_1st_sib==year_entry_1st
 						//keep if year_entry_1st_sib>=`y' & year_entry_1st_sib<=`y'+1
@@ -732,9 +736,14 @@ estimates clear
 */	
 
 *- Grouping Years	
-
-
-
+/*
+local rel_cutoff = "K"
+local bw = "365"
+local subj = "m"
+local size = "a"
+local foc_order = ""
+local sib_order = ""
+*/
 foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 	foreach subj in "m" "c" {
 		foreach size in "a" "2" "3" /*"4"*/ { //a="all"={2,3}
@@ -813,7 +822,7 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 									gen dob_relative_sib = dob_siagie_sib - cutoff
 									gen ABOVE= dob_relative_sib>0
 									gen ABOVE_dob_relative_sib = dob_relative_sib*ABOVE
-									keep if abs(dob_relative)<`bw'
+									keep if abs(dob_relative_sib)<`bw'
 									
 									//drop if year_entry_1st_sib==year_entry_1st
 									//keep if year_entry_1st_sib>=`y' & year_entry_1st_sib<=`y'+1
@@ -886,7 +895,8 @@ foreach bw in "365" "300" "250" "200" "150" "100" "50" {
 										"\begin{tabular}{lccc}" _n ///
 										/// HEADER OF TABLE
 										"\toprule" _n ///
-										"\cmidrule(lr){2-4}" _n ///					
+										"\cmidrule(lr){2-4}" _n ///	
+										"& \multicolumn{3}{c}{Standardized GPA}" _n ///
 										"& Pre-Covid & Covid & Post-Covid  \\" _n ///
 										"& 2018-2019 & 2020-2021 & 2022-2023  \\" _n ///
 										"& (1) & (2) & (3)  \\" _n ///
@@ -1423,4 +1433,177 @@ program define ece_dob_analysis_sibling_draft
 end 
 
 
+
+capture program drop ece_parental_investment_dob
+program define ece_parental_investment_dob
+
+foreach g in "2p" "4p" "2s" {
+
+	if "`g'" == "2p" use "$TEMP\ece_family_`g'", clear
+	if "`g'" == "4p" use "$TEMP\ece_family_`g'", clear
+	if "`g'" == "2s" use "$TEMP\ece_student_`g'", clear
+
+	merge 1:1 id_estudiante_`g' using "$TEMP\ece_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
+	rename (score_com score_math socioec_index) (_score_com _score_math _socioec_index)
+	merge 1:1 id_estudiante_`g' using "$TEMP\em_`g'", keepusing(score_com score_math socioec_index) keep(master match) nogen
+	replace score_com  = _score_com if score_com==.
+	replace score_math = _score_math if score_math==.
+	replace socioec_index  = _socioec_index if socioec_index==.
+	drop _score* _socio*
+
+	rename id_estudiante_`g' id_estudiante
+	merge m:1 id_estudiante using "$TEMP\match_siagie_ece_`g'", keep(master match)
+	keep if _m==3
+	drop _m
+
+	merge m:1 id_per_umc using "$TEMP\id_dob", keep(master match)
+
+	keep if fam_total_${fam_type}<=4
+
+	egen index_parent_educ_inv = rmean(freq_parent_student_edu*)
+
+
+	VarStandardiz index_parent_educ_inv, by(year) newvar(std_index)
+	
+	keep id_per_umc year std_index score*
+	tempfile ece_parental_score
+	save `ece_parental_score', replace
+	
+	use "$TEMP\student_sibling_combinations_dob", clear	
+
+	keep if fam_order_2!=fam_order_2_sib //Keep dob of the sibling
+	keep if dob_siagie_sib!=.
+
+	//keep if fam_total_2==2
+
+	keep id_per_umc year_entry_1st_sib dob_siagie_sib
+
+	merge m:1 id_per_umc using `ece_parental_score', keep(master match)
+	drop _m
+	
+	local rel_cutoff = "1"
+	local bw = 365
+	gen cutoff = .
+	forvalues y = 2015(1)2023 {
+		if "`rel_cutoff'" == "K" local cutoff_year = `y'+1
+		if "`rel_cutoff'" == "1" local cutoff_year = `y'
+		if "`rel_cutoff'" == "2" local cutoff_year = `y'-1	
+		replace cutoff = ${cutoff_last_1_`cutoff_year'} if year==`y'
+	}	
+	
+	capture drop dob_relative_sib 
+	gen dob_relative_sib = dob_siagie_sib - cutoff
+	gen ABOVE= dob_relative_sib>0
+	gen ABOVE_dob_relative_sib = dob_relative_sib*ABOVE
+	keep if abs(dob_relative_sib)<`bw'	
+	
+
+	gen grade = "`g'"
+	
+	order 	id_per_umc year grade ///
+			score_math score_com std_index ///
+			dob_relative_sib ABOVE ABOVE_dob_relative_sib ///
+			dob_siagie_sib year_entry_1st_sib
+			
+	tempfile data_`g'
+	save `data_`g'', replace
+}
+
+clear
+append using `data_2p'
+append using `data_4p'
+append using `data_2s'
+	
+gen local_linear = 1
+
+binsreg score_math dob_relative_sib if inlist(year,2018,2019) & abs(dob_relative_sib)<365, nbins(100)
+
+*- Without grade FE
+reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<365, a(year)
+reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(year)
+reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(year)
+
+*- Without Year FE
+reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<365, a(grade)
+reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(grade)
+reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(grade)
+
+*- With grade and year FE
+reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<365, a(year grade)
+reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(year grade)
+reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365, a(year grade)
+	
+*- Varying Window
+foreach bw in "100" "200" "300" "365" {
+	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw', a(year grade)
+	reghdfe score_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw', a(year grade)
+	}
+	
+*- What if we exclude 2S, only focus on Primary students
+
+//Scores are measured with SD of 100, so we standardize them
+gen std_math = (score_math-500)/100
+gen std_read = (score_com-500)/100
+
+
+reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2015) & abs(dob_relative_sib)<365 & inlist(grade,"2p","4p")==1, a(year grade)	
+reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365 & inlist(grade,"2p","4p")==1, a(year grade)	
+
+
+foreach bw in "50" "100" "200" "300" "365" {
+	estimates clear
+	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	estimates store	rd_math_pre_`bw'
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2018,2019) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)	
+	estimates store	rd_read_pre_`bw'
+	reghdfe std_math 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)	
+	estimates store	rd_math_post_`bw'
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365 & inlist(grade,"2p","4p")==1, a(year grade)	
+	estimates store	rd_read_post_`bw'
+	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023) & abs(dob_relative_sib)<365 & inlist(grade,"2p","4p")==1, a(year grade)
+	estimates store	rd_index_post_`bw'
+			
+	capture erase "$TABLES_TEMP\rd_ece_index_`bw'.tex"
+	
+	file open  table_tex	using "$TABLES_TEMP\rd_ece_index_`bw'.tex", replace write
+	file write table_tex	/// HEADER OPTIONS OF TABLE
+					"\makebox[0.1\width][l]{" _n ///
+					"\resizebox{`scale'\textwidth}{!}{" _n
+	file close table_tex
+	
+	file open  table_tex	using "$TABLES_TEMP\rd_ece_index_`bw'.tex", append write
+	file write table_tex	/// HEADER OPTIONS OF TABLE
+					"\begin{tabular}{lccccc}" _n ///
+					/// HEADER OF TABLE
+					"\toprule" _n ///
+					"\cmidrule(lr){2-3} \cmidrule(lr){4-6}" _n ///	
+					"& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\" _n ///
+					"& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2023}  \\" _n ///
+					"& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\" _n ///
+					"& (1) & (2) & (3) & (4) & (5) \\" _n ///
+					"\bottomrule" _n ///
+					"&  &  &  & &  \\" _n 
+	file close table_tex			
+	
+	estout   rd_math_pre_`bw' rd_read_pre_`bw'  rd_math_post_`bw'   rd_read_post_`bw'  rd_index_post_`bw'  ///
+	using "$TABLES_TEMP\rd_ece_index_`bw'.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(ABOVE) ///
+	indicate("Local Linear" = local_linear, labels("Yes" "No")) ///
+	stats(blank_line N y_below bandwidth , fmt(%9.0fc %9.0fc %9.3f %9.0fc ) labels(" " "Observations" "Counterfactual mean" "Bandwidth")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES_TEMP\rd_ece_index_`bw'.tex", append write
+	file write table_tex	/// HEADER OPTIONS OF TABLE							
+	_n "\bottomrule" _n ///
+		"\end{tabular}" _n ///
+		"}" _n ///
+		"}" _n
+	file close table_tex		
+}
+		
+end	
+	
+	
 main
