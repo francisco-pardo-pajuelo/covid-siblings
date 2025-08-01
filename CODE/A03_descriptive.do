@@ -7,6 +7,8 @@ program define main
 
 	setup_PARENTAL
 	
+	descriptive
+	
 	parental_investment
 	
 
@@ -56,6 +58,27 @@ program define setup_PARENTAL
 	global green_3 = "`r(p3)'"		
 	global green_4 = "`r(p4)'"
 	
+end
+
+
+capture program drop descriptive
+program define descriptive
+
+
+*- Urb/Rur
+
+*- Prim on time
+
+*- Age
+
+*- Parents Ed
+
+*- Q1-Q4 SES
+
+*- Lives both
+
+
+
 end
 
 

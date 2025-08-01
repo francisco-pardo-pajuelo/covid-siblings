@@ -2212,7 +2212,8 @@ program define analyze_2009_2012_vs_2022
 				
 				twoway 	///
 						(scatter did_`subj' weeks_`policy' if CNT!="PER", mlabel(CNT)) ///
-						(scatter did_`subj' weeks_`policy' if inlist(CNT,"NLD","USA","CHL","COL","PER"), mlabel(CNT)) ///
+						///(scatter did_`subj' weeks_`policy' if inlist(CNT,"NLD","USA","CHL","COL","PER"), mlabel(CNT)) ///
+						(scatter did_`subj' weeks_`policy' if inlist(CNT,"PER"), mlabel(CNT)) ///
 						, ///
 						xtitle("`xtitle_`policy''") ///
 						ytitle("Raw DID `ytitle_`subj'' (Change in sibling - only child gap)") ///
