@@ -1,0 +1,212 @@
+% PP-Article.tex for AEA last revised 22 June 2011
+%\documentclass[draftmode]{AEA}
+\documentclass[AER]{AEA}
+
+%\documentclass[12pt, a4paper]{article}
+% If you have trouble with the mathtime package please see our technical support 
+% document at: http://www.aeaweb.org/templates/technical_support.pdf
+% You may remove the mathtime package if you can't get it working but your page
+% count may be inaccurate as a result.
+%\usepackage[cmbold]{mathtime}
+
+% Note: you may use either harvard or natbib (but not both) to provide a wider
+% variety of citation commands than latex supports natively. See below.
+
+% Uncomment the next line to use the natbib package with bibtex 
+\usepackage{natbib}
+
+% Uncomment the next line to use the harvard package with bibtex
+%\usepackage[abbr]{harvard}
+
+%other packages
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{comment}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx} % Allows including images
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{forest}
+\usepackage{lscape}
+\usepackage{adjustbox}
+\usepackage{multicol}
+\setlength{\columnsep}{1cm}
+\usepackage{pgf,tikz}
+\usepackage{subcaption} %for subfigure
+%\usepackage{float} %For better positioning of objects
+\forestset{qtree/.style={for tree={parent anchor=south, 
+           child anchor=north,align=center,inner sep=0pt}}}
+
+\usepackage{progressbar}
+
+\usepackage{csquotes}
+\usepackage{setspace}
+           
+
+%For number in equations with 'align'
+\newcommand{\tabnotes}[2]{\bottomrule \multicolumn{#1}{@{}p{0.70\linewidth}@{}}{\footnotesize #2 }\end{tabular}\end{table}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}} %https://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
+
+
+%For quotting we define this 2:
+\SetBlockThreshold{2}
+\newcommand\myblockquote[2]{%
+  \blockquote{\hspace*{2em}\emph{`#1'}\hfill(#2)}\par}
+
+
+%For links
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.65}
+\definecolor{darkgreen}{rgb}{0.0, 0.65, 0.0}
+\hypersetup{
+	citecolor=blue,
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=magenta
+}
+
+\let\footnote\thanks
+%Prevent Footnote from breaking pages
+\interfootnotelinepenalty=10000
+
+%\usepackage[round]{natbib}
+
+
+% This command determines the leading (vertical space between lines) in draft mode
+% with 1.5 corresponding to "double" spacing.
+\draftSpacing{1.5}
+
+\begin{document}
+
+%Has information on all the statistics estimated
+\input{./macros.tex} 
+
+%Full text
+\input{./1_title.tex}
+%\input{./2_abstract.tex}
+\maketitle
+The COVID-19 pandemic shifted educational responsibilities from schools to households. This allows me to examine the quantity-quality tradeoff in a context where parents play a larger role in childcare and education. Sibling spillovers might occur through direct effects (mentoring or competing for resources like computers) or indirect effects through parental resource allocation, as increased childcare reduces time for educational activities. With reduced participation from schools and teachers in students’ education and children being at home, parental investments in education become more important but more constrained due to increased childcare responsibilities; hence, these sibling spillovers may be exacerbated. 
+%There are many different potential mechanisms through which these sibling spillovers might occur. On the one hand, siblings might have a direct effect on one another, positively through mentoring or negatively by competing for limited resources such as a computer. On the other hand, they might also have an indirect effect on one another through their effect on the allocation of parental resources, such as additional time required for childcare that could reduce time invested in educational activities.
+
+I study the differential impact of learning losses between students with siblings and only children in this context. First, I use international PISA scores and UNESCO school closure data. In \hyperref[fig:pisa]{Figure \ref{fig:pisa}}, I show that across developed and developing countries, learning losses have been higher for students with siblings, and the size of these differential losses is correlated with the duration of school closures. Then I use administrative data from Peru from 2014 to 2024 on school progression and standardized exams using parents' IDs to identify siblings within the data. I find that relative to only children, children with siblings do much worse when the pandemic begins, with larger effects for larger families of up to 0.1 standard deviations (\hyperref[fig:event_study]{Figure \ref{fig:event_study}}). Moreover, they are robust and present regardless of parental education and other potential attenuating factors (\hyperref[fig:twfe]{Figure \ref{fig:twfe}}). Finally, to explore potential mechanisms behind this, I exploit school-starting age cutoffs as exogenous variation in parental investments. In normal circumstances, having a younger sibling delay their school start could imply more time required for childcare and less time available for investing in the children already in school, affecting their performance. In \hyperref[tab:rd_gpa]{Table \ref{tab:rd_gpa}} and \hyperref[tab:rd_ece]{Table \ref{tab:rd_ece}}, I find evidence that this is the case in years before and after the pandemic, where delaying school starting age increases childcare responsibilities, but not during the pandemic, when all children were already at home. This suggests that increased childcare responsibilities during school closures may create similar spillover effects on siblings.
+
+
+
+ %I find that (i) across developed and developing countries, learning losses have been higher for students with siblings and the size of these differential losses is correlated with the duration of school closures , (ii) In Peru, I observe that this happens regardless of socioeconomic status, internet access, parental education and other potential attenuating factors and (iii) that these effects are partially caused by the increased responsibilities in childcare and education that parents need to take on the rest of their children and (iv) that the differential impact continues to be present even 4 years after the closures, highlighting potential changes in norms and beliefs about the way parental investment affects the education production function.
+
+\newpage
+
+
+\begin{figure}[htbp]
+    \centering
+    
+        \centering
+        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_not_fully_open.pdf}
+        %\caption{Change in learning gaps by duration of school closure for OECD and Non-OECD countries.}
+    
+    \caption{Change in learning gaps by duration of school closure for OECD and Non-OECD countries.}
+    \label{fig:pisa}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    
+        \centering
+        \includegraphics[width=0.9\textwidth]{./FIGURES/Event Study/covid_std_gpa_m_adj_all_all_all_elm_all.pdf}
+        %\caption{Change in learning gaps by duration of school closure for OECD and Non-OECD countries.}
+    
+    \caption{Event Study: Learning losses of children with siblings overall and by number of siblings compared to only children}
+    \label{fig:event_study}
+\end{figure}
+
+
+\begin{figure}[htbp]
+    \centering
+    
+        \centering
+        \includegraphics[width=\textwidth]{./FIGURES/TWFE/covid_twfe_summ_all_all_gpa_m_adj_4.pdf}
+        %\caption{Change in learning gaps by duration of school closure for OECD and Non-OECD countries.}
+        
+    
+    \caption{Difference in Difference: Learning losses of children with siblings compared to only children by different subsamples.}\label{fig:twfe}
+\end{figure}
+
+
+
+%RD-first grade
+\begin{table}[htbp]
+\centering
+\caption{Effect of Younger Sibling Delayed School Entry on Standardized GPA before, during and after the Pandemic}
+\label{tab:rd_gpa}
+\resizebox{0.9\textwidth}{!}{
+\begin{tabular}{lccc}
+\toprule
+\cmidrule(lr){2-4}
+& \multicolumn{3}{c}{Standardized GPA} \\
+\cmidrule(lr){2-4}
+& Pre-Covid & Covid & Post-Covid  \\
+& 2018-2019 & 2020-2021 & 2022-2023  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}
+& (1) & (2) & (3)  \\
+\bottomrule
+&  &  &   \\
+Delay School (After SSA)&      -0.023***&      -0.001   &      -0.023***\\
+                    &     (0.007)   &     (0.007)   &     (0.006)   \\
+Local Linear        &         Yes   &         Yes   &         Yes   \\
+                    &               &               &               \\
+Observations        &     358,861   &     354,044   &     447,536   \\
+Counterfactual mean &       0.058   &       0.020   &       0.050   \\
+Bandwidth           &         365   &         365   &         365   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+\begin{tablenotes}
+\footnotesize
+This table presents local linear regression discontinuity estimates of the effect of having a younger sibling delay school entry (after reaching school starting age, SSA) on the older sibling standardized GPA across three time periods: pre-Covid (2018-2019), Covid (2020-2021), and post-Covid (2022-2023). All specifications use a bandwidth of 365 days around the school entry cutoff. Robust standard errors are reported in parentheses. The counterfactual mean represents the predicted GPA for students just below the cutoff (those who entered school on time). *** p<0.01, ** p<0.05, * p<0.1.
+\end{tablenotes}
+\end{table}
+
+
+\newpage
+\begin{table}[htbp]
+\centering
+\caption{Effect of Younger Sibling Delayed School Entry on Standardized Exams and Parental Investment}
+\label{tab:rd_ece}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\
+& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2024}  \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-6}
+& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\
+& (1) & (2) & (3) & (4) & (5) \\
+\bottomrule
+&  &  &  & &  \\
+\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}&      -0.023*  &      -0.023*  &      -0.011   &      -0.012   &      -0.038***\\
+                    &     (0.014)   &     (0.012)   &     (0.013)   &     (0.010)   &     (0.013)   \\
+Local Linear        &         Yes   &         Yes   &         Yes   &         Yes   &         Yes   \\
+                    &               &               &               &               &               \\
+Observations        &      87,927   &      87,924   &     106,174   &     106,257   &     102,901   \\
+Counterfactual mean &      -0.110   &      -0.087   &       0.189   &       0.284   &      -0.005   \\
+Bandwidth           &         365   &         365   &         365   &         365   &         365   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+\begin{tablenotes}
+\footnotesize
+ This table presents local linear regression discontinuity estimates of the effect of having a younger sibling delay school entry (after reaching school starting age, SSA) on the older sibling standardized national examinations and parental investment in education across two time periods: pre-Covid (2018-2019) and post-Covid (2022-2023). The parental investment index has been calculated based on several questions related to time spent with the children in educational activities. All specifications use a bandwidth of 365 days around the school entry cutoff. Robust standard errors are reported in parentheses. The counterfactual mean represents the predicted GPA for students just below the cutoff (those who entered school on time). *** p<0.01, ** p<0.05, * p<0.1.
+\end{tablenotes}
+\end{table}
+
+
+
+
+%\input{./6_appendix.tex}
+\end{document}
+

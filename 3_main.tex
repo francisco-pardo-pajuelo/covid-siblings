@@ -7,7 +7,107 @@
 
 
 % Learning losses from school closures
-During the COVID-19 pandemic and school closures, many countries implemented some form of remote learning. Suddenly without the usual school inputs,  parents had a bigger role in the education of their children. This period caused significant learning losses, especially for more vulnerable populations (\cite{haelermans_inequality_2022}, \cite{jakubowski_global_2023}). Yet, with parents as a more relevant input in the education production function and remote schooling that required digital resources, there is no evidence on how the size of the household could have affected children's learning.
+%During the COVID-19 pandemic and school closures, many countries implemented some form of remote learning. Suddenly without the usual school inputs,  parents had a bigger role in the education of their children. This period caused significant learning losses, especially for more vulnerable populations (\cite{haelermans_inequality_2022}, \cite{jakubowski_global_2023}). Yet, with parents as a more relevant input in the education production function and remote schooling that required digital resources, there is no evidence on how the size of the household could have affected children's learning.
+
+The COVID-19 pandemic and school closures caused significant learning losses, especially for more vulnerable populations (\cite{haelermans_inequality_2022}, \cite{jakubowski_global_2023}). During this time, educational responsibilities shifted from schools to households. This allows me to examine the quantity-quality tradeoff in a context where parents play a larger role in childcare and education. Sibling spillovers might occur through direct effects (mentoring or competing for resources like computers) or indirect effects through parental resource allocation, as increased childcare reduces time for educational activities. With reduced participation from schools and teachers in students’ education and children being at home, parental investments in education become more important but more constrained due to increased childcare responsibilities; hence, these sibling spillovers may be exacerbated. 
+
+I study the differential impact of learning losses between students with siblings and only children in this context. First, I use international PISA scores and UNESCO school closure data. In \hyperref[fig:pisa]{Figure \ref{fig:pisa}}, I show that across developed and developing countries, learning losses have been higher for students with siblings, and the size of these differential losses is correlated with the duration of school closures. Then I use administrative data from Peru from 2014 to 2024 on school progression and standardized exams using parents' IDs to identify siblings within the data. I find that relative to only children, children with siblings do much worse when the pandemic begins, with larger effects for larger families of up to 0.1 standard deviations (\hyperref[fig:event_study]{Figure \ref{fig:event_study}}). Moreover, they are robust and present regardless of parental education and other potential attenuating factors (\hyperref[fig:twfe]{Figure \ref{fig:twfe}}). Finally, to explore potential mechanisms behind this, I exploit school-starting age cutoffs as exogenous variation in parental investments. In normal circumstances, having a younger sibling delay their school start could imply more time required for childcare and less time available for investing in the children already in school, affecting their performance. In \hyperref[tab:rd_gpa]{Table \ref{tab:rd_gpa}} and \hyperref[tab:rd_ece]{Table \ref{tab:rd_ece}}, I find evidence that this is the case in years before and after the pandemic, where delaying school starting age increases childcare responsibilities, but not during the pandemic, when all children were already at home. This suggests that increased childcare responsibilities during school closures may create similar spillover effects on siblings.
+
+
+Parental investments across siblings:
+
+%1. Compensating or Reinforcing
+\cite{adhvaryu_endowments_2016} find that siblings of treated children were also more likely to be immunised. $\rightarrow$ In favor of parents equalising. Not sure the model is what we need though. \cite{yi_early_2015} also in favor of equalisers. Can I place myself in this literature? How do I estimate one of these? Perhaps if I see that low performers are not the ones doing worse?
+
+\section{Model}
+
+We have the following characteristics:
+
+\begin{itemize}
+    \item Outputs: One dimension of human capital - Education
+    \item Inputs: For single grades we have measures of parental investment
+    \item Proxies for parental power: single vs both parent households. For single grades we also have parental income.
+    \item Simplify with only 2 children.
+    \item Information on initial endowments roughly for all grades (GPA) or more precisely for some grades (standardized scores).
+    \item The decision parents make is on the level of childcare-time in education-work. Not so much on other medium term decisions such as type of school given the short term of the pandemic.?
+    \item static: single period?
+\end{itemize}
+
+
+\subsection{Literature review}
+
+There is mixed evidence with about the quantity-quality tradeoff. How does family size affect the outcomes of the children? An important distinction is between planned changes with no effect in quality (\cite{black_more_2005} and unplanned changes that affect IQ and  (\cite{black_small_2010}) changes in family size. 
+
+
+
+\subsection{Models}
+
+\cite{behrman_parental_1982}: 
+
+\cite{behrman_chapter_1997}
+
+\cite{behrman_parental_2022}
+
+\cite{conti_parental_2022}
+
+\cite{bharadwaj_health_2018}
+
+\cite{rosenzweig_heterogeneity_1988}
+
+\cite{cunha_technology_2007}
+
+\cite{yi_early_2015}
+
+\cite{giannola_parental_2024}
+
+\subsubsection{Sandra Black}
+\cite{black_more_2005}: We find a negative correlation between family size and children’s education, but when we include indicators for birth order or use twin births as an instrument, family size effects become negligible. One important issue remains unresolved: what is causing the birth order effects we observe in the data? Our findings are consistent with optimal stopping being a small part of the explanation. Also, the large birth order effects found for highly educated mothers, allied with the weak evidence for family size effects, suggest that financial constraints may not be that important. Although a number of other theories (including time constraints, endowment effects, and parental preferences) have been proposed in the literature, we are quite limited in our ability to distinguish between these models.
+
+%\cite{black_recent_2010}
+
+\cite{black_small_2010}: Our results suggest that the effect of family size depends on the type of family-size intervention and that there are no important negative effects of expected increases in family size. However, unexpected shocks to family size resulting from twin births have negative effects on the IQ scores of existing children. Our IV estimates using the birth of twins as exogenous variation in family size imply that family size has a negative effect on IQ. An intriguing result is that existing children suffer intellectually as a result of the birth of twins and that this effect is only present in recent cohorts. This may reflect that fact that unexpected shocks to family size are becoming increasingly costly as the attachment of both parents to the labor force increases.
+
+\cite{black_too_2011}: Shows that SSA effects are only shortrun and mostly due to age at test effects. Despite the fact that the effects of SSA on in-school tests in Norway are as large as those in the United States (Bedard & Dhuey 2006), the long-run effects of SSA seem modest.
+
+\cite{black_sibling_2021}: The paper finds evidence that, relative to the first born, the second child in a family is differentially affected when the third child is disabled.
+
+
+\subsubsection{Other fields}
+
+\cite{hughes_siblings_2023}, \cite{lampis_long-lasting_2023}: Show that siblings act as a buffering during the pandemic. With better linguistic and emotional-behavioral outcomes. Mid 2020 and late 2021. 
+% Australia, China, Italy, Sweden, United Kingdom, and United States of America 
+%Italy
+
+\cite{}
+
+
+
+\subsection{Consensus parental preference models with passive children}
+
+Altruistic parents maximize their consensus utility function,
+
+\begin{equation}
+\begin{aligned}
+U &= U(C_p, Y_1, Y_2, \ldots, Y_n, T_1, T_2, \ldots, T_n), \\
+U &= U(C_p, Y_1, Y_2, T_1, T_2)
+\end{aligned}
+\tag{1}
+\end{equation}
+
+where $C_p$ is the parents' (and offsprings' childhood) consumption, $Y_j$ is the adult earnings of the $j$th child, and $T_j$ are transfers (the sum of inter vivos gifts and bequests) given by the parents to the $j$th child. 
+
+\begin{equation}
+Y_j = Y(H_j, G_j).
+\tag{2}
+\end{equation}
+
+The earnings production function states the adult earnings of the jth child that are produced by human resource investments in that child ($H_i$) and that child's endowments ($G_j$):
+
+\section{Research Questions}
+
+\begin{itemize}
+    \item Has inequality within the household increased or decreased after the pandemic? We can look at Standardized examinations to estimate the share of inequality within and between households as well. \cite{giannola_parental_2024}
+\end{itemize}
 
 % Siblings did much worse (PISA score)
 
