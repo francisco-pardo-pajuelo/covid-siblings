@@ -44,6 +44,11 @@ program define main
 	//Reduced parental investment (in regular times)
 	ece_parental_investment_dob //Shows reduction in parental investment when school entry is delayed for a younger sibling.
 	
+	*- TWFE: New Born
+	twfe_new_born
+	twfe_new_born_monthly
+	
+	
 end
 
 ********************************************************************************
@@ -92,6 +97,7 @@ program define setup_AGE_CUTOFF
 	global green_4 = "`r(p4)'"
 	
 	
+	global cutoff_last_1_2013 = 17622-365
 	global cutoff_last_1_2014 = 17622
 	global cutoff_last_1_2015 = 17987
 	global cutoff_last_1_2016 = 18352
@@ -196,9 +202,8 @@ program define prepare_data
 	drop _m
 	*/
 	use "$TEMP\siagie_append", clear
-	sort id_per_umc
-	keep id_per_umc 
-	by id_per_umc: keep if _n==1
+	sort id_per_umc year grade
+	keep id_per_umc year grade
 	
 	preserve
 			use "$TEMP\id_siblings", clear
@@ -211,24 +216,42 @@ program define prepare_data
 	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie) 
 	rename _m merge_siblings	
 	
-gen dob_num=dob_siagie
+	gen dob_num=dob_siagie
 
+	*- Year they should enter 1st grade
 	gen year_entry_1st = .
 	gen year_entry_K = .
-	forvalues y = 2015(1)2027 {
+	forvalues y = 2014(1)2027 {
 		local y_pre = `y'-1
 		replace year_entry_1st = `y' 	if ${cutoff_last_1_`y_pre'}<dob_num & dob_num<=${cutoff_last_1_`y'}
 		replace year_entry_K = `y'-3 	if ${cutoff_last_1_`y_pre'}<dob_num & dob_num<=${cutoff_last_1_`y'}
 	}
 	
+	*- We estimate when they entered PreK
+	gen prek = .
+	replace prek = 5 if grade==0 & (year+1==year_entry_1st)
+	replace prek = 4 if grade==0 & (year+2==year_entry_1st)
+	replace prek = 3 if grade==0 & (year+3==year_entry_1st)	
+	replace prek = 2 if grade==0 & (year+4==year_entry_1st)	
 	
-	forvalues y = 2015(1)2027 {
+	bys id_per_umc: egen first_prek = min(prek)
+	
+	drop grade year prek merge_siblings
+	
+	by id_per_umc: keep if _n==1	
+	
+	*- Year born variables
+	gen year_born = year(dob_siagie)
+	gen month_born = month(dob_siagie)
+	gen schoolyear_born = year_entry_1st-7
+	
+	forvalues y = 2014(1)2027 {
 		gen around_cutoff_`y' = abs(dob_num-${cutoff_last_1_`y'})<${cutoff_window}
 	}	
 	   	
 	  
 	*- Relevant sample
-	forvalues y = 2015(1)2027 {
+	forvalues y = 2014(1)2027 {
 		bys id_fam_${fam_type}: egen sib_around_cutoff_`y' = max(around_cutoff_`y')
 	  }
 	  
@@ -238,13 +261,40 @@ gen dob_num=dob_siagie
 	gen stack_year_1st = .
 	gen stack_year_k = .
 
-	forvalues y = 2015(1)2027 {
+	forvalues y = 2014(1)2027 {
 		replace dob_relative = dob_num - ${cutoff_last_1_`y'} if around_cutoff_`y'==1
 		replace stack_year_1st 	= `y' 	if around_cutoff_`y'==1
 		replace stack_year_k 	= `y'-3 if around_cutoff_`y'==1
 		}
 
-	order id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type}, first  
+	order id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} ///
+		  dob_* ///
+		  educ_caretaker educ_mother educ_father ///
+		  exp_entry_year year_entry_1st year_entry_K schoolyear_born first_prek	///
+		  , first  
+	
+	
+	label var dob_siagie 		"Date of Birth"
+	label var dob_num 			"Date of Birth (numeric)"
+	label var dob_relative 		"Date of Birth relative to relevant cutoff"
+	label var educ_caretaker 	"Education (caretaker)"
+	label var educ_mother 		"Education (mother)"
+	label var educ_father 		"Education (father)"
+	label var exp_entry_year 	"Expected year of school start (based on first time observed)"
+	label var year_entry_1st 	"Year school start based on date of birth"
+	label var year_entry_K 		"Year Kinder start based on date of birth"
+	label var year_born 		"Year of birth"
+	label var month_born 		"Month of birth"
+	label var schoolyear_born 	"School year in which was born (3/31 Y to 3/31 Y+1)"
+	label var first_prek 		"First time observed in PreK (3,4,5 years old)"
+	
+	label var stack_year_1st 	"Year cutoff for which relative date has been estimated" 
+	label var stack_year_k		"Corresponding PreK year of 1st grade cutoff for relative date"
+	
+	forvalues y = 2014(1)2027 {
+		capture label var around_cutoff_`y' 	"Student around cutoff `y'"
+		capture label var sib_around_cutoff_`y' "Student has sibling around cutoff `y'"
+	}
 	  
 	compress 
 	
@@ -1589,14 +1639,14 @@ foreach bw in "365" "300" "180" "120" "90" "60" "30" {
 	
 	sum std_read if ABOVE==0 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_read 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_read_post_`bw'
 	
 	sum std_index if ABOVE==0 //Counterfactual Mean
 	local y_below=r(mean)	
-	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p")==1, a(year grade)
+	reghdfe std_index 	ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear if inlist(year,2022,2023,2024) & abs(dob_relative_sib)<`bw' & inlist(grade,"2p","4p","6p")==1, a(year grade)
 	estadd scalar y_below `y_below'
 	estadd scalar bandwidth `bw' 	
 	estimates store	rd_index_post_`bw'	
@@ -1643,13 +1693,288 @@ foreach bw in "365" "300" "180" "120" "90" "60" "30" {
 }
 		
 end	
+
+
+
+******************************
+
+
+************************************************************************************
+
+
+capture program drop twfe_new_born
+program define twfe_new_born	
+		
+
+	use id_per_umc grade year std_gpa_?_adj  using "$TEMP\siagie_append", clear
+	//use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_2024", clear
+	keep id_per_umc grade year std_gpa_?_adj
+	merge m:1 id_per_umc using "$TEMP\id_dob", keep(master match) keepusing(id_fam_${type} fam_total_${type} fam_order_${type} year_entry_1st dob_siagie schoolyear_born year_born month_born first_prek educ_mother educ_father educ_caretaker)
+	
+	*-----
+	*- Option 1: Born on Q1 (control is next year)
+	*- Issue: There could be an important selection of who gets pregnant 'during' COVID
+	*-----
+	
+	
+	*- Given the limitations of 2024 data (we obser those yborn 2021 only if enrolled in prek=3) we need to impose the same limitations for the other data
+	forvalues y = 2014(1)2020 {
+		gen t_`y' = .
+		replace t_`y' = 1 if year_born==`y' & inlist(month_born,1,2,3)==1 & first_prek<=3
+		}
+
+	
+	forvalues y = 2014(1)2020 {
+		gen c_`y' = .
+		replace c_`y' = 1 if year_born==`y'+1 & inlist(month_born,1,2,3)==1 & first_prek<=3
+		}
+	
+	//t and c are at the individual level. This are the 'born' children that cause the 'treatemnt' and 'control' status in the family. We define those now.
+	
+	forvalues y = 2014(1)2020 {
+		bys id_fam_${fam_type}: egen treated_`y' 	= max(cond(t_`y'==1,1,0))
+		bys id_fam_${fam_type}: egen control_`y' 	= max(cond(c_`y'==1,1,0))
+		}
+		
+	gen treated = .
+	forvalues y = 2014(1)2020 {
+		replace treated = 0 if (control_`y'==1 & year==`y')
+		replace treated = 1 if (treated_`y'==1 & year==`y') //There are a few cases of both treated and control (in that case, we consider them treated)
+	}
+	
+	tab grade treated if year==2020, m
+	
+	save "$TEMP\erase_born", replace
+	
+	use "$TEMP\erase_born", clear
+	
+		keep if grade>=0 & grade<=6
+		keep if year>=2014 & year<=2020
+		keep if fam_total_${fam_type}<=4
+		
+		replace treated = -1 if treated==.
+		replace treated = -2 if treated==-1 & fam_total_${fam_type}==1	
+		
+		bys id_per_umc: egen min_grade = min(grade)
+		
+		gen hed = educ_mother>=6
+		
+	preserve
+		keep if grade==1
+		keep if fam_total_${fam_type}==2
+		table year treated , stat(mean hed)
+		table year treated , stat(mean std_gpa_m_adj)
+	restore
+		
+		
+	preserve
+	
+		keep if min_grade==0
+		keep if fam_total_${fam_type}<=2
+		keep if fam_order_${fam_type}==1
+		collapse std_gpa_m_adj, by(year grade treated)
+		forvalues g = 1(1)5 {
+			
+			//Since data starts in 2015, we cannot observe someone in PreK-K if they are in 1st grade in 2015, 2nd in 2016, etc. (then year>=2015+`g')
+			twoway 	///
+					(connected std_gpa_m_adj year if treated==1 	& grade==`g' &  year>=2015+`g', msymbol(circle)) /// 
+					(connected std_gpa_m_adj year if treated==0 	& grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					(connected std_gpa_m_adj year if treated==-1 	& grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					(connected std_gpa_m_adj year if treated==-2 	& grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					, ///
+					xlabel(2015(1)2020) ///
+					legend(order(1 "Treated" 2 "Control" 3 "No births, but size>=2" 4 "Only childs") col(4) pos(6))
+					
+			capture qui graph export "$FIGURES_TEMP\Descriptive\birth_g`g'.png", replace			
+			capture qui graph export "$FIGURES_TEMP\Descriptive\birth_g`g'.pdf", replace	
+			}
+	restore
+	
+	/*
+	
+	use "$TEMP\test", clear
+	keep if grade==0
+	gen hed = educ_mother>=6
+	bys id_per_umc: keep if _n==1
+	collapse hed year_entry_1st, by(dob_siagie)
+	twoway 	(line year_entry_1st dob_siagie if dob_siagie>=21000 & dob_siagie<=22750) ///
+			(line hed dob_siagie if dob_siagie>=21000 & dob_siagie<=22750, yaxis(2)) ///
+			, ///
+ xlabel(21000(91)22700, angle(45)) legend(off)	
+ 
+ histogram  dob_siagie if dob_siagie>=21000 & dob_siagie<=22750
+	
+	collapse hed dob_siagie, by(year_born month_born)
+	line hed dob_siagie if dob_siagie>=21000 & dob_siagie<=22750, ///
+ xlabel(21000(91)22700, angle(45))
+ 
+	*- Or is it that some only report when entering 1st grade?
+	
+	*- Does level of education change as they progress?
+	
+	
+	*/
+	
+end
+
+
+capture program drop twfe_new_born_monthly
+program define twfe_new_born_monthly	
+		
+
+	use id_per_umc grade year std_gpa_?_adj  using "$TEMP\siagie_append", clear
+	//use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_2024", clear
+	keep id_per_umc grade year std_gpa_?_adj
+	merge m:1 id_per_umc using "$TEMP\id_dob", keep(master match) keepusing(id_fam_${type} fam_total_${type} fam_order_${type} year_entry_1st dob_siagie schoolyear_born year_born month_born first_prek educ_mother educ_father educ_caretaker)
+	compress
+	keep if fam_total_${type}<=4
+	*-----
+	*- Option 1: Born on Q1 (control is next year)
+	*- Issue: There could be an important selection of who gets pregnant 'during' COVID
+	*-----
+	
+	
+	*- Given the limitations of 2024 data (we obser those yborn 2021 only if enrolled in prek=3) we need to impose the same limitations for the other data
+	timer clear 1 
+	timer on 1
+	forvalues y = 2014(1)2020 {
+		forvalues m = 1(1)12 {
+			di "*********************" _n "Currently #1 `y'-`m'" _n "*********************"
+			gen byte t_`y'_`m' = .
+			replace t_`y'_`m' = 1 if year_born==`y' & inlist(month_born,`m')==1 & first_prek<=3
+			}
+		}
+	
+	compress
+	timer off 1
+	
+	timer clear 2
+	timer on 2
+	forvalues y = 2014(1)2020 {
+		forvalues m = 1(1)3 {
+			di "*********************" _n "Currently #2 `y'-`m'" _n "*********************"
+			gen byte c_`y'_`m' = .
+			replace c_`y'_`m' = 1 if year_born==`y'+1 & inlist(month_born,`m')==1 & first_prek<=3
+			}
+		}
+	
+	compress
+	timer off 2
+	//t and c are at the individual level. This are the 'born' children that cause the 'treatemnt' and 'control' status in the family. We define those now.
+	timer clear 3 
+	timer on 3		
+	forvalues y = 2014(1)2020 {
+	
+		forvalues m = 1(1)12 {
+			di "*********************" _n "Currently #3 `y'-`m'" _n "*********************"
+			bys id_fam_${fam_type}: egen byte treated_`y'_`m' 	= max(cond(t_`y'_`m'==1,1,0))
+			}
+		forvalues m = 1(1)3 {
+			di "*********************" _n "Currently #4 `y'-`m'" _n "*********************"
+			bys id_fam_${fam_type}: egen byte control_`y'_`m' 	= max(cond(c_`y'_`m'==1,1,0))
+			}
+	timer off 3
+	}
+	
+	timer clear 4 
+	timer on 4	
+	gen status = .
+	forvalues y = 2014(1)2020 {
+		forvalues m = 1(1)12 {
+		di "*********************" _n "Currently #5 `y'-`m'" _n "*********************"	
+			replace status = `m' if (treated_`y'_`m'==1 & year==`y') //There are a few cases of both treated and control (in that case, we consider them treated)
+		}
+		di "*********************" _n "Currently #6 `y'-`m'" _n "*********************"
+		forvalues m = 1(1)3 {
+			replace status = `m'+12 if (control_`y'_`m'==1 & year==`y') //There are a few cases of both treated and control (in that case, we consider them treated)
+		}
+	}
+	
+timer off 4
+
+	tab grade status if year==2020, m
+	
+	compress
+	save "$TEMP\erase_born_monthly", replace
+	
+	use "$TEMP\erase_born_monthly", clear
+	
+timer list 1
+timer list 2
+timer list 3
+timer list 4
+	
+		keep if grade>=0 & grade<=6
+		keep if year>=2014 & year<=2020
+		keep if fam_total_${fam_type}<=4
+		
+		bys id_per_umc: egen min_grade = min(grade)
+		
+		gen hed = educ_mother>=6
+		
+	preserve
+		keep if grade==1
+		keep if fam_total_${fam_type}==2
+		table year status , stat(mean hed)
+		table year status , stat(mean std_gpa_m_adj)
+	restore
+		
+		
+	preserve
+	
+		keep if min_grade==0
+		keep if fam_total_${fam_type}<=2
+		keep if fam_order_${fam_type}==1
+		collapse std_gpa_m_adj, by(year grade status)
+		forvalues g = 1(1)5 {
+			
+			//Since data starts in 2015, we cannot observe someone in PreK-K if they are in 1st grade in 2015, 2nd in 2016, etc. (then year>=2015+`g')
+			twoway 	///
+					(connected std_gpa_m_adj year if status==3 	& grade==`g' &  year>=2015+`g', msymbol(circle)) /// 
+					(connected std_gpa_m_adj year if status==6 	& grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					(connected std_gpa_m_adj year if status==9 	& grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					(connected std_gpa_m_adj year if status==12 & grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					(connected std_gpa_m_adj year if status==15 & grade==`g' &  year>=2015+`g', msymbol(circle)) ///
+					, ///
+					xlabel(2015(1)2020) ///
+					legend(order(1 "Born M3" 2 "Born M6" 3 "Born M9" 4 "Born M12" 5 "Born t+1 M3" 6 "No births, but size>=2" 7 "Only childs") col(4) pos(6))
+					
+			capture qui graph export "$FIGURES_TEMP\Descriptive\birth_monthly_g`g'.png", replace			
+			capture qui graph export "$FIGURES_TEMP\Descriptive\birth_g`g'.pdf", replace	
+			}
+	restore
+	
+	/*
+	
+	use "$TEMP\test", clear
+	keep if grade==0
+	gen hed = educ_mother>=6
+	bys id_per_umc: keep if _n==1
+	collapse hed year_entry_1st, by(dob_siagie)
+	twoway 	(line year_entry_1st dob_siagie if dob_siagie>=21000 & dob_siagie<=22750) ///
+			(line hed dob_siagie if dob_siagie>=21000 & dob_siagie<=22750, yaxis(2)) ///
+			, ///
+ xlabel(21000(91)22700, angle(45)) legend(off)	
+ 
+ histogram  dob_siagie if dob_siagie>=21000 & dob_siagie<=22750
+	
+	collapse hed dob_siagie, by(year_born month_born)
+	line hed dob_siagie if dob_siagie>=21000 & dob_siagie<=22750, ///
+ xlabel(21000(91)22700, angle(45))
+ 
+	*- Or is it that some only report when entering 1st grade?
+	
+	*- Does level of education change as they progress?
+	
+	
+	*/
+	
+end
+
 	
 	
 main
 
 
 											
-									
-									gen local_linear = 1 
-									
-									reghdfe std_gpa_`subj'_adj ABOVE dob_relative_sib ABOVE_dob_relative_sib local_linear, a(year)
+								
