@@ -159,12 +159,14 @@
 
 \frame{\titlepage}
 
-
+\begin{comment}
 \begin{frame}
     \label{update_scott}
     \frametitle{Some updates}
     \begin{itemize}
         %\item Refresher
+        \item Emailed Sandy
+        \item Dean? Jere Behrman?
         \item Other gaps: by parental education
         \item Primary complete
         \item Model
@@ -183,7 +185,7 @@
                 \item Having a new-born sibling during school year 
                 \item ¿Scores? ¿Parental investment
             \end{itemize}
-        \item Exogenous family size? Twin birth and birth order as instruments?
+        \item Exogenous family size? Twin birth and birth order as instruments? $\approx$ 10k twins per grade-year.
             
         %\item International Evidence 
         %\item School Start Age cutoff
@@ -198,6 +200,205 @@
         %\item Colombia Saber
     \end{itemize}
 \end{frame}
+\end{comment}
+
+\section{Model}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Characteristics}
+      \begin{itemize}
+          \item \textbf{Static} vs Dynamic
+          \item \textbf{Single} vs Intergenerational
+          \item \textbf{One} vs Multiple outcomes
+          \item \textbf{Parental investments} vs transfers
+          \item Fertility as \textbf{given} or choice
+          \item Essentially, parents decide how much to invest in the children they have.
+          \item What is the shock I experience? Some models do income, health, etc. 
+          \item There is certainly an income component, but I would start with a `childcare' shock dues to school closures?
+          \item Should I separate parental investment in childcare from investment in education?
+          \item How to think through age-factor? Is it through returns to investment?
+      \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Model}
+    Parents maximize Utility based on their Consumption (work) and outcomes (education) of their children 1 \& 2.
+        \begin{equation}
+        \begin{aligned}
+        U &= U(C_p, Y_1, Y_2) \\
+        Y_i &= Y(I_i, E_i, S_i). \\
+        \bar{A} &= C_p + I_1 + I_2
+        \end{aligned}
+        \tag{1}
+        \end{equation}
+    $C$ : Consumption
+    
+    $Y_i$: Education of child $i$
+    
+    $I_i$: Investment in child $i$
+    
+    $E_i$: Endowment of child $i$ (previous scores/education?)
+
+    $S_i$: School/childcare availability/quality?
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Model}
+        \begin{equation}
+        \begin{aligned}
+        U &= U(C_p, Y_1, Y_2) \\
+        Y_i &= Y(I_i, E_i, S_i). \\
+        \bar{A} &= C_p + I_1 + I_2
+        \end{aligned}
+        \tag{1}
+        \end{equation}
+
+\begin{itemize}
+  \item $\downarrow$ $S_i$ $\Rightarrow$ $\uparrow$ $I_i$ likely through returns to parental investment going up in the absence of school ($\frac{\partial^2 Y_i}{\partial S_i \partial I_i}<0$). 
+   
+  \item If this only affects $i$, then likely we would see $\downarrow$ $I_j$. This is somewhat seen in my RD effects of delaying school.
+
+  \item What if both $\downarrow$ $S_i$,  $\downarrow$ $S_j$? I can imagine both $\uparrow$ $I_i$, $\uparrow$ $I_j$ but still overall fall in $Y$.
+
+  \item However, the more children, the lower $\uparrow$ $I_i$ due to budget constraints.
+
+  \item Am I imposing my conclusions?
+
+  \item What is the role of $E_i$?
+\end{itemize}
+   
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Literature}
+      \begin{itemize}
+    \item  Behrman, Pollak and Taubman (1982):
+    \item  Behrman (1997)
+    \item  Behrman (2022)
+    \item  Conti, Giannola and Toppeta (2022)
+    \item  Bharadwaj, Eberhard and Neilson (2018)
+    \item  Rosenzweig and Wolpin (1988)
+    \item  Cunha and Heckman (2007)
+    \item  Yi et al. (2015)
+    \item  Giannola (2024)
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Literature II}
+      \begin{itemize}
+        \item  What type of empirical evidence would point in a similar direction? Thinking about policies that alter the amount of childcare.
+        \item \textbf{Universal Pre-K}: I see new literature like Jackson et al (2025), Humphries et al (2025) mostly on increased labor/earnings.
+        \item \textbf{Changes in SSA}:
+        \item \textbf{Quantity-quality tradeoff} Expected fertility has no effect on quality. Howver, Black et al (2010) and Black et al (2021) $\rightarrow$ Unexpected changes in family size (twin births) do have an impact in quality. Disabled third child affects more 2nd than 1st.
+        \item Also, these conclusions seem to be different in early vs late 20th century. May make contribution relevant.
+    \end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+
+\section{Potential Analysis}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Shock: Delayed schooling}
+        \begin{itemize}
+            \item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
+            \item Mixed results in literature (US and Denmark) although not until younger starts school.
+        \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+    \frametitle{Effects of delaying younger School Entry (GPA of older)}
+    \input{./TABLES/rd_summ_1_m_a_365.tex}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Effects of delaying younger School Entry (Scores and investment)}
+    \input{./TABLES/rd_ece_index_365.tex}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Effects of delaying K-Entry}
+    \input{./TABLES/rd_summ_K_m_a_365.tex}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Effects of delaying 2nd grade}
+    \input{./TABLES/rd_summ_2_m_a_365.tex}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Shock: Birth of a sibling}
+      \begin{itemize}
+          \item Families of size 2. Variation around second child's birth
+          \item compare $GPA_t$ between children with a younger sibling born in $t$ and $t+1$. 
+          \item Does this change in COVID?
+          \item I would expect the gap to increase given the additional burden of childcare.
+          \item Similar to `school delay' estimation but with 0-1 year old instead of 6-7.
+          \item Issue: We only observe enrolled students.
+          \item Those born in late 2020 would be in K3 in 2024, but optional, so we might miss some unenrolled.
+          \item Impose same 'enrolled by 3 y.o.' restriction in other years.
+      \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Other potential analysis}
+        \begin{itemize}
+        \item Twins? $\approx$ 10k twins per grade-year.
+        \item Reinforcing vs Compensating: Perhaps previous scores could help here?
+        \item For specific grades (6th and 8th) I might be able to have richer information across time (e.g. 2018-2021). Need to look into it but closer look at:
+        \begin{itemize}
+            \item 2° (2015,2016) $\rightarrow$ 6° (2019,2020)
+            \item 4° (2016,2018) $\rightarrow$ 6°/7° (2018/2019,2020/2021)
+            \item 8° (2018,2019) $\rightarrow$ 9° (2019/2020)
+            \item 8° (2015,2016) $\rightarrow$ college app (2019/2020)
+        \end{itemize}
+        
+        \begin{itemize}
+        \item Internet/TV/Radio at home
+        \item Books in the house
+        \item Previous Standardized scores
+        \item Prior parental expectations, investments..
+        \end{itemize}
+        \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Extra}
+        \begin{itemize}
+        \item Emailed Sandy, we will meet in a couple of weeks.
+        \item Was thinking about emailing Jere Behrman. Know him?
+        \end{itemize}
+\end{frame}
+
+
+\section{Thanks!}
+
+
 
 \section{Refresher}
 
@@ -249,7 +450,7 @@
     \label{update_scott}
     \frametitle{School characteristics}
  {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_A_all_gpa_m_4.png}
+       \includegraphics{./FIGURES/TWFE/covid_twfe_A_all_all_gpa_m_adj_4.png}
       }
     }
 \end{frame}
@@ -258,7 +459,7 @@
     \label{update_scott}
     \frametitle{Student demographics}
  {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_B_all_gpa_m_4.png}
+       \includegraphics{./FIGURES/TWFE/covid_twfe_B_all_all_gpa_m_adj_4.png}
       }
     }
 \end{frame}
@@ -267,7 +468,7 @@
     \label{update_scott}
     \frametitle{Family Structure (siblings)}
  {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_C_all_gpa_m_4.png}
+       \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_C_elm_all_gpa_m_adj_4.png}
       }
     }
 \end{frame}
@@ -276,7 +477,7 @@
     \label{update_scott}
     \frametitle{Family Structure (parents)}
  {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_D_all_gpa_m_4.png}
+       \includegraphics{./FIGURES/TWFE/covid_twfe_D_all_all_gpa_m_adj_4.png}
       }
     }
 \end{frame}
