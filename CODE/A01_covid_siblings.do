@@ -5991,7 +5991,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
@@ -6026,7 +6026,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
@@ -6061,7 +6061,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
@@ -6095,7 +6095,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
@@ -6129,7 +6129,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
@@ -6222,7 +6222,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
@@ -6257,7 +6257,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
@@ -6292,7 +6292,7 @@ replace g_pair = 4 if g_pair==.
 	keep(treated_post) ///
 	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
 	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
