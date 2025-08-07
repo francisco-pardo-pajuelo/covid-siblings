@@ -202,93 +202,6 @@
 \end{frame}
 \end{comment}
 
-\section{Model}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Characteristics}
-      \begin{itemize}
-          \item \textbf{Static} vs Dynamic
-          \item \textbf{Single} vs Intergenerational
-          \item \textbf{One} vs Multiple outcomes
-          \item \textbf{Parental investments} vs transfers
-          \item Fertility as \textbf{given} or choice
-          \item Essentially, parents decide how much to invest in the children they have.
-          \item What is the shock I experience? Some models do income, health, etc. 
-          \item There is certainly an income component, but I would start with a `childcare' shock dues to school closures?
-          \item Should I separate parental investment in childcare from investment in education?
-          \item How to think through age-factor? Is it through returns to investment?
-      \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Model}
-    Parents maximize Utility based on their Consumption (work) and outcomes (education) of their children 1 \& 2.
-        \begin{equation}
-        \begin{aligned}
-        U &= U(C_p, Y_1, Y_2) \\
-        Y_i &= Y(I_i, E_i, S_i). \\
-        \bar{A} &= C_p + I_1 + I_2
-        \end{aligned}
-        \tag{1}
-        \end{equation}
-    $C$ : Consumption
-    
-    $Y_i$: Education of child $i$
-    
-    $I_i$: Investment in child $i$
-    
-    $E_i$: Endowment of child $i$ (previous scores/education?)
-
-    $S_i$: School/childcare availability/quality?
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Model}
-        \begin{equation}
-        \begin{aligned}
-        U &= U(C_p, Y_1, Y_2) \\
-        Y_i &= Y(I_i, E_i, S_i). \\
-        \bar{A} &= C_p + I_1 + I_2
-        \end{aligned}
-        \tag{1}
-        \end{equation}
-
-\begin{itemize}
-  \item $\downarrow$ $S_i$ $\Rightarrow$ $\uparrow$ $I_i$ likely through returns to parental investment going up in the absence of school ($\frac{\partial^2 Y_i}{\partial S_i \partial I_i}<0$). 
-   
-  \item If this only affects $i$, then likely we would see $\downarrow$ $I_j$. This is somewhat seen in my RD effects of delaying school.
-
-  \item What if both $\downarrow$ $S_i$,  $\downarrow$ $S_j$? I can imagine both $\uparrow$ $I_i$, $\uparrow$ $I_j$ but still overall fall in $Y$.
-
-  \item However, the more children, the lower $\uparrow$ $I_i$ due to budget constraints.
-
-  \item Am I imposing my conclusions?
-
-  \item What is the role of $E_i$?
-\end{itemize}
-   
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Literature}
-      \begin{itemize}
-    \item  Behrman, Pollak and Taubman (1982):
-    \item  Behrman (1997)
-    \item  Behrman (2022)
-    \item  Conti, Giannola and Toppeta (2022)
-    \item  Bharadwaj, Eberhard and Neilson (2018)
-    \item  Rosenzweig and Wolpin (1988)
-    \item  Cunha and Heckman (2007)
-    \item  Yi et al. (2015)
-    \item  Giannola (2024)
-    \end{itemize}
-\end{frame}
-
 
 \begin{frame}
     \label{update_scott}
@@ -303,10 +216,59 @@
 \end{frame}
 
 
+\begin{frame}
+    \label{update_scott}
+    \frametitle{The distribution of gaps moves down}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2022.png}
+      }
+    }
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Raw DID vs school closures}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_not_fully_open.pdf}
+      }
+    }
+\end{frame}
 
 
 
 
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Potential Mechanisms}
+      \begin{itemize}
+        \item Sibling Order Effect
+            \begin{itemize}
+                \item Effects are robust when focusing on first born
+            \end{itemize}
+        \item Sibling competition for material resources
+            \begin{itemize}
+                \item Effects are robust in households with/without internet, pc, etc.
+                \item Effects are robust to different age gaps
+            \end{itemize}
+        \item Limited Parental Resources
+            \begin{itemize}
+                \item RD is a first approach, bur results not quite robust to smaller windows.
+                \item Effects are not different for single parent households.
+                \item Perhaps more detailed with Survey TWFE (Work? Income? Better measure of who lives in HH? Investment?)
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{TWFE results}
+        {\resizebox{0.9\textwidth}{!}{
+       \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_summ_all_all_gpa_m_adj_siblings_4.pdf}
+      }
+    }
+\end{frame}
 
 
 \section{Potential Analysis}
@@ -394,6 +356,95 @@
         \item Was thinking about emailing Jere Behrman. Know him?
         \end{itemize}
 \end{frame}
+
+
+\section{Model}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Characteristics}
+      \begin{itemize}
+          \item \textbf{Static} vs Dynamic
+          \item \textbf{Single} vs Intergenerational
+          \item \textbf{One} vs Multiple outcomes
+          \item \textbf{Parental investments} vs transfers
+          \item Fertility as \textbf{given} or choice
+          \item Essentially, parents decide how much to invest in the children they have.
+          \item What is the shock I experience? Some models do income, health, etc. 
+          \item There is certainly an income component, but I would start with a `childcare' shock dues to school closures?
+          \item Should I separate parental investment in childcare from investment in education?
+          \item How to think through age-factor? Is it through returns to investment?
+      \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Model}
+    Parents maximize Utility based on their Consumption (work) and outcomes (education) of their children 1 \& 2.
+        \begin{equation}
+        \begin{aligned}
+        U &= U(C_p, Y_1, Y_2) \\
+        Y_i &= Y(I_i, E_i, S_i). \\
+        \bar{A} &= C_p + I_1 + I_2
+        \end{aligned}
+        \tag{1}
+        \end{equation}
+    $C$ : Consumption
+    
+    $Y_i$: Education of child $i$
+    
+    $I_i$: Investment in child $i$
+    
+    $E_i$: Endowment of child $i$ (previous scores/education?)
+
+    $S_i$: School/childcare availability/quality?
+\end{frame}
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Model}
+        \begin{equation}
+        \begin{aligned}
+        U &= U(C_p, Y_1, Y_2) \\
+        Y_i &= Y(I_i, E_i, S_i). \\
+        \bar{A} &= C_p + I_1 + I_2
+        \end{aligned}
+        \tag{1}
+        \end{equation}
+
+\begin{itemize}
+  \item $\downarrow$ $S_i$ $\Rightarrow$ $\uparrow$ $I_i$ likely through returns to parental investment going up in the absence of school ($\frac{\partial^2 Y_i}{\partial S_i \partial I_i}<0$). 
+   
+  \item If this only affects $i$, then likely we would see $\downarrow$ $I_j$. This is somewhat seen in my RD effects of delaying school.
+
+  \item What if both $\downarrow$ $S_i$,  $\downarrow$ $S_j$? I can imagine both $\uparrow$ $I_i$, $\uparrow$ $I_j$ but still overall fall in $Y$.
+
+  \item However, the more children, the lower $\uparrow$ $I_i$ due to budget constraints.
+
+  \item Am I imposing my conclusions?
+
+  \item What is the role of $E_i$?
+\end{itemize}
+   
+\end{frame}
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Literature}
+      \begin{itemize}
+    \item  Behrman, Pollak and Taubman (1982):
+    \item  Behrman (1997)
+    \item  Behrman (2022)
+    \item  Conti, Giannola and Toppeta (2022)
+    \item  Bharadwaj, Eberhard and Neilson (2018)
+    \item  Rosenzweig and Wolpin (1988)
+    \item  Cunha and Heckman (2007)
+    \item  Yi et al. (2015)
+    \item  Giannola (2024)
+    \end{itemize}
+\end{frame}
+
 
 
 \section{Thanks!}
