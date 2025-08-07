@@ -2027,7 +2027,7 @@ forvalues pv = 1(1)10 {
 //gen did_m = gap_`subj'2022 - gap_`subj'2012
 
 
-local subj = "PV4MATH" //
+local subj = "PV1MATH" //
 local policy = "not_fully_open" //full partial not_fully_open
 				
 local xtitle_full = "Weeks schools fully closed"
@@ -2045,20 +2045,20 @@ twoway 	///
 	capture qui graph export "$FIGURES\Descriptive\PISA_raw_DID_`subj'_`policy'.png", replace			
 	capture qui graph export "$FIGURES\Descriptive\PISA_raw_DID_`subj'_`policy'.pdf", replace		
 
-sum PV1MATH20120
+sum `subj'20120
 local m_20120 = r(mean)	
-sum PV1MATH20121	
+sum `subj'20121	
 local m_20121 = r(mean)
-sum PV1MATH20220	
+sum `subj'20220	
 local m_20220 = r(mean)
-sum PV1MATH20221	
+sum `subj'20221	
 local m_20221 = r(mean)
 
 twoway 	///
-					(kdensity PV1MATH20120 if PV1MATH20120<.4 & PV1MATH20120>-.5, 				lcolor("red%30")	lwidth(normal)) ///
-					(kdensity PV1MATH20121 if PV1MATH20121<.4 & PV1MATH20121>-.5, 				lcolor("blue%30")	lwidth(normal)) ///
-					(kdensity PV1MATH20220 if PV1MATH20220<.4 & PV1MATH20220>-.5, 				lcolor("red%80")	lwidth(thick)) ///
-					(kdensity PV1MATH20221 if PV1MATH20221<.4 & PV1MATH20221>-.5, 				lcolor("blue%80")	lwidth(thick)) ///
+					(kdensity `subj'20120 if `subj'20120<.4 & `subj'20120>-.5, 				lcolor("red%30")	lwidth(normal)) ///
+					(kdensity `subj'20121 if `subj'20121<.4 & `subj'20121>-.5, 				lcolor("blue%30")	lwidth(normal)) ///
+					(kdensity `subj'20220 if `subj'20220<.4 & `subj'20220>-.5, 				lcolor("red%80")	lwidth(thick)) ///
+					(kdensity `subj'20221 if `subj'20221<.4 & `subj'20221>-.5, 				lcolor("blue%80")	lwidth(thick)) ///
 					(pcarrowi 4.5 `m_20120' 4.5 `m_20220', 		lcolor("red") 		mcolor("red")	lwidth(medium) barbsize(medium)) ///
 					(pcarrowi 3.5 `m_20121' 3.5 `m_20221', 	lcolor("blue") 		mcolor("blue")	lwidth(medium)) ///
 					///(pcspike 3 `m_20120' 3 `m_20220', 		lcolor("red") 		lwidth(medium) barbsize(medium)) ///
