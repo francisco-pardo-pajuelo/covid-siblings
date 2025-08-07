@@ -847,11 +847,15 @@ foreach bw in "365" /*"300" "180" "120" "90" "60" "30"*/ {
 						
 						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
 						file write table_tex	/// HEADER OPTIONS OF TABLE							
-						_n "\bottomrule" _n ///
-							"\end{tabular}" _n ///
-							"}" _n ///
-							"}" _n
-						file close table_tex				
+					_n "\bottomrule" _n ///
+						"\end{tabular}" _n ///
+						"}" _n ///
+						"\@ifclassloaded{beamer}{%" _n ///
+							"}{%" _n ///
+							"	\end{table}" _n ///
+							"}" _n 
+						file close table_tex	
+								
 					
 						}
 					}

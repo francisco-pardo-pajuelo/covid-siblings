@@ -850,8 +850,12 @@ foreach bw in "365" /*"300" "180" "120" "90" "60" "30"*/ {
 						_n "\bottomrule" _n ///
 							"\end{tabular}" _n ///
 							"}" _n ///
-							"}" _n
-						file close table_tex				
+							"\@ifclassloaded{beamer}{%" _n ///
+							"}{%" _n ///
+							"	\end{table}" _n ///
+							"}" _n 
+						file close table_tex	
+								
 					
 						}
 					}
