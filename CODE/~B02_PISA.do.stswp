@@ -34,7 +34,7 @@ program define main
 	
 	pisa_figures_2009_2012_vs_2022
 	
-	//analyze_2009_2012_vs_2022
+	analyze_2009_2012_vs_2022
 	analyze_2018_D_vs_2022	
 end
 

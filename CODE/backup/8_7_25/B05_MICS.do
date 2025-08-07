@@ -1,0 +1,574 @@
+*- MICS with Foundational Learning Module (UNICEF)
+
+
+capture program drop main 
+program define main 
+
+	setup_MICS
+	
+	append_years
+	
+	analysis
+	
+	
+end
+
+
+capture program drop setup_MICS 
+program define setup_MICS 
+
+	di "SETUP"
+	
+	colorpalette  HCL blues, selec(2 5 8 11) nograph
+	return list
+
+	global blue_1 = "`r(p1)'"
+	global blue_2 = "`r(p2)'"
+	global blue_3 = "`r(p3)'"
+	global blue_4 = "`r(p4)'"
+	
+	colorpalette  HCL reds, selec(2 5 8 11) nograph
+	return list
+
+	global red_1 = "`r(p1)'"
+	global red_2 = "`r(p2)'"
+	global red_3 = "`r(p3)'"	
+	global red_4 = "`r(p4)'"	
+	
+		colorpalette  HCL greens, selec(2 5 8 11) nograph
+	return list
+
+	global green_1 = "`r(p1)'"
+	global green_2 = "`r(p2)'"
+	global green_3 = "`r(p3)'"		
+	global green_4 = "`r(p4)'"
+	
+	
+end
+
+capture program drop append_years
+program define append_years
+
+	//FS - Random 5-17 child from each household
+	clear
+	tempfile append_countries
+	save `append_countries', replace emptyok
+
+
+	/*
+
+	import spss using "$IN\MICS\W6\Afghanistan MICS6 Datasets\Afghanistan MICS6 Datasets\Afghanistan MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Jamaica MICS6 Datasets\Jamaica MICS6 Datasets\Jamaica MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\DRCongo MICS6 SPSS Datafiles\DRCongo MICS6 SPSS Datafiles\fs.sav", clear
+	import spss using "$IN\MICS\W6\Nepal MICS6 Datasets\Nepal MICS6 SPSS Datasets\fs.sav", clear
+
+
+	* Correct month since year is 2020
+	import spss using "$IN\MICS\W6\Argentina MICS6 Datasets\Argentina MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Guyana MICS6 Datasets\Guyana MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Honduras MICS6 Datasets\Honudras MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Kosovo (UNSCR 1244) (Roma, Ashkali and Egyptian Communities) MICS6 Datasets\Kosovo (UNSCR 1244) (Roma, Ashkali and Egyptian Communities) MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Kosovo under UNSC res. 1244 MICS6 Datasets\Kosovo (UNSCR 1244) MICS6 Datasets\Kosovo (UNSCR 1244) MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Malawi MICS6 SPSS\Malawi MICS6 SPSS\Malawi MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\MICS6 Samoa Datasets\MICS6 Samoa Datasets\MICS6 Samoa SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Pakistan (Balochistan) MICS6 Datasets\Pakistan (Baluchistan) SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\State of Palestine MICS6 Datasets\State of Palestine MICS6 SPSS Datasets\fs.sav", clear
+	
+	import spss using "$IN\MICS\W6\Viet Nam MICS6 Datasets\Viet Nam MICS6 Datasets\Viet Nam MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Tonga MICS6 Datasets\Tonga MICS6 Datasets\Tonga MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Turks and Caicos Islands MICS6 Datasets\Turks and Caicos Islands MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Tuvalu MICS6 Datasets\Tuvalu MICS6 SPSS Datasets\fs.sav", clear
+
+	*- No reading
+	import spss using "$IN\MICS\W6\Afghanistan MICS6 Datasets\Afghanistan MICS6 Datasets\Afghanistan MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Comoros MICS6 Datasets\Comoros MICS6 Datasets\Comoros MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Fiji MICS6 Datasets\Fiji MICS6 Datasets\Fiji MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Jamaica MICS6 Datasets\Jamaica MICS6 Datasets\Jamaica MICS6 SPSS Datasets\fs.sav", clear
+	*import spss using "$IN\MICS\W6\Lao PDR MICS6 Datasets\Lao PDR MICS6 Datasets\Lao PDR MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\MICS6 Samoa Datasets\MICS6 Samoa Datasets\MICS6 Samoa SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Trinidad and Tobago MICS6 Datasets\Trinidad and Tobago MICS6 Datasets\Trinidad and Tobago MICS6 SPSS Datasets\fs.sav", clear	
+	import spss using "$IN\MICS\W6\Zimbabwe MICS6 SPSS Datasets\Zimbabwe MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Azerbaijan MICS6 2023 Datasets\Azerbaijan MICS6 2023 Datasets\Azerbaijan MICS6 2023 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Kyrgyzstan MICS6 2023 Datasets\Kyrgyzstan MICS6 2023 Datasets\Kyrgyzstan MICS6 2023 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Nigeria MICS6 Datasets\Nigeria MICS6 Datasets\Nigeria MICS6 SPSS Datasets\fs.sav", clear
+	import spss using "$IN\MICS\W6\Vanuatu MICS6 Datasets\Vanuatu MICS6 Datasets\Vanuatu MICS6 SPSS Datasets\fs.sav", clear
+	
+	
+	*- doubts
+	import spss using "$IN\MICS\W6\Kyrgyz Republic MICS6 Datasets\Kyrgyz Republic MICS6 Datasets\fs.sav", clear
+                   
+	                          
+	
+
+
+	
+	
+	
+
+	*/
+
+
+	foreach country in ///
+	"Afghanistan" ///
+	"Algeria" ///
+	"Argentina" ///
+	"Azerbaijan" ///
+	"Bangladesh" ///
+	"Belarus" ///
+	"Benin" ///
+	"Central African Republic" ///
+	"Chad" ///
+	"Comoros" ///
+	"Costa Rica" ///
+	"Cuba" ///
+	"Dominican Republic" ///
+	"DRCongo" ///
+	"Eswatini" ///
+	"Fiji" ///
+	"Georgia" ///
+	"Ghana" ///
+	"Guinea Bissau" ///
+	"Guyana" ///
+	"Honduras" ///
+	"Iraq" ///
+	"Jamaica" ///
+	"Kiribati" ///
+	"Kosovo (Roma, Ashkali and Egyptian Communities)"  ///
+	"Kosovo" ///
+	"Kyrgyz Republic" ///
+	"Kyrgyzstan" ///
+	"Lao PDR (2023)" ///
+	"Lao PDR" ///
+	"Lesotho" ///
+	"Madagascar" ///
+	"Malawi" ///
+	"Samoa" ///
+	"Mongolia" ///
+	"Montenegro (Roma Settlements)" ///
+	"Montenegro" ///
+	"Nauru" ///
+	"Nepal" ///
+	"Nigeria" ///
+	"Pakistan (Balochistan)" ///
+	"Pakistan (Khyber Pakhtunkhwa)" ///
+	"Pakistan (Punjab)" ///
+	"Pakistan (Sindh)" ///
+	"Qatar" ///
+	"Republic of North Macedonia (Roma Settlements)" ///
+	"Republic of North Macedonia" /// 
+	"Sao Tome and Principe" ///
+	"Serbia (Roma Settlements)" ///
+	"Serbia" ///
+	"Sierra Leone" ///
+	"State of Palestine" ///
+	"Suriname" ///
+	"Thailand - 1" ///
+	"Thailand - 2" ///
+	"Thailand - 3" ///
+	"The Gambia" ///
+	"Togo" ///
+	"Tonga" ///
+	"Trinidad and Tobago" ///
+	"Tunisia - 1" ///
+	"Tunisia - 2" ///
+	"Turkmenistan" ///
+	"Turks and Caicos Islands" ///
+	"Tuvalu" ///
+	"Uzbekistan" ///
+	"Vanuatu" ///
+	"Viet Nam" ///
+	"Yemen" ///
+	"Zimbabwe" ///
+	{
+
+	local country_folder = ""
+	if "`country'" == "Afghanistan" 													local country_folder = "Afghanistan MICS6 Datasets\Afghanistan MICS6 Datasets\Afghanistan MICS6 SPSS Datasets"
+	if "`country'" == "Algeria" 														local country_folder = "Algeria MICS6 Datasets\Algeria MICS6 SPSS Datasets"
+	if "`country'" == "Argentina" 														local country_folder = "Argentina MICS6 Datasets\Argentina MICS6 SPSS Datasets"
+	if "`country'" == "Azerbaijan" 														local country_folder = "Azerbaijan MICS6 2023 Datasets\Azerbaijan MICS6 2023 Datasets\Azerbaijan MICS6 2023 SPSS Datasets"
+	if "`country'" == "Bangladesh" 														local country_folder = "Bangladesh MICS6 SPSS Datasets\Bangladesh MICS6 SPSS Datasets"
+	if "`country'" == "Belarus" 														local country_folder = "Belarus MICS6 Datasets\Belarus MICS6 SPSS Datasets"
+	if "`country'" == "Benin" 															local country_folder = "Benin MICS6 Datasets\Benin MICS6 Datasets\Benin MICS6 SPSS Datasets"
+	if "`country'" == "Central African Republic" 										local country_folder = "Central African Republic MICS6 Datasets\Central African Republic MICS6 SPSS Datasets"
+	if "`country'" == "Chad" 															local country_folder = "Chad MICS6 Datasets\Chad MICS6 SPSS Datasets"
+	if "`country'" == "Comoros" 														local country_folder = "Comoros MICS6 Datasets\Comoros MICS6 Datasets\Comoros MICS6 SPSS Datasets"
+	if "`country'" == "Costa Rica" 														local country_folder = "Costa Rica MICS6 Datasets\Costa Rica MICS6 Datasets\Costa Rica MICS6 SPSS Datasets"
+	if "`country'" == "Cuba" 															local country_folder = "Cuba MICS6 Datasets\Cuba MICS6 SPSS Datasets"
+	if "`country'" == "Dominican Republic" 												local country_folder = "Dominican Republic MICS6 Datasets\Dominican Republic MICS6 SPSS Datasets"
+	if "`country'" == "DRCongo" 														local country_folder = "DRCongo MICS6 SPSS Datafiles\DRCongo MICS6 SPSS Datafiles"
+	if "`country'" == "Eswatini" 														local country_folder = "Eswatini MICS6 Datasets\Eswatini MICS6 SPSS Datasets"
+	if "`country'" == "Fiji" 															local country_folder = "Fiji MICS6 Datasets\Fiji MICS6 Datasets\Fiji MICS6 SPSS Datasets"
+	if "`country'" == "Georgia" 														local country_folder = "Georgia MICS6 SPSS Datasets\Georgia MICS6 SPSS Datasets\Georgia MICS6 SPSS Datasets"
+	if "`country'" == "Ghana" 															local country_folder = "Ghana MICS6 SPSS Datasets\Ghana MICS6 SPSS Datasets"
+	if "`country'" == "Guinea Bissau" 													local country_folder = "Guinea Bissau MICS6 Datasets\Guinea Bissau MICS6 SPSS Datasets"
+	if "`country'" == "Guyana" 															local country_folder = "Guyana MICS6 Datasets\Guyana MICS6 SPSS Datasets"
+	if "`country'" == "Honduras" 														local country_folder = "Honduras MICS6 Datasets\Honudras MICS6 SPSS Datasets"
+	if "`country'" == "Iraq" 															local country_folder = "Iraq MICS6 Datasets"
+	if "`country'" == "Jamaica" 														local country_folder = "Jamaica MICS6 Datasets\Jamaica MICS6 Datasets\Jamaica MICS6 SPSS Datasets"
+	if "`country'" == "Kiribati" 														local country_folder = "Kiribati MICS6 Datasets\Kiribati MICS6 SPSS Datasets"
+	if "`country'" == "Kosovo (Roma, Ashkali and Egyptian Communities)" 				local country_folder = "Kosovo (UNSCR 1244) (Roma, Ashkali and Egyptian Communities) MICS6 Datasets\Kosovo (UNSCR 1244) (Roma, Ashkali and Egyptian Communities) MICS6 SPSS Datasets"
+	if "`country'" == "Kosovo"															local country_folder = "Kosovo under UNSC res. 1244 MICS6 Datasets\Kosovo (UNSCR 1244) MICS6 Datasets\Kosovo (UNSCR 1244) MICS6 SPSS Datasets"
+	if "`country'" == "Kyrgyz Republic" 												local country_folder = "Kyrgyz Republic MICS6 Datasets\Kyrgyz Republic MICS6 Datasets"
+	if "`country'" == "Kyrgyzstan" 														local country_folder = "Kyrgyzstan MICS6 2023 Datasets\Kyrgyzstan MICS6 2023 Datasets\Kyrgyzstan MICS6 2023 SPSS Datasets"
+	if "`country'" == "Lao PDR (2023)" 													local country_folder = "Lao PDR MICS6 2023 Datasets\Lao PDR MICS6 2023 Datasets\Lao PDR MICS6 2023 SPSS Datasets"
+	if "`country'" == "Lao PDR" 														local country_folder = "Lao PDR MICS6 Datasets\Lao PDR MICS6 Datasets\Lao PDR MICS6 SPSS Datasets"
+	if "`country'" == "Lesotho" 														local country_folder = "Lesotho_MICS6_datasets\Lesotho_MICS6_datasets"
+	if "`country'" == "Madagascar" 														local country_folder = "Madagascar MICS6 datasets\Madagascar MICS6 datasets\Madagascar MICS6 SPSS datasets"
+	if "`country'" == "Malawi" 															local country_folder = "Malawi MICS6 SPSS\Malawi MICS6 SPSS\Malawi MICS6 SPSS Datasets"
+	if "`country'" == "Samoa" 															local country_folder = "MICS6 Samoa Datasets\MICS6 Samoa Datasets\MICS6 Samoa SPSS Datasets"
+	if "`country'" == "Mongolia" 														local country_folder = "Mongolia MICS 2018 SPSS Datasets\Mongolia MICS 2018 SPSS Datasets"
+	if "`country'" == "Montenegro (Roma Settlements)" 									local country_folder = "Montenegro (Roma Settlements) MICS6 Datasets\Montenegro (Roma Settlements) MICS6 SPSS Datasets"
+	if "`country'" == "Montenegro" 														local country_folder = "Montenegro MICS6 Datasets\Montenegro MICS6 SPSS Datasets"
+	if "`country'" == "Nauru" 															local country_folder = "Nauru MICS6 2023 Datasets\Nauru MICS6 2023 Datasets\Nauru MICS6 2023 SPSS Datasets"
+	if "`country'" == "Nepal" 															local country_folder = "Nepal MICS6 Datasets\Nepal MICS6 SPSS Datasets"
+	if "`country'" == "Nigeria" 														local country_folder = "Nigeria MICS6 Datasets\Nigeria MICS6 Datasets\Nigeria MICS6 SPSS Datasets"
+	if "`country'" == "Pakistan (Balochistan)" 											local country_folder = "Pakistan (Balochistan) MICS6 Datasets\Pakistan (Baluchistan) SPSS Datasets"
+	if "`country'" == "Pakistan (Khyber Pakhtunkhwa)" 									local country_folder = "Pakistan Khyber Pakhtunkhwa MICS6 Datasets\Pakistan Khyber Pakhtunkhwa MICS6 SPSS Datasets"
+	if "`country'" == "Pakistan (Punjab)" 												local country_folder = "Pakistan Punjab MICS6 Datasets\Pakistan Punjab MICS6 Datasets"
+	if "`country'" == "Pakistan (Sindh)" 												local country_folder = "Pakistan Sindh MICS6 Datasets\Pakistan Sindh MICS6 SPSS Datasets"
+	if "`country'" == "Qatar" 															local country_folder = "Qatar MICS6 Datasets\Qatar MICS6 Datasets\Qatar MICS6 SPSS Datasets"
+	if "`country'" == "Republic of North Macedonia (Roma Settlements)" 					local country_folder = "Republic of North Macedonia (Roma Settlements) MICS6 Datasets\Republic of North Macedonia (Roma Settlements) MICS6 SPSS Datasets"
+	if "`country'" == "Republic of North Macedonia" 									local country_folder = "Republic of North Macedonia MICS6 Datasets\Republic of North Macedonia MICS6 SPSS Datasets"
+	if "`country'" == "Sao Tome and Principe" 											local country_folder = "Sao Tome and Principe MICS6 Datasets\Sao Tome and Principe MICS6 SPSS Datasets"
+	if "`country'" == "Serbia (Roma Settlements)" 										local country_folder = "Serbia (Roma Settlements) MICS6 Datasets\Serbia (Roma Settlements) MICS6 SPSS Datasets"
+	if "`country'" == "Serbia" 															local country_folder = "Serbia MICS6 Datasets\Serbia MICS6 SPSS Datasets"
+	if "`country'" == "Sierra Leone" 													local country_folder = "Sierra Leone MICS6 Datasets\Sierra Leone MICS6 Datasets"
+	if "`country'" == "State of Palestine" 												local country_folder = "State of Palestine MICS6 Datasets\State of Palestine MICS6 SPSS Datasets"
+	if "`country'" == "Suriname" 														local country_folder = "Suriname MICS6 SPSS Datafiles\Suriname MICS6 SPSS Datafiles"
+	if "`country'" == "Thailand - 1" 													local country_folder = "Thailand MICS6 2022 Datasets\Thailand MICS6 2022 SPSS Datasets"
+	if "`country'" == "Thailand - 2" 													local country_folder = "Thailand MICS6 and Thailand Selected 17 Provinces MICS6 Datasets\Thailand MICS6 Datasets"
+	if "`country'" == "Thailand - 3" 													local country_folder = "Thailand MICS6 and Thailand Selected 17 Provinces MICS6 Datasets\Thailand Selected 17 Provinces MICS6 Datasets"
+	if "`country'" == "The Gambia" 														local country_folder = "The Gambia MICS6 Datasets\The Gambia MICS6 SPSS Datasets"
+	if "`country'" == "Togo" 															local country_folder = "Togo MICS6 SPSS Datasets\Togo MICS6 SPSS Datasets"
+	if "`country'" == "Tonga" 															local country_folder = "Tonga MICS6 Datasets\Tonga MICS6 Datasets\Tonga MICS6 SPSS Datasets"
+	if "`country'" == "Trinidad and Tobago" 											local country_folder = "Trinidad and Tobago MICS6 Datasets\Trinidad and Tobago MICS6 Datasets\Trinidad and Tobago MICS6 SPSS Datasets"
+	if "`country'" == "Tunisia - 1" 													local country_folder = "Tunisia MICS6 2023 Datasets\Tunisia MICS6 2023 Datasets\Tunisia MICS6 2023 SPSS Datasets"
+	if "`country'" == "Tunisia - 2" 													local country_folder = "Tunisia MICS6 Datasets\Tunisia MICS6 Datasets"
+	if "`country'" == "Turkmenistan" 													local country_folder = "Turkmenistan MICS6 SPSS Datasets\Turkmenistan MICS6 Datasets"
+	if "`country'" == "Turks and Caicos Islands" 										local country_folder = "Turks and Caicos Islands MICS6 Datasets\Turks and Caicos Islands MICS6 SPSS Datasets"
+	if "`country'" == "Tuvalu" 															local country_folder = "Tuvalu MICS6 Datasets\Tuvalu MICS6 SPSS Datasets"
+	if "`country'" == "Uzbekistan" 														local country_folder = "Uzbekistan MICS6 Datasets\Uzbekistan MICS6 Datasets\Uzbekistan MICS6 SPSS Datasets"
+	if "`country'" == "Vanuatu" 														local country_folder = "Vanuatu MICS6 Datasets\Vanuatu MICS6 Datasets\Vanuatu MICS6 SPSS Datasets"
+	if "`country'" == "Viet Nam" 														local country_folder = "Viet Nam MICS6 Datasets\Viet Nam MICS6 Datasets\Viet Nam MICS6 SPSS Datasets"
+	if "`country'" == "Yemen" 															local country_folder = "Yemen MICS6 Datasets\Yemen MICS6 SPSS Datasets"
+	if "`country'" == "Zimbabwe" 														local country_folder = "Zimbabwe MICS6 SPSS Datasets\Zimbabwe MICS6 SPSS Datasets"
+	if "`country'" == "" 																local country_folder = ""
+
+	di as result "`country'"
+	assert "`country_folder'" != ""
+
+	if "`country'" != "" {
+		import spss using "$IN\MICS\W6\\`country_folder'\fs.sav", clear
+		gen country = "`country'"
+		
+		if "`country'" == "Afghanistan" gen year = FS7Y_G
+		if "`country'" == "Nepal" 		gen year = 2019 // FS7Y It is in Nepalese calendar
+
+		capture gen year = FS7Y
+		
+		if "`country'" == "DRCongo" 	replace year = 2017 if year==2027 // FS7Y It is in Nepalese calendar
+		if inlist("`country'","Argentina","Guyana","Honduras","Kosovo (Roma, Ashkali and Egyptian Communities)","Kosovo","Samoa","Pakistan (Balochistan)")==1 	replace year = 2019 				// It is mostly 2020 but mainly pre covid		
+		if inlist("`country'","Tonga","Turks and Caicos Islands","Tuvalu","State of Palestine")==1 																replace year = 2019 				// It is mostly 2020 but mainly pre covid		
+		//if inlist("`country'","Viet Nam")==1 																													replace year = 2020 				// This is late 2020 and early 2021, but is the only one in 2020 in either case.	
+		if inlist("`country'","Thailand - 1","Thailand - 2","Thailand - 3")==1 																					replace year = year-543 			// It is mostly 2020 but mainly pre covid		
+
+		//keep country year CB3 HH52
+
+		isvar 	/*ID*/ 				country year FS7M ///
+				/*SAMPLE*/			PSU stratum  ///
+				/*DEMOG*/			CB3 HH52 HL4 fselevel melevel wscore windex5 ///
+				/*CONSENT*/			FL1 FL3 FL4A FL4B FL4C ///
+				/*FL module lit*/	FL20* FL22* ///
+				/*FL module num*/	FL6A FL6B ///
+				/*MATH*/			FL23* FL24* FL25* FL27* ///
+				/*WEIGH*/			fsweight fshweight
+					local all_vars = r(varlist)
+					ds `all_vars', not
+					keep `all_vars'
+					order `all_vars'	
+					
+		ds country year, not
+		local all_vars = r(varlist)
+		destring `all_vars', replace	force		
+
+		append using `append_countries'
+		save `append_countries', replace
+		describe
+		}
+	}
+
+	ds CB3 HH52
+	
+	*- Sibling variable
+	gen sibs = HH52>1 if HH52!=.
+	drop if sibs==.
+	
+	*- Numeracy skills
+	gen number_read = 0 if FL3==1
+	gen number_dis 	= 0 if FL3==1
+	gen number_add 	= 0 if FL3==1
+	gen number_patt = 0 if FL3==1
+	gen numbskill 	= 0 if FL3==1
+
+	replace number_read = 1 if (FL23A==1 & FL23B==1 & FL23C==1 & FL23D==1 & FL23E==1)		& inlist(country,"Kyrgyz Republic") == 0
+	replace number_dis 	= 1 if (FL24A==1 & FL24B==1 & FL24C==1 & FL24D==1 & FL24E==1) 		& inlist(country,"Kyrgyz Republic") == 0
+	replace number_add 	= 1 if (FL25A==1 & FL25B==1 & FL25C==1 & FL25D==1 & FL25E==1)		& inlist(country,"Kyrgyz Republic") == 0
+	replace number_patt = 1 if (FL27A==1 & FL27B==1 & FL27C==1 & FL27D==1 & FL27E==1)		& inlist(country,"Kyrgyz Republic") == 0
+
+	replace number_read = 1 if (FL23A==1 & FL23B==1 & FL23C==1 & FL23D==1 & FL23E==1) 		& inlist(country,"Kyrgyz Republic") == 1
+	replace number_dis 	= 1 if (FL24A==7 & FL24B==24 & FL24C==58 & FL24D==67 & FL24E==154) 	& inlist(country,"Kyrgyz Republic") == 1
+	replace number_add 	= 1 if (FL25A==5 & FL25B==14 & FL25C==10 & FL25D==19 & FL25E==36) 	& inlist(country,"Kyrgyz Republic") == 1
+	replace number_patt = 1 if (FL27A==8 & FL27B==16 & FL27C==30 & FL27D==8 & FL27E==14) 	& inlist(country,"Kyrgyz Republic") == 1	 
+
+	replace numbskill 	= 1 if (number_read==1 & number_dis==1 & number_add==1 & number_patt==1)
+
+	*- Numeracy skills
+	gen read_corr = 0 if FL3==1
+	gen alit 	= 0 if FL3==1
+	gen alnfe 	= 0 if FL3==1
+	gen readsk 	= 0 if FL3==1
+
+	replace read_corr 	= 1 if (FL20B<0.1*FL20A)			
+	replace alit 		= 1 if (FL22A==1 & FL22B==1 & FL22C==1)		
+	replace alnfe 		= 1 if (FL22D==1 & FL22E==1)		
+
+	replace readsk 	= 1 if (read_corr==1 & alit==1 & alnfe==1)	
+	
+	*- Region
+	gen region = ""
+	replace region = "East Asia and Pacific" if country == "Lao PDR (2023)"
+	replace region = "East Asia and Pacific" if country == "Lao PDR"
+	replace region = "East Asia and Pacific" if country == "Nauru"
+	replace region = "East Asia and Pacific" if country == "Vanuatu"
+	replace region = "East Asia and Pacific" if country == "Thailand - 1"
+	replace region = "East Asia and Pacific" if country == "Thailand - 2"
+	replace region = "East Asia and Pacific" if country == "Thailand - 3"
+	replace region = "East Asia and Pacific" if country == "Fiji"
+	replace region = "East Asia and Pacific" if country == "Viet Nam"
+	replace region = "East Asia and Pacific" if country == "Samoa"
+	replace region = "East Asia and Pacific" if country == "Tonga"
+	replace region = "East Asia and Pacific" if country == "Tuvalu"
+	replace region = "East Asia and Pacific" if country == "Kiribati"
+	replace region = "East Asia and Pacific" if country == "Mongolia"
+	replace region = "East Asia and Pacific" if country == "Lao People's Democratic Republic"
+
+	replace region = "Eastern and Southern Africa" if country == "Comoros"
+	replace region = "Eastern and Southern Africa" if country == "Eswatini"
+	replace region = "Eastern and Southern Africa" if country == "Malawi"
+	replace region = "Eastern and Southern Africa" if country == "Zimbabwe"
+	replace region = "Eastern and Southern Africa" if country == "Lesotho"
+	replace region = "Eastern and Southern Africa" if country == "Madagascar"
+
+	replace region = "Europe and Central Asia" if country == "Azerbaijan"
+	replace region = "Europe and Central Asia" if country == "Kyrgyzstan"
+	replace region = "Europe and Central Asia" if country == "Uzbekistan"
+	replace region = "Europe and Central Asia" if country == "Belarus"
+	replace region = "Europe and Central Asia" if country == "Kosovo (Roma, Ashkali and Egyptian Communities)"
+	replace region = "Europe and Central Asia" if country == "Kosovo"
+	replace region = "Europe and Central Asia" if country == "Serbia (Roma Settlements)"
+	replace region = "Europe and Central Asia" if country == "Serbia"
+	replace region = "Europe and Central Asia" if country == "Turkmenistan"
+	replace region = "Europe and Central Asia" if country == "Georgia"
+	replace region = "Europe and Central Asia" if country == "Kyrgyz Republic"
+	replace region = "Europe and Central Asia" if country == "Montenegro (Roma Settlements)"
+	replace region = "Europe and Central Asia" if country == "Montenegro"
+	replace region = "Europe and Central Asia" if country == "Republic of North Macedonia"
+	replace region = "Europe and Central Asia" if country == "Republic of North Macedonia (Roma Settlements)"
+		
+	replace region = "Latin America and Caribbean" if country == "Jamaica"
+	replace region = "Latin America and Caribbean" if country == "Trinidad and Tobago"
+	replace region = "Latin America and Caribbean" if country == "Argentina"
+	replace region = "Latin America and Caribbean" if country == "Cuba"
+	replace region = "Latin America and Caribbean" if country == "Dominican Republic"
+	replace region = "Latin America and Caribbean" if country == "Guyana"
+	replace region = "Latin America and Caribbean" if country == "Honduras"
+	replace region = "Latin America and Caribbean" if country == "Turks and Caicos Islands"
+	replace region = "Latin America and Caribbean" if country == "Costa Rica"
+	replace region = "Latin America and Caribbean" if country == "Suriname"
+
+	replace region = "Middle East and North Africa" if country == "Qatar"
+	replace region = "Middle East and North Africa" if country == "Tunisia - 1"
+	replace region = "Middle East and North Africa" if country == "Tunisia - 2"
+	replace region = "Middle East and North Africa" if country == "Yemen"
+	replace region = "Middle East and North Africa" if country == "State of Palestine"
+	replace region = "Middle East and North Africa" if country == "Algeria"
+	replace region = "Middle East and North Africa" if country == "Iraq"
+	
+	replace region = "South Asia" if country == "Afghanistan"
+	replace region = "South Asia" if country == "Bangladesh"
+	replace region = "South Asia" if country == "Nepal"
+	replace region = "South Asia" if country == "Pakistan (Balochistan)"
+	replace region = "South Asia" if country == "Pakistan (Khyber Pakhtunkhwa)"
+	replace region = "South Asia" if country == "Pakistan (Sindh)"
+	replace region = "South Asia" if country == "Pakistan (Punjab)"
+	
+
+	replace region = "West and Central Africa" if country == "Benin"
+	replace region = "West and Central Africa" if country == "Nigeria"
+	replace region = "West and Central Africa" if country == "Chad"
+	replace region = "West and Central Africa" if country == "Sao Tome and Principe"
+	replace region = "West and Central Africa" if country == "Central African Republic"
+	replace region = "West and Central Africa" if country == "The Gambia"
+	replace region = "West and Central Africa" if country == "Guinea Bissau"
+	replace region = "West and Central Africa" if country == "DRCongo"
+	replace region = "West and Central Africa" if country == "Ghana"
+	replace region = "West and Central Africa" if country == "Sierra Leone"
+	replace region = "West and Central Africa" if country == "Togo"
+
+
+	encode region, gen(region_code)
+
+	compress
+
+
+	save "$TEMP\MICS\append_w6", replace
+
+
+end
+
+
+
+capture program drop analysis 
+program define analysis 
+
+	use "$TEMP\MICS\append_w6", clear
+	
+	local ytitle_gap 		= "Siblings - Only Child Gap"
+	local ytitle_numbskill 	= "(% Foundational Numeracy Skills)"
+	local ytitle_readsk 	= "(% Foundational Reading Skills)"
+	
+	
+	*- Rename
+	rename CB3 age
+	
+	*- Non relevant ages
+	keep if age>=7 & age<=14
+	
+	*- Filter some countries
+	bys country: gen N=_N
+	bys country sibs: 		gen N_sibs =_N
+	bys country: 			egen rate_numbskill = mean(numbskill)
+	bys country: 			egen rate_readsk = mean(readsk)
+
+	bys country: egen min_obs_sibs = min(N_sibs)
+
+	
+	*- Too few observations
+	drop if N<1000
+	drop if N_sibs<500
+	
+	*- Skill achievement strangely low
+	sum rate_readsk rate_numbskill, de
+	replace numbskill = . if rate_numbskill<0.05
+	replace readsk = . if rate_readsk<0.05
+	
+	*- Has both Pre and Post covid (post march 2020)
+	drop if country == "Malawi"	
+	drop if year == 2020 // Only has one country, Viet Nam.
+	bys country (year): replace year = year[1]
+	
+	//keep if CB3>=
+	
+	gen pop = 1
+	collapse (sum) pop (mean) numbskill readsk year [iw=fsweight], by(region_code country sib age) 
+	
+
+	*- Graph overall achievements by year for comparability of countries
+	preserve
+		collapse numbskill readsk [iw=pop], by(year)
+		twoway 	///
+				(scatter numbskill year) ///
+				(scatter readsk year) ///
+				, ///
+				ytitle("% Foundational level") ///
+				xtitle("Year") ///
+				legend(order(1 "Numeracy" 2 "Literary") col(2) pos(6)) 
+				
+				capture qui graph export "$FIGURES\Descriptive\MICS_overall.png", replace			
+				capture qui graph export "$FIGURES\Descriptive\MICS_overall.pdf", replace		
+	restore
+	
+
+	*- Graph overall achievements by sibling-year for comparability of countries
+	preserve
+		collapse numbskill readsk [iw=pop], by(year country sibs)
+		collapse numbskill readsk, by(year sibs)
+		twoway 	///
+				(scatter numbskill year if sibs==0) ///
+				(scatter numbskill year if sibs==1) ///
+				, ///
+				ytitle("% Foundational level") ///
+				xtitle("Year") ///
+				xlabel(2017(1)2023) ///
+				legend(order(1 "Only Child Sample" 2 "Sibling Sample") col(2) pos(6)) 
+				
+				capture qui graph export "$FIGURES\Descriptive\MICS_overall_sibs.png", replace			
+				capture qui graph export "$FIGURES\Descriptive\MICS_overall_sibs.pdf", replace		
+	restore
+	
+	
+	reshape wide numbskill readsk pop, i(region_code country age) j(sibs) 
+	
+	gen pop = pop0+pop1
+	gen gap_numbskill = numbskill1 - numbskill0
+	gen gap_readsk = readsk1 - readsk0
+	
+	
+	gen age_cat = 1 if age>=7 & age<=10
+	replace age_cat = 2 if age>=11 & age<=14
+
+	
+	foreach subj in "numbskill" "readsk" {
+		preserve
+			collapse gap_`subj'  [iw=pop], by(year)
+			scatter gap_`subj' year if year!=2020 ///
+			, ///
+			xlabel(2017(1)2023) ///
+			ytitle("`ytitle_gap'" "`ytitle_`subj''")
+			
+			capture qui graph export "$FIGURES\Descriptive\MICS_gap_`subj'_all.png", replace			
+			capture qui graph export "$FIGURES\Descriptive\MICS_gap_`subj'_all.pdf", replace			
+		restore	
+	}
+	
+	//collapse gap_numbskill year [iw=pop], by(region_code country age_cat)
+	collapse gap_numbskill gap_readsk year [iw=pop], by(region_code country)
+	
+
+	foreach subj in "numbskill" "readsk" {
+		
+		graph box gap_`subj', over(year) ///
+				ytitle("`ytitle_gap'" "`ytitle_`subj''") ///
+				yline(0, lcolor(gs12))
+			capture qui graph export "$FIGURES\Descriptive\MICS_gap_`subj'_box_countries.png", replace			
+			capture qui graph export "$FIGURES\Descriptive\MICS_gap_`subj'_box_countries.pdf", replace	
+				
+		twoway ///
+				(scatter gap_`subj' year if region_code==1, mcolor("${blue_1}")) ///
+				(scatter gap_`subj' year if region_code==3, mcolor("${blue_2}")) ///
+				(scatter gap_`subj' year if region_code==6, mcolor("${blue_3}")) ///
+				(scatter gap_`subj' year if region_code==2, mcolor("${red_1}")) ///
+				(scatter gap_`subj' year if region_code==5, mcolor("${red_2}")) ///
+				(scatter gap_`subj' year if region_code==7, mcolor("${red_3}")) ///
+				(scatter gap_`subj' year if region_code==4, mcolor("${green_1}")) ///
+				, ///
+				legend(order (1 "East Asia and Pacific" 2 "Eastern and Southern Africa" 3 "Europe and Central Asia" 4 "Latin America and Caribbean" 5 "Middle East and North Africa" 6 "South Asia" 7 "West and Central Africa") col(3) pos(6)) ///
+				xtitle("Year") ///
+				ytitle("`ytitle_gap'" "`ytitle_`subj''") ///
+				xlabel(2017(1)2023) ///
+				xline(2020, lcolor(gs12)) ///
+				yline(0, lcolor(gs12))
+			capture qui graph export "$FIGURES\Descriptive\MICS_gap_`subj'_countries.png", replace			
+			capture qui graph export "$FIGURES\Descriptive\MICS_gap_`subj'_countries.pdf", replace	
+	}
+	
+	
+	
+end
+
+main
+
+//PR - Parental Involvement [7–14]
+
+
+//Foundational Learning Skills: [7–14]
