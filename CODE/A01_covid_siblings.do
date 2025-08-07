@@ -5652,7 +5652,7 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 						"}{%" _n ///
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
-						"	\caption{Effect of Delaying School Entry on Standardized GPA Across Different Time Periods}" _n ///
+						"	\caption{TWFE on 8th grade GPA and standardized exams controlling for baseline 2nd grade standardized exams}" _n ///
 						"	\resizebox{0.95\textwidth}{!}%" _n ///
 						"}" _n ///
 						"{" _n ///
@@ -5667,7 +5667,7 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 					"\cmidrule(lr){2-5}" _n ///	
 					"& \multicolumn{4}{c}{TWFE} \\"  _n ///
 					"\cmidrule(lr){2-5}" _n ///	
-					"& 2-4 children & 2 children & 3 children & 4 children  \\" _n ///
+					"& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
 					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
 					"& (1) & (2) & (3) & (4) \\" _n ///
 					"\bottomrule" _n ///
@@ -5892,31 +5892,442 @@ replace g_pair = 4 if g_pair==.
 	gen treated_post = treated*post
 	
 	
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==1, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==2, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==3, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==4, a(id_ie g_pair)
-	
-	//Effect by SES
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==1, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==2, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==3, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==4, a(id_ie g_pair)
-	
-	//Effect by Resources
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==0, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==1, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if pc==0, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if pc==1, a(id_ie g_pair)
-	
-	//Effect by Aspirations
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,1,2)==1, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,3)==1, a(id_ie g_pair)
-	reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,4,5)==1, a(id_ie g_pair)
 
+	foreach size in "2_4" "2" "3" "4" {
+	preserve
+		di as result "*********************" _n as text "Size: `size'" _n as result "*********************"
+		if "`size'" == "2-4" 	keep if fam_total_${fam_type}<=4
+		if "`size'" == "2" 		keep if inlist(fam_total_${fam_type},1,2)==1
+		if "`size'" == "3" 		keep if inlist(fam_total_${fam_type},1,3)==1
+		if "`size'" == "4" 		keep if inlist(fam_total_${fam_type},1,4)==1	
+		foreach subj in "m" "c" {
+		
+			eststo gpa_`subj'_all_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index, a(id_ie g_pair)
+			eststo gpa_`subj'_1_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==1, a(id_ie g_pair)
+			eststo gpa_`subj'_2_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==2, a(id_ie g_pair)
+			eststo gpa_`subj'_3_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==3, a(id_ie g_pair)
+			eststo gpa_`subj'_4_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==4, a(id_ie g_pair)
+			
+			//Effect by SES
+			eststo gpa_`subj'_ses1_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==1, a(id_ie g_pair)
+			eststo gpa_`subj'_ses2_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==2, a(id_ie g_pair)
+			eststo gpa_`subj'_ses3_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==3, a(id_ie g_pair)
+			eststo gpa_`subj'_ses4_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==4, a(id_ie g_pair)
+			
+			//Effect by Resources
+			eststo gpa_`subj'_pc_int0_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==0 & pc==0, a(id_ie g_pair)
+			eststo gpa_`subj'_pc_int1_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==1 & pc==1, a(id_ie g_pair)
+
+			
+			//Effect by Aspirations
+			eststo gpa_`subj'_asp_low_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,1)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_med_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,2)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_hig_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,4,5)==1, a(id_ie g_pair)
+		}
+	restore
+	}
 	//Interesting... if Computer or internet, results partly go away. But not if there is a laptop...?
 
+
+****
+***
+**
+* Table based on household resources
+**
+***
+****
+
+	capture erase "$TABLES\twfe_ece_survey_1.tex"
+	
+	****** TABLE HEADER
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", replace write
+	file write table_tex	/// HEADER OPTIONS OF TABLE
+						"\makeatletter" _n ///
+						"\@ifclassloaded{beamer}{%" _n ///
+						"	\centering" _n ///
+						"	\resizebox{0.6\textwidth}{!}%" _n ///
+						"}{%" _n ///
+						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
+						"	\centering" _n ///
+						"	\caption{TWFE on GPA controlling for baseline standardized exams}" _n ///
+						"	\resizebox{0.95\textwidth}{!}%" _n ///
+						"}" _n ///
+						"{" _n ///
+						"\makeatother"	 _n 
+	file close table_tex
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex	/// HEADER OPTIONS OF TABLE
+					"\begin{tabular}{lcccc}" _n ///
+					/// HEADER OF TABLE
+					"\toprule" _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& \multicolumn{4}{c}{TWFE} \\"  _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
+					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
+					"& (1) & (2) & (3) & (4) \\" _n ///
+					"\bottomrule" _n ///
+					"&  &  & &  \\" _n 
+	file close table_tex
+	
+	******* TABLE CONTENT	
+	
+
+	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel A: All studentes } \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_all_2_4 gpa_m_all_2 gpa_m_all_3 gpa_m_all_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_all_2_4 gpa_c_all_2 gpa_c_all_3 gpa_c_all_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	
+	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel B: Low SES Households (Q1)} \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_ses1_2_4 gpa_m_ses1_2 gpa_m_ses1_3 gpa_m_ses1_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_ses1_2_4 gpa_c_ses1_2 gpa_c_ses1_3 gpa_c_ses1_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	
+	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel C: High SES Households (Q4)} \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_ses4_2_4 gpa_m_ses4_2 gpa_m_ses4_3 gpa_m_ses4_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_ses4_2_4 gpa_c_ses4_2 gpa_c_ses4_3 gpa_c_ses4_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
+
+
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel D: Households with no PC or Internet} \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_pc_int0_2_4 gpa_m_pc_int0_2 gpa_m_pc_int0_3 gpa_m_pc_int0_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_pc_int0_2_4 gpa_c_pc_int0_2 gpa_c_pc_int0_3 gpa_c_pc_int0_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
+	
+	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel E: Households with both PC and Internet} \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_pc_int1_2_4 gpa_m_pc_int1_2 gpa_m_pc_int1_3 gpa_m_pc_int1_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_pc_int1_2_4 gpa_c_pc_int1_2 gpa_c_pc_int1_3 gpa_c_pc_int1_4  ///
+	using "$TABLES\twfe_ece_survey_1.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
+	
+
+	********* END TABLE
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
+	file write table_tex	/// HEADER OPTIONS OF TABLE							
+	_n "\bottomrule" _n ///
+		"\end{tabular}" _n ///
+		"}" _n ///
+		"\@ifclassloaded{beamer}{%" _n ///
+		"}{%" _n ///
+		"	\end{table}" _n ///
+		"}" _n 
+	file close table_tex	
+	
+	
+****
+***
+**
+* Table based on parental investment (aspirations, actual time, both/single...)
+**
+***
+****
+
+
+	capture erase "$TABLES\twfe_ece_survey_2.tex"
+	
+	****** TABLE HEADER
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", replace write
+	file write table_tex	/// HEADER OPTIONS OF TABLE
+						"\makeatletter" _n ///
+						"\@ifclassloaded{beamer}{%" _n ///
+						"	\centering" _n ///
+						"	\resizebox{0.6\textwidth}{!}%" _n ///
+						"}{%" _n ///
+						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
+						"	\centering" _n ///
+						"	\caption{TWFE on GPA controlling for baseline standardized exams}" _n ///
+						"	\resizebox{0.95\textwidth}{!}%" _n ///
+						"}" _n ///
+						"{" _n ///
+						"\makeatother"	 _n 
+	file close table_tex
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
+	file write table_tex	/// HEADER OPTIONS OF TABLE
+					"\begin{tabular}{lcccc}" _n ///
+					/// HEADER OF TABLE
+					"\toprule" _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& \multicolumn{4}{c}{TWFE} \\"  _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
+					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
+					"& (1) & (2) & (3) & (4) \\" _n ///
+					"\bottomrule" _n ///
+					"&  &  & &  \\" _n 
+	file close table_tex
+	
+	******* TABLE CONTENT	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel A: All studentes } \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_all_2_4 gpa_m_all_2 gpa_m_all_3 gpa_m_all_4  ///
+	using "$TABLES\twfe_ece_survey_2.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_all_2_4 gpa_c_all_2 gpa_c_all_3 gpa_c_all_4  ///
+	using "$TABLES\twfe_ece_survey_2.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	
+	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel B: Parents or students don't expect to graduate from school} \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_asp_low_2_4 gpa_m_asp_low_2 gpa_m_asp_low_3 gpa_m_asp_low_4  ///
+	using "$TABLES\twfe_ece_survey_2.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_asp_low_2_4 gpa_c_asp_low_2 gpa_c_asp_low_3 gpa_c_asp_low_4  ///
+	using "$TABLES\twfe_ece_survey_2.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	
+	
+	
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel C: Parents or students expect to finish 4-year college education} \\" _n
+	file close table_tex	
+	
+	estout   gpa_m_asp_hig_2_4 gpa_m_asp_hig_2 gpa_m_asp_hig_3 gpa_m_asp_hig_4  ///
+	using "$TABLES\twfe_ece_survey_2.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex		
+	
+	estout   gpa_c_asp_hig_2_4 gpa_c_asp_hig_2 gpa_c_asp_hig_3 gpa_c_asp_hig_4  ///
+	using "$TABLES\twfe_ece_survey_2.tex", ///
+	append style(tex) ///
+	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
+	keep(treated_post) ///
+	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
+	///indicate("School FE" = fe, labels("Yes" "No")) ///
+	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
+	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
+
+
+	
+
+	********* END TABLE
+	
+	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
+	file write table_tex	/// HEADER OPTIONS OF TABLE							
+	_n "\bottomrule" _n ///
+		"\end{tabular}" _n ///
+		"}" _n ///
+		"\@ifclassloaded{beamer}{%" _n ///
+		"}{%" _n ///
+		"	\end{table}" _n ///
+		"}" _n 
+	file close table_tex	
+	
+	
+	
 
 
 end
