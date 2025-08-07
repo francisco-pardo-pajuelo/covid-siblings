@@ -5653,6 +5653,7 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
 						"	\caption{TWFE on 8th grade GPA and standardized exams controlling for baseline 2nd grade standardized exams}" _n ///
+						"	\label{tab:twfe_ece}" _n ///
 						"	\resizebox{0.95\textwidth}{!}%" _n ///
 						"}" _n ///
 						"{" _n ///
@@ -5902,27 +5903,27 @@ replace g_pair = 4 if g_pair==.
 		if "`size'" == "4" 		keep if inlist(fam_total_${fam_type},1,4)==1	
 		foreach subj in "m" "c" {
 		
-			eststo gpa_`subj'_all_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index, a(id_ie g_pair)
-			eststo gpa_`subj'_1_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==1, a(id_ie g_pair)
-			eststo gpa_`subj'_2_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==2, a(id_ie g_pair)
-			eststo gpa_`subj'_3_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==3, a(id_ie g_pair)
-			eststo gpa_`subj'_4_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com if g_pair==4, a(id_ie g_pair)
+			eststo gpa_`subj'_all_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index, a(id_ie g_pair)
+			eststo gpa_`subj'_1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==1, a(id_ie g_pair)
+			eststo gpa_`subj'_2_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==2, a(id_ie g_pair)
+			eststo gpa_`subj'_3_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==3, a(id_ie g_pair)
+			eststo gpa_`subj'_4_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==4, a(id_ie g_pair)
 			
 			//Effect by SES
-			eststo gpa_`subj'_ses1_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==1, a(id_ie g_pair)
-			eststo gpa_`subj'_ses2_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==2, a(id_ie g_pair)
-			eststo gpa_`subj'_ses3_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==3, a(id_ie g_pair)
-			eststo gpa_`subj'_ses4_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==4, a(id_ie g_pair)
+			eststo gpa_`subj'_ses1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==1, a(id_ie g_pair)
+			eststo gpa_`subj'_ses2_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==2, a(id_ie g_pair)
+			eststo gpa_`subj'_ses3_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==3, a(id_ie g_pair)
+			eststo gpa_`subj'_ses4_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==4, a(id_ie g_pair)
 			
 			//Effect by Resources
-			eststo gpa_`subj'_pc_int0_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==0 & pc==0, a(id_ie g_pair)
-			eststo gpa_`subj'_pc_int1_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==1 & pc==1, a(id_ie g_pair)
+			eststo gpa_`subj'_pc_int0_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==0 & pc==0, a(id_ie g_pair)
+			eststo gpa_`subj'_pc_int1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==1 & pc==1, a(id_ie g_pair)
 
 			
 			//Effect by Aspirations
-			eststo gpa_`subj'_asp_low_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,1)==1, a(id_ie g_pair)
-			eststo gpa_`subj'_asp_med_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,2)==1, a(id_ie g_pair)
-			eststo gpa_`subj'_asp_hig_`size'	: reghdfe std_gpa_m_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,4,5)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_low_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,1)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_med_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,2)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_hig_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,4,5)==1, a(id_ie g_pair)
 		}
 	restore
 	}
@@ -5951,7 +5952,8 @@ replace g_pair = 4 if g_pair==.
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
 						"	\caption{TWFE on GPA controlling for baseline standardized exams}" _n ///
-						"	\resizebox{0.95\textwidth}{!}%" _n ///
+						"	\label{tab:twfe_ece_survey_1}" _n ///
+						"	\resizebox{0.7\textwidth}{!}%" _n ///
 						"}" _n ///
 						"{" _n ///
 						"\makeatother"	 _n 
@@ -6185,6 +6187,7 @@ replace g_pair = 4 if g_pair==.
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
 						"	\caption{TWFE on GPA controlling for baseline standardized exams}" _n ///
+						"	\label{tab:twfe_ece_survey_2}" _n ///
 						"	\resizebox{0.95\textwidth}{!}%" _n ///
 						"}" _n ///
 						"{" _n ///

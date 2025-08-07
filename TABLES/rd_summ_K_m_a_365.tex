@@ -1,3 +1,16 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.6\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{Effects of younger sibling delaying school on older sibling standardized exams - K - m - a -  - 365}
+       \label{tab:rd_summ_K_m_a_365}
+       \resizebox{0.95\textwidth}{!}%
+}
+{
+\makeatother
 \makebox[0.1\width][l]{
 \resizebox{\textwidth}{!}{
 \begin{tabular}{lccc}
@@ -11,7 +24,7 @@
 & (1) & (2) & (3)  \\
 \bottomrule
 &  &  &   \\
-Delay School (After SSA)&      -0.001   &      -0.010   &      -0.004   \\
+\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}&      -0.001   &      -0.010   &      -0.004   \\
                     &     (0.006)   &     (0.006)   &     (0.006)   \\
 Local Linear        &         Yes   &         Yes   &         Yes   \\
                     &               &               &               \\

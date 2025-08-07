@@ -1,24 +1,13 @@
-\makebox[0.1\width][l]{
-\resizebox{\textwidth}{!}{
-\begin{tabular}{lccccc}
-\toprule
-& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\
-& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2024}  \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-6}
-& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\
-& (1) & (2) & (3) & (4) & (5) \\
-\bottomrule
-&  &  &  & &  \\
-\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}&      -0.018   &      -0.023*  &      -0.003   &      -0.004   &      -0.045***\\
-                    &     (0.015)   &     (0.013)   &     (0.014)   &     (0.011)   &     (0.014)   \\
-Local Linear        &         Yes   &         Yes   &         Yes   &         Yes   &         Yes   \\
-                    &               &               &               &               &               \\
-Observations        &      71,623   &      71,620   &      86,342   &      86,412   &      83,681   \\
-Counterfactual mean &      -0.101   &      -0.072   &       0.189   &       0.284   &      -0.005   \\
-Bandwidth           &         300   &         300   &         300   &         300   &         300   \\
- 
-
-\bottomrule
-\end{tabular}
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.6\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{Effects of younger sibling delaying school on older sibling standardized exams and parental investment}
+       \label{tab:rd_ece_index_300}
+       \resizebox{0.95\textwidth}{!}%
 }
-}
+{
+\makeatother
