@@ -815,7 +815,7 @@ foreach bw in "365" /*"300" "180" "120" "90" "60" "30"*/ {
 						
 						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
 						file write table_tex	/// HEADER OPTIONS OF TABLE
-										"\makebox[0.1\width][l]{" _n ///
+										///"\makebox[0.1\width][l]{" _n ///
 										"\resizebox{`scale'\textwidth}{!}{" _n
 						file close table_tex
 						
