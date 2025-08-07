@@ -5639,10 +5639,24 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 	
 	****** TABLE HEADER
 	
+
+
+	
+	
 	file open  table_tex	using "$TABLES\twfe_ece.tex", replace write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
-					"\makebox[0.1\width][l]{" _n ///
-					"\resizebox{`scale'\textwidth}{!}{" _n
+						"\makeatletter" _n ///
+						"\@ifclassloaded{beamer}{%" _n ///
+						"	\centering" _n ///
+						"	\resizebox{0.6\textwidth}{!}%" _n ///
+						"}{%" _n ///
+						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
+						"	\centering" _n ///
+						"	\caption{Effect of Delaying School Entry on Standardized GPA Across Different Time Periods}" _n ///
+						"	\resizebox{0.95\textwidth}{!}%" _n ///
+						"}" _n ///
+						"{" _n ///
+						"\makeatother"	 _n 
 	file close table_tex
 	
 	file open  table_tex	using "$TABLES\twfe_ece.tex", append write
@@ -5677,6 +5691,11 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
+	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  ///
+	file close table_tex		
+	
 	estout   gpa_c_2_4 gpa_c_2 gpa_c_3 gpa_c_4 ///
 	using "$TABLES\twfe_ece.tex", ///
 	append style(tex) ///
@@ -5703,6 +5722,11 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
+	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
+	file write table_tex ///	
+					"&  &  & &  \\" _n  
+	file close table_tex
+	
 	estout   ece_c_2_4 ece_c_2 ece_c_3 ece_c_4 ///
 	using "$TABLES\twfe_ece.tex", ///
 	append style(tex) ///
@@ -5721,15 +5745,12 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 	_n "\bottomrule" _n ///
 		"\end{tabular}" _n ///
 		"}" _n ///
-		"}" _n
+		"\@ifclassloaded{beamer}{%" _n ///
+		"}{%" _n ///
+		"	\end{table}" _n ///
+		"}" _n 
 	file close table_tex	
-	
-	
 
-		
-	
-
-	
 
 end
 
