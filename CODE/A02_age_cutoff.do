@@ -796,29 +796,23 @@ foreach bw in "365" /*"300" "180" "120" "90" "60" "30"*/ {
 
 						capture erase "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex"
 												
-	file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", replace write
-	file write table_tex	/// HEADER OPTIONS OF TABLE
-						"\makeatletter" _n ///
-						"\@ifclassloaded{beamer}{%" _n ///
-						"	\centering" _n ///
-						"	\resizebox{0.6\textwidth}{!}%" _n ///
-						"}{%" _n ///
-						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
-						"	\centering" _n ///
-						"	\caption{Effects of younger sibling delaying school on older sibling standardized exams - `rel_cutoff' - `subj' - `size' - `foc_order'`sib_order' - `bw'}" _n ///
-						"	\label{tab:rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'}" _n ///
-						"	\resizebox{0.95\textwidth}{!}%" _n ///
-						"}" _n ///
-						"{" _n ///
-						"\makeatother"	 _n 
-	file close table_tex							
-						
-						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
+						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", replace write
 						file write table_tex	/// HEADER OPTIONS OF TABLE
-										///"\makebox[0.1\width][l]{" _n ///
-										"\resizebox{`scale'\textwidth}{!}{" _n
-						file close table_tex
-						
+											"\makeatletter" _n ///
+											"\@ifclassloaded{beamer}{%" _n ///
+											"	\centering" _n ///
+											"	\resizebox{0.6\textwidth}{!}%" _n ///
+											"}{%" _n ///
+											"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
+											"	\centering" _n ///
+											"	\caption{Effects of younger sibling delaying school on older sibling standardized exams - `rel_cutoff' - `subj' - `size' - `foc_order'`sib_order' - `bw'}" _n ///
+											"	\label{tab:rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'}" _n ///
+											"	\resizebox{0.95\textwidth}{!}%" _n ///
+											"}" _n ///
+											"{" _n ///
+											"\makeatother"	 _n 
+						file close table_tex							
+
 						file open  table_tex	using "$TABLES_TEMP\rd_summ_`rel_cutoff'_`subj'_`size'`foc_order'`sib_order'_`bw'.tex", append write
 						file write table_tex	/// HEADER OPTIONS OF TABLE
 										"\begin{tabular}{lccc}" _n ///
