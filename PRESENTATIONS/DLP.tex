@@ -17,12 +17,18 @@
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{caption}
-\usepackage{block} %blocks for statements
+%\usepackage{block} %blocks for statements
 \usepackage{comment}
 \usepackage[absolute,overlay]{textpos}
 \usepackage{forest}
 \forestset{qtree/.style={for tree={parent anchor=south, 
            child anchor=north,align=center,inner sep=0pt}}}
+
+
+% Custom block colors for better appearance
+\setbeamercolor{block title}{bg=blue!20,fg=black}
+\setbeamercolor{block body}{bg=blue!10,fg=black}
+\setbeamertemplate{blocks}[rounded][shadow=true]
 
 
 \definecolor{ColorOne}{named}{MidnightBlue}
@@ -119,7 +125,7 @@
 
 
 %Title
-\title[]{School closures, remote learning and differential effects between only childs and children with siblings}
+\title[]{When the Household Becomes the School: Sibling Effects on Parental Attention and Educational Outcomes During School Closures}
 %\subtitle[]{DLP Writing Seminar}
 
 \author[Francisco Pardo] % (optional, for multiple authors)
@@ -164,10 +170,15 @@
     \label{update_scott}
     \frametitle{Motivation}
     \begin{enumerate}
-        \item Persistent learning losses from Covid-19
-        \item \textbf{Universal PreK:} \\
-        $\uparrow$ labor and earnings. Benefits $>>>$ Costs. \\
-        \small \textcolor{grey}{Jackson, Turner, Bastian (2025), Humphries et al (2025)}
+        \item Persistent learning losses from Covid-19 across the world, especially in more vulnerable populations. %\textcolor{blue}{cite}
+        \item With school closures and kids at home, parents spent more time in childcare and education.
+        \item Unexpected changes in family size have negative spillovers. \textcolor{blue}{Black et al (2010)}
+        \item No evidence of the role of family size in places with significant school closures.
+        
+
+        \begin{block}{Research Question}
+Do students with siblings experience larger learning losses through the pandemic compared to only children? Is this because of dilution of parental resources?
+\end{block}
     \end{enumerate}
 \end{frame}
 
@@ -175,117 +186,114 @@
     \label{update_scott}
     \frametitle{Contribution to literature}
     \begin{enumerate}
-        \item \textbf{Covid Learning Loss} \\
-        \item \textbf{Universal Pre-K}: Is there a sibling spillover effect in this space due to released time? I see new literature like Jackson et al (2025), Humphries et al (2025) mostly on increased labor/earnings.
-        \item \textbf{Health Shocks}: 
-        \begin{itemize}
-            \item Siblings with disabilities: Black et a
-        \end{itemize}
-        \item \textbf{Parental Investment} \\
-        \item \textbf{Quanity-Quality} \\
+        %\item \textbf{Covid Learning Loss} \\
+        %\item \textbf{Universal Pre-K}: Is there a sibling spillover effect in this space due to released time? I see new literature like Jackson et al (2025), Humphries et al (2025) mostly on increased labor/earnings.
+        %\item \textbf{Health Shocks}: 
+        %\begin{itemize}
+        %    \item Siblings with disabilities: Black et a
+        %\end{itemize}
+        %\item \textbf{Parental Investment} \\
+        %\item \textbf{Quanity-Quality} \\
+        %\item \textbf{Universal PreK:} \\
+        %$\uparrow$ labor and earnings. Benefits $>>>$ Costs. \\
+        %\small \textcolor{gray}{Jackson, Turner, Bastian (2025), Humphries et al (2025)}
 
     \end{enumerate}
 \end{frame}
 
 
-
+% ========================================
+% DATA
+% ========================================
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Model}
-    \begin{enumerate}
-        \item 
-    \end{enumerate}
-\end{frame}
+    \frametitle{Data}
 
-\begin{frame}
-    \label{update_scott}
-    \frametitle{School Start Age Cutoff}
-    \begin{enumerate}
-        \item 
-    \end{enumerate}
-\end{frame}
-
-
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Some updates}
     \begin{itemize}
-        %\item Refresher
-        \item Other gaps: by parental education
-        \item Primary complete
-        \item Model
-            \begin{itemize}
-            \item Parental Investment
-            \item Childcare
-            \item ...
-            \end{itemize}
-        \item School Starting Age cutoffs
-            \begin{itemize}
-                \item Having a 6-7 year delay school
-                \item Lower scores and parental investment
-            \end{itemize}
-        \item Sibling born $t$ vs $t+1$
+        \item School progression (approval and GPA per grade-year)
+        \item Standardized test scores in 2nd, 4th, 6th, 8th grade in some years.
+        \item Family, student, teachers and principals surveys:
         \begin{itemize}
-                \item Having a new-born sibling during school year 
-                \item ¿Scores? ¿Parental investment
-            \end{itemize}
-        \item Exogenous family size? Twin birth and birth order as instruments?
-            
-        %\item International Evidence 
-        %\item School Start Age cutoff
-        %\item Change in parental investments
-        %\item PISA 2000, 2003, 2006?
-        %\item Entry-age cutoff and exposure to school closures in covid? School starting age
-        %\item Other TWFE: Age gap, same sex, middle child, school size
-        %\item Job Market
-        %\item Model
-        %\item Literature
-        %\item ECE Survey on parents
-        %\item Colombia Saber
+            \item Parental involvement in children's education
+            \item Socioeconomic Status
+            \item Aspirations for higher education: parents (2nd and 4th grade) and students (8th grade)
+            %\item Gender beliefs: "Boys are better at Math than girls"
+            %\item Parental involvement: my parents ask me about my grades, I talk to my parents about what I read, why they chose school, gender beliefs, overall knowledge about school/child, etc
+            %\item studying habits, beliefs, etc
+            %\item Specifically related to siblings: ``Read out loud to my siblings''.
+        \end{itemize}
+        \item Identify siblings through parent's anonymized ID.
     \end{itemize}
 \end{frame}
 
-\section{Refresher}
-
+% ========================================
+% DATA
+% ========================================
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Research Question}
-      \begin{itemize}
-          \item Did families with multiple children experience bigger learning losses during COVID? 
-          \item Are these gaps persistent? widespread? 
-          \item Why do they exist?
-          \begin{itemize}
-          \item Is it because less resources in bigger families (computer)?
-          \item Is it because parents are now responsible for education and have limited time?
-          \item Is it because with no school, childcare investment now is bigger?
-          \item Is it just heterogeneous effects correlated with income or other demographic characteristic?
-          \end{itemize}
-      \end{itemize}
+    \frametitle{Trends in data}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{\% of A's in Mathematics}
+            \vspace{0.2cm}
+            \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_total_elm_pass_math.pdf}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{Standardized GPA in Mathematics}
+            \vspace{0.2cm}
+            \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_total_elm_std_gpa_m_adj.pdf}
+        \end{column}
+    \end{columns}
+    
+    
 \end{frame}
 
 
+% ========================================
+% EMPIRICAL STRATEGY
+% ========================================
 \begin{frame}
-    \label{update_scott}
-    \frametitle{\% of A's in Mathematics}
+    \frametitle{Identification Strategy}
+    
+    \begin{block}{Identification Strategy}
+    Differential changes between only children and children with siblings before and after the pandemic.
+    \end{block}
+    
+    \textbf{Difference-in-Differences Specification:}
+    \small
+    \begin{align}
+    Y_{ist} &= \alpha + \delta_1 \text{Post}_{it} + \delta_2 \text{HasSiblings}_{i} \nonumber  \\
+    &\quad + \boldsymbol{\beta} (\text{Post}_{it} \times \text{HasSiblings}_{i}) \nonumber \\
+    &\quad + \mathbf{X}_{ist}'\gamma + \lambda_s + \mu_t + \varepsilon_{ist}
+    \end{align}
+    
+    \vspace{0.1cm}
+    
+    \textbf{Event Study Specification:}
+    \begin{align}
+    Y_{ist} &= \alpha + \sum_{k=-5}^{-2} \delta_k (\mathbb{I}[t = 2020+k] \times \text{HasSiblings}_{i}) \nonumber \\
+    & \quad + \sum_{k=0}^{4} \beta_k (\mathbb{I}[t = 2020 + k] \times \text{HasSiblings}_{i}) \nonumber \\
+    & \quad + \mathbf{X}_{ist}'\gamma + \text{HasSiblings}_{i} + \lambda_s + \mu_t + \varepsilon_{ist}
+    \end{align}
+    \normalsize
+    
+    %where $\tau_d$ is the treatment date for district $d$, and we normalize $\beta_{-1} = \delta_{-1} = 0$.
+    
+\end{frame}
+
+
+% ========================================
+% RESULTS
+% ========================================
+\begin{frame}
+    \frametitle{TWFE results}
         {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_total_elm_pass_math.pdf}
+       \includegraphics{./FIGURES/TWFE/covid_twfe_summ_all_all_gpa_m_adj_siblings_4.pdf}%\includegraphics{./FIGURES/TWFE/covid_twfe_sibs_summ_all_all_gpa_m_adj_siblings_4.pdf}
       }
     }
 \end{frame}
 
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Standardized GPA in Mathematics}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_total_elm_std_gpa_m_adj.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
     \frametitle{Event Study - Mathematics GPA}
         {\resizebox{0.9\textwidth}{!}{
        \includegraphics{./FIGURES/Event Study/covid_std_gpa_m_adj_all_all_all_elm_all.pdf}
@@ -294,45 +302,250 @@
 \end{frame}
 
 \begin{frame}
-    \label{update_scott}
-    \frametitle{School characteristics}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_A_all_gpa_m_4.png}
-      }
-    }
+\frametitle{TWFE - Standardized Exams}
+       \centering
+       \resizebox{0.7\textwidth}{!}%
+{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+\cmidrule(lr){2-5}
+& \multicolumn{4}{c}{TWFE} \\
+\cmidrule(lr){2-5}
+& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4) \\
+\bottomrule
+&  &  & &  \\
+&  &  & &  \\
+\multicolumn{5}{l}{Panel A: GPA } \\
+Mathematics         &      -0.099***&      -0.011   &      -0.036***&      -0.059***\\
+                    &     (0.009)   &     (0.009)   &     (0.011)   &     (0.015)   \\
+                    &               &               &               &               \\ 
+&  &  & &  \\
+Reading             &      -0.099***&      -0.010   &      -0.031***&      -0.034** \\
+                    &     (0.009)   &     (0.009)   &     (0.010)   &     (0.015)   \\
+                    &               &               &               &               \\
+Observations        &     326,669   &     280,846   &     225,840   &     180,218   \\
+ 
+&  &  & &  \\
+\multicolumn{5}{l}{Panel B: Standardized Exams } \\
+Mathematics         &      -0.034***&      -0.017** &      -0.044***&      -0.071***\\
+                    &     (0.006)   &     (0.007)   &     (0.008)   &     (0.011)   \\
+                    &               &               &               &               \\ 
+&  &  & &  \\
+Reading             &      -0.013** &       0.002   &      -0.022***&      -0.046***\\
+                    &     (0.006)   &     (0.006)   &     (0.008)   &     (0.011)   \\
+                    &               &               &               &               \\
+Observations        &     409,690   &     282,769   &     227,486   &     181,466   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+    \frametitle{Main Results}
+    
 \end{frame}
 
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Student demographics}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_B_all_gpa_m_4.png}
-      }
-    }
+    \frametitle{Main Results}
+    
+\end{frame}
+\end{comment}
+% ========================================
+% MECHANISMS
+% ========================================
+\begin{frame}
+    \frametitle{Potential Mechanisms}
+    \begin{itemize}
+        \item Birth Order
+        \item Scarce material resources
+        \item Sibling disruption
+        \item Parental dilution
+        \item Income Shocks
+    \end{itemize} 
 \end{frame}
 
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Family Structure (siblings)}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_C_all_gpa_m_4.png}
+    \frametitle{Birth Order}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_summ_all_all_gpa_m_adj_siblings_4.pdf}
       }
-    }
+    }    
 \end{frame}
 
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Family Structure (parents)}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_D_all_gpa_m_4.png}
-      }
-    }
+    \frametitle{Scarce material resources: Socio Economic Status}
+       \centering
+       \resizebox{0.7\textwidth}{!}{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+\cmidrule(lr){2-5}
+& \multicolumn{4}{c}{TWFE} \\
+\cmidrule(lr){2-5}
+& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4) \\
+\bottomrule
+&  &  & &  \\
+&  &  & &  \\
+
+\multicolumn{5}{l}{Panel B: Low SES Households (Q1)} \\
+Mathematics         &      -0.028***&      -0.009   &      -0.036***&      -0.061***\\
+                    &     (0.005)   &     (0.006)   &     (0.006)   &     (0.008)   \\
+ 
+&  &  & &  \\
+Reading             &      -0.022***&      -0.010   &      -0.029***&      -0.044***\\
+                    &     (0.005)   &     (0.006)   &     (0.007)   &     (0.008)   \\
+                    &               &               &               &               \\
+Observations        &     643,621   &     398,084   &     358,488   &     290,244   \\
+ 
+&  &  & &  \\
+\multicolumn{5}{l}{Panel C: High SES Households (Q4)} \\
+Mathematics         &      -0.035***&      -0.029***&      -0.051***&      -0.072***\\
+                    &     (0.006)   &     (0.007)   &     (0.009)   &     (0.019)   \\
+ 
+&  &  & &  \\
+Reading             &      -0.039***&      -0.032***&      -0.068***&      -0.010   \\
+                    &     (0.006)   &     (0.007)   &     (0.010)   &     (0.019)   \\
+                    &               &               &               &               \\
+Observations        &     385,616   &     318,633   &     230,174   &     186,296   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+
 \end{frame}
 
-\section{International Evidence - PISA}
+
+\begin{frame}
+    \frametitle{Scarce material resources: PC and Internet}
+       \centering
+       \resizebox{0.7\textwidth}{!}{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+\cmidrule(lr){2-5}
+& \multicolumn{4}{c}{TWFE} \\
+\cmidrule(lr){2-5}
+& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4) \\
+\bottomrule
+&  &  & &  \\
+\multicolumn{5}{l}{Panel D: Households with no PC or Internet} \\
+Mathematics         &      -0.037***&      -0.024***&      -0.067***&      -0.089***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.010)   \\
+ 
+&  &  & &  \\
+Reading             &      -0.036***&      -0.025***&      -0.063***&      -0.083***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.010)   \\
+                    &               &               &               &               \\
+Observations        &     766,875   &     566,628   &     447,252   &     356,075   \\
+ 
+&  &  & &  \\
+\multicolumn{5}{l}{Panel E: Households with both PC and Internet} \\
+Mathematics         &      -0.043***&      -0.024***&      -0.051***&      -0.080***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.008)   \\
+ 
+&  &  & &  \\
+Reading             &      -0.035***&      -0.018***&      -0.049***&      -0.054***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.008)   \\
+                    &               &               &               &               \\
+Observations        &     793,797   &     552,557   &     452,886   &     360,214   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+
+\end{frame}
+
+
+
+\begin{frame}
+    \frametitle{Sibling disruption}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_C_elm_all_gpa_m_adj_4.pdf}
+      }
+    }
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental dilution}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_D_elm_all_gpa_m_adj_4.pdf}
+      }
+    }
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parental dilution - Increased childcare}
+       \begin{itemize}
+            \item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
+            \item Mixed results in literature (US and Denmark) although not until younger starts school.
+        \end{itemize}
+\end{frame}      
+
+\begin{frame}
+    \frametitle{Effects of delaying younger School Entry (GPA of older)}
+    \input{./TABLES/rd_summ_1_m_a_365.tex}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Effects of delaying younger School Entry (Scores and investment)}
+\makeatletter
+     \centering
+       \resizebox{0.95\textwidth}{!}%
+{
+\makeatother
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\
+& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2024}  \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-6}
+& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\
+& (1) & (2) & (3) & (4) & (5) \\
+\bottomrule
+&  &  &  & &  \\
+\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}&      -0.025*  &      -0.023*  &      -0.009   &      -0.012   &      -0.035***\\
+                    &     (0.014)   &     (0.012)   &     (0.013)   &     (0.010)   &     (0.013)   \\
+Local Linear        &         Yes   &         Yes   &         Yes   &         Yes   &         Yes   \\
+                    &               &               &               &               &               \\
+Observations        &      86,605   &      86,602   &     104,983   &     105,064   &     101,766   \\
+Counterfactual mean &      -0.105   &      -0.083   &       0.194   &       0.288   &      -0.004   \\
+Bandwidth           &         365   &         365   &         365   &         365   &         365   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Income Shocks}
+     
+
+\end{frame}
+
+% ========================================
+% EXTERNAL VALIDITY
+% ========================================
+\section{External Validity}
+
     \begin{frame}
-         \label{update_scott}
-            \frametitle{PISA data)}
+            \frametitle{Looking at PISA data)}
         \begin{itemize}
             \item International examination to 15 year olds
             \item 81 countries (37 OECD and 44 non-OECD).
@@ -342,689 +555,32 @@
     \end{frame}
 
 \begin{frame}
-    \label{update_scott}
-    \frametitle{Gaps are centered around 0}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2012.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{The distribution of gaps moves down}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_histogram_2009_2022.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw DID vs school closures}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_not_fully_open.pdf}
-      }
-    }
-\end{frame}
-
-
-
-
-
-
-
-\section{School entry cutoff as exogeneity}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Exposure to school closures}
-    \begin{itemize}
-        \item There are clear school-age entry cutoffs
-        \item Pre-covid, having a child start school will mean less childcare responsibilities $\rightarrow$ more time for older child
-        \item Post-covid, having a child start school will mean more education responsibilities $\rightarrow$ less time for older child
-        %\item There is an age-entry cutoff in schools. Some kids are delayed and others have to enroll in 1st grade.
-        %\item Can this be a source of variation? Not only of the effects of the pandemic but also as source of variation in 'siblings in school' that may require extra parental attention.
-        %but a DID of family size and exposure to pandemic?
-        %\item $\approx$ 1500 students per day
-        %\item I know how Covid was dealt with for elementary (1-6), but not sure what K and below meant. Some students are in the data 3 years before elementary. Was there services during COVID?
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Potential variations}
-    \begin{itemize}
-        \item PreK-K starting age
-        \item \textbf{1st grade starting age}
-        \item graduating from primary
-        \item graduating from school
-        %\item Exposure to the pandemic and future outcomes
-        %\item Having a younger sibling start school during pandemic. (randomness over +1 sibling in school).
-        %\item Exposure to covid while having siblings or not (Is this the same as my diff in diff?). The randomness is in being exposed to pandemic or not, not in having a sibling.
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{School age entry cutoffs}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/dob_cutoffs.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Example: A delay in school start pre-covid could mean more childcare responsibilities and less time for focal child}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/example_pre_covid.png}
-      }
-    }
-\end{frame}
-
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Example: A delay in school start during COVID could mean more time for education for focal child}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/example_post_covid.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \frametitle{Effects of delaying 1st grade School Entry}
-    \input{./TABLES/rd_summ_1_m_a_365.tex}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Effects of delaying 1st grade School Entry}
-    \input{./TABLES/rd_ece_index_365.tex}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Effects of delaying K-Entry}
-    \input{./TABLES/rd_summ_K_m_a_100.tex}
-\end{frame}
-
-
-\begin{frame}
-    \frametitle{Effects of delaying 2nd grade}
-    \input{./TABLES/rd_summ_2_m_a_100.tex}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Pre-Covid}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/RD_age/1_m_a_365_18_19.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Covid}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/RD_age/K_m_a_365_20_21.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Post-Covid}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/RD_age/1_m_a_365_22_23.png}
-      }
-    }
-\end{frame}
-
-
-\section{Change in parental investments}
-
-
-\begin{frame}
-    \frametitle{Parental Investment mechanism}
-    \begin{itemize}
-        \item Current Hypothesis: During Covid, education relied more on parents than on school
-        \item Given limited parent's time, more children means less quality of education
-        \item A persistent gap might also be explained by persistent changes in the education production function. 
-        \item Did parental input increase during COVID? 
-        \item Is it still higher than before COVID?
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Increase in parental Home-schooling (USA)}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/ATU_B_0-5.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Total time spent in care}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/ATU_summary_0-5.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \frametitle{Parental Investment vs $\#$ of children}
-    \begin{itemize}
-        \item Using Peru surveys, I look at the relation between a standardized index of parental investment in education and number of children
-        \item Relation becomes more negative after COVID
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Parental investment vs $\#$ of children - 2nd grade}
-    \input{./TABLES/parental_investment_2p.tex}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Parental investment vs $\#$  of children - 8th grade}
-    \input{./TABLES/parental_investment_2s.tex}
-\end{frame}
-
-
-
-\section{Next Steps}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Next Steps}
-    \begin{itemize}
-        \item Other cutoffs? Primary and HS graduation cutoffs.
-        \item Having a sibling born during COVID vs non-COVID?
-    \end{itemize}
-\end{frame}
-
-\section{Job Market}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Job Talk}
-    \begin{enumerate}
-        \item 8/29 (internal DLP); 9/15 (department-wide)
-        \item 9/12 (internal DLP); 9/29 (department-wide)
-        \item 9/19 (internal DLP); 10/6 (department-wide)
-        \item 9/26 (internal DLP); 10/13 (department-wide)
-    \end{enumerate}
-\end{frame}
-
-
-
-\section{Thanks!}
-
-
-\begin{comment}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Job Market Paper}
-    \begin{enumerate}
-        \item Thoughts on pursuing this or focusing on my previous research on sibling spillovers?
-    \end{enumerate}
-\end{frame}
-
-\section{Other TWFE: Age gap, same sex, middle child, school size}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Thinking about the literature/models}
-    \begin{itemize}
-        \item If parents are replacing teachers, we could expect a bigger role where teachers had a bigger share (small class size, teacher/student ration)
-        \item Middle child is more affected than older/younger
-        \item Age gap and fight for resources
-    \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{TWFE}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_A_elm_gpa_c_adj_4.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{TWFE}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_B_elm_gpa_c_adj_4.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{TWFE}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_C_elm_gpa_c_adj_4.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{TWFE}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_D_elm_gpa_c_adj_4.png}
-      }
-    }
-\end{frame}
-
-
-
-
-
-\section{Grade change criteria}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade distributions pre-covid: Elementary}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/histogram_pre_elm.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade distributions pre-covid: Secondary}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/histogram_pre_9-10.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Event Study - Mathematics GPA}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Event Study/covid_std_gpa_m_adj_all_all_all_elm_all.pdf}
-      }
-    }
-\end{frame}
-
-
-
-
-
-\section{Parallel Trends}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{\% of A's in Mathematics}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_total_elm_pass_math.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Standardized GPA in Mathematics}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_total_elm_std_gpa_m_adj.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Standardized GPA in Mathematics}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/parallel_trends.png}
-      }
-    }
-\end{frame}
-
-
-\section{Thinking about the model}
-\begin{frame}
-    \label{update_scott}
-    \frametitle{}
-    \begin{itemize}
-        \item Parental investments/time is important, specially in young ages ($<=$5 y.o.)
-        \item However, this is in a regular context. What if teacher's share in the education production function is replaced by parent's?
-        \item Additionally, no market for childcare.
-        \item Siblings are not a constraint for teachers, but they are for parent's.
-        \item $\Rightarrow$ Less education for children in bigger households.
-    \end{itemize}
-\end{frame}
-
-
-
-
-\section{Thinking about the model}
-\begin{frame}
-    \label{update_scott}
-    \frametitle{}
-    \begin{itemize}
-        \item Parents that have to stay at home vs essential workers?
-        \item Would there be changes in inequality among children? Maybe not in shares... but within household inequality may become more relevant in overall inequality (within + between)
-    \end{itemize}
-\end{frame}
-
-\section{Beyond}
-\begin{frame}
-    \label{update_scott}
-    \frametitle{}
-    \begin{itemize}
-        \item Effects go beyond the 1-2 years of COVID.
-        \item Is this a lasting effect of a temporary shock?
-        \item or is it a permanent change in education production function?
-        \item e.g. Are parent's expected to play a bigger role now than before?
-    \end{itemize}
-\end{frame}
-
-
-\section{Thanks!}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw plots per cohort - Age trend}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_cohorts_std_gpa_m.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw plots per grade - Time trend}
-        {\resizebox{0.8\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_grades_std_gpa_m.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{TWFE}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_A_all_gpa_m_4.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{TWFE}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_B_all_gpa_m_4.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{School average standardized exams - 2nd grade}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_ece_math_2.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{School average standardized exams - 4th grade}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_ece_math_4.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{School average standardized exams - 8th grade}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/raw_ece_math_8.pdf}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Event Study - 2nd grade}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Event Study/ece_school_score_2p.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Event Study - 4th grade}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Event Study/ece_school_score_4p.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Event Study - 8th grade}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Event Study/ece_school_score_2s.png}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{event_cohort_m}
-    \frametitle{Evidence from the Netherlands}
-    \begin{itemize}
-        \item Had 2 school closures during 1.5 years of Covid. $\approx$ 8 weeks of closure.
-        \item Studies heterogeneity by SES, single parents, # of siblings (1-2, vs 3+). Find effects on the first, not on # of siblings.
-        \item Look at learning growth across different cohorts
-   
-       $\Delta Y_{ijc}= \beta Post + \epsilon_{ijc}$ 
-       $\Delta Y_{ijc}= \beta Post + \gamma SES + \delta Post*SES + \epsilon_{ijc}$ 
-     \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade thresholds during covid}
-    \begin{itemize}
-        \item During covid (full academic year 2020 and 2021) all children were promoted and no subject was failed. 
-        \item D grade was elimiated and grades went from 0-20 to 11-20.
-        \item This could cause an spurious effect if one population was more likely below the passing grade
-    \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade distributions pre-covid: Elementary}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/histogram_pre_elm.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade distributions pre-covid: Secondary}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/histogram_pre_9-10.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade distributions post-covid: Elementary}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/histogram_post_elm.png}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Grade distributions post-covid: Secondary}
- {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/histogram_post_9-10.png}
-      }
-    }
-\end{frame}
-
-
-\section{International Evidence}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Is this just an issue in Peru?}
-    \begin{itemize}
-        \item Some evidence from the Netherlands suggests it is not an issue there: No heterogeneity by number of children.
-        \item I need data on:
-            \begin{itemize}
-                \item Educational outcomes
-                \item Siblings (e.g. Do you have any?, Household size, etc)
-                \item pre and post covid
-            \end{itemize}
-    \end{itemize}
-\end{frame}
-
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{International Achievement surveys}
-    \begin{itemize}
-        \item PISA
-            \begin{itemize}
-                \item 15 y.o.
-                \item 2009-2012 and 2022 allow for sibling identification
-                \item 2018 includes it for some developing countries
-                \item I look at countries with observations both pre-post covid
-            \end{itemize}            
-    \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{PISA: From 2009/2012 to 2022}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_PV1MATH_2009_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Similar Socio Economic Status}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_SES_2022.pdf}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{The distribution of gaps moves down}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_gap_PV1MATH_scatter_2009_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{PISA-D: 2018 vs 2022 (Mathematics)}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_country_PV1MATH_2018_2022.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{PISA-D: 2018 vs 2022 (Reading)}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_country_PV1READ_2018_2022.pdf}
-      }
-    }
-\end{frame}
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Motivation}
-    \begin{enumerate}
-        \item Persistent learning losses from Covid-19
-        \item \textbf{Universal PreK:} \\
-        $\uparrow$ labor and earnings. Benefits $>>>$ Costs. \\
-        \small \textcolor{grey}{Jackson, Turner, Bastian (2025), Humphries et al (2025)}
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Contribution to literature}
-    \begin{enumerate}
-        \item \textbf{Covid Learning Loss} \\
-        \item \textbf{Parental Investment} \\
-        \item \textbf{Quanity-Quality} \\
-
-    \end{enumerate}
-\end{frame}
-
-
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw DID vs school closures}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1MATH_full.pdf}
-      }
-    }
-\end{frame}
-
-\begin{frame}
-    \label{update_scott}
-    \frametitle{Raw DID vs school closures}
-        {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Descriptive/PISA_raw_DID_PV1READ_not_fully_open.pdf}
-      }
-    }
-\end{frame}
-
-
-\begin{comment}
-\begin{frame}
-    \label{update_scott}
-    \frametitle{List of Countries}
-       \begin{itemize}
-           
-       \end{itemize}
+    \frametitle{Learning gaps in Mathematics by year}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_distribution_2012_2022_PV4MATH.pdf}
+        \caption{Learning gaps in Mathematics by year}
+        \label{fig:1a}
+    \end{figure}
     
 \end{frame}
-\end{comment}
+
+\begin{frame}
+    \frametitle{Change in learning gaps by duration of school closure}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_raw_DID_PV4MATH_not_fully_open.pdf}
+        \caption{Change in learning gaps by duration of school closure for OECD and Non-OECD countries}
+        \label{fig:1b}
+    \end{figure}
+    
+\end{frame}
+
+% ========================================
+% EXTERNAL VALIDITY
+% ========================================
+\section{Conclusions}
 
 \end{document}
