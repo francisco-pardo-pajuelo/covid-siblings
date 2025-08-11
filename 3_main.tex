@@ -45,11 +45,22 @@ The paper proceeds as follows. \hyperref[sec:empirical_strategy]{Section \ref{se
 
 \section{Empirical Strategy}\label{sec:empirical_strategy}
 
+Main identification
+
+
+Validation 
+
 
 %%%%%%%%%%%%%%
 % Data
 %%%%%%%%%%%%%%
 \section{Data}\label{sec:data}
+
+\subsection{SIAGIE}
+
+\subsection{ECE}
+
+\subsection{Sibling Identification}
 
 %%%%%%%%%%%%%%
 % Results
@@ -68,6 +79,10 @@ The paper proceeds as follows. \hyperref[sec:empirical_strategy]{Section \ref{se
 
 \subsubsection{Graduation and Higher Education}
 
+\subsection{Expectations over educational attainment}
+
+Using ECE survey from before and after covid we perform simple TWFE estimations. In \textcolor{green}{Table...} we see a reduction in parental expectations for attaining a 4-year college degree and an increase of those who believe the maximum level of education will be high-school.
+
 
 %%%%%%%%%%%%%%
 % Robustness and Mechanisms
@@ -82,7 +97,9 @@ Results hold when working only with first births
 
 \subsection{Socio economic and human capital constraints in the household}
 
-Results hold when controlling for these
+Results hold when controlling for level of education, internet and pc.
+
+We also look into the number of rooms
 
 \subsection{Sibling disruptions}
 
@@ -90,14 +107,19 @@ Results hold when doing age gap.
 
 \subsection{Parental time and investment}
 
-Results by single/both parents
+Results by single/both parents. Other adults in the household.
 
 Results from RD of SSA
 
 Results from \hyperref[tab:rd_summ_1_m_a_365]{Table \ref{tab:rd_summ_1_m_a_365}} show how delaying school has a negative effect in the older sibling. \footenote{a}
 
+\subsection{Income}
 
-Results from birth of a sibling
+Results from socio-economic status show that... 
+This is highly correlated with income... (show)
+However, it is certainly not a malleable, but it is evidence that there is not differential loss in income driving the results.
+
+Perhaps show that there are losses of socio-economic status overall? Can we do this with household surveys or with the ECE surveys themselves?
 
 \section{Heterogeneity}\label{sec:heterogeneity}
 
@@ -106,6 +128,24 @@ Surprisingly, results are consistent across...
 \subsection{Reinforcement vs Compensation}
 
 \section{Robustness}\label{sec:robustness}
+
+\subsection{Potential sample selection}
+
+Discuss how siblings are observed. We only see observations as long as they are enrolled in data. Most children are enrolled in primary school \textcolor{green}{(show data from household surveys)}. However, most children are not enrolled until 3-4 years old. Since our last year of administrative data is 2024, this means that some families with 2 children, one of which was born after 2021, might be observed as only childs. To address any concerns from this selection I do the following:
+
+\begin{itemize}
+    \item These families are not particularly different from others? (this true)?
+    \item I use data up to 2023 and 2022 to define families (and potentially imposing a similar bias to earlier years) and still see results change around COVID. \textcolor{green}{Pending Analyis}
+\end{itemize}
+
+
+\subsection{Siblings in same vs different schools}
+
+\subsection{Different definitions of siblings: father, both, caretaker}
+
+\subsection{Younger and middle child}
+
+\subsection{Unadjusted scores}
 
 %%%%%%%%%%%%%%
 % Policy Discussion

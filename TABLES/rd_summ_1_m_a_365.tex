@@ -1,14 +1,6 @@
 \makeatletter
-\@ifclassloaded{beamer}{%
        \centering
-       \resizebox{0.6\textwidth}{!}%
-}{%
-       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-       \centering
-       \caption{Effects of younger sibling delaying school on older sibling standardized exams - 1 - m - a -  - 365}
-       \label{tab:rd_summ_1_m_a_365}
        \resizebox{0.95\textwidth}{!}%
-}
 {
 \makeatother
 \begin{tabular}{lccc}
@@ -34,7 +26,4 @@ Bandwidth           &         365   &         365   &         365   \\
 \bottomrule
 \end{tabular}
 }
-\@ifclassloaded{beamer}{%
-}{%
-       \end{table}
-}
+
