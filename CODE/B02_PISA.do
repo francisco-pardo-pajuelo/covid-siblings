@@ -1977,10 +1977,15 @@ capture program drop pisa_figures_2009_2012_vs_2022
 program define pisa_figures_2009_2012_vs_2022
 
 use  "$TEMP\COVID_pisa_append", clear
+
+
 		
 		tab year sibs, row nofreq
 		keep if year==2009 | year==2012 | year==2022
 		keep if sibs!=.
+		replace ESCS=. if ESCS==9999 | ESCS==9997
+		
+		bys CNT year: egen p_sibs = mean(sibs)
 		
 		*- Standardize results by base year:
 			foreach subj of var PV*MATH PV*READ PV*SCIE {
@@ -1996,12 +2001,12 @@ use  "$TEMP\COVID_pisa_append", clear
 			}
 	
 keep 	CNT CNTRYID OECD sibs year ///
-		ESCS ESCS15 SENWT ///
+		ESCS ESCS15 SENWT p_sibs ///
 		PV*MATH PV*READ PV*SCIE
 	
-collapse PV*MATH PV*READ PV*SCIE [aw=SENWT], by(CNT year sibs OECD)
-reshape wide PV*MATH PV*READ PV*SCIE, i(CNT OECD sibs) j(year)
-reshape wide PV*MATH* PV*READ* PV*SCIE*, i(CNT OECD) j(sibs)
+collapse PV*MATH PV*READ PV*SCIE ESCS p_sibs [aw=SENWT], by(CNT year sibs OECD)
+reshape wide PV*MATH PV*READ PV*SCIE ESCS p_sibs, i(CNT OECD sibs) j(year)
+reshape wide PV*MATH* PV*READ* PV*SCIE* ESCS* p_sibs*, i(CNT OECD) j(sibs)
 
 merge 1:1 CNT using "$TEMP\COVID\school_closure_country", keep(master match)
 		
@@ -2027,6 +2032,11 @@ forvalues pv = 1(1)10 {
 //gen did_m = gap_`subj'2022 - gap_`subj'2012
 
 
+//
+gen consistent_sib = 1 if inlist(CNT,"TAP","SVN","SVK","SRB","SGP","PRT","MNE")==1
+replace consistent_sib=1 if inlist(CNT,"MAC","LTU","KOR","JPN","ITA","IRL","HRV")==1
+replace consistent_sib=1 if inlist(CNT,"HKG","GRC","GBR","ESP","CHE","CAN")==1
+
 local subj = "PV1MATH" //
 local policy = "not_fully_open" //full partial not_fully_open
 				
@@ -2045,6 +2055,8 @@ twoway 	///
 	capture qui graph export "$FIGURES\Descriptive\PISA_raw_DID_`subj'_`policy'.png", replace			
 	capture qui graph export "$FIGURES\Descriptive\PISA_raw_DID_`subj'_`policy'.pdf", replace		
 
+
+//keep if consistent_sib==1
 sum `subj'20120
 local m_20120 = r(mean)	
 sum `subj'20121	
@@ -2082,6 +2094,46 @@ twoway 	///
 					note("")	
 				capture qui graph export "$FIGURES\Descriptive\PISA_distribution_2012_2022_`subj'.png", replace			
 				capture qui graph export "$FIGURES\Descriptive\PISA_distribution_2012_2022_`subj'.pdf", replace		
+		
+
+//keep if consistent_sib==1
+sum ESCS20120
+local m_20120 = r(mean)	
+sum ESCS20121	
+local m_20121 = r(mean)
+sum ESCS20220	
+local m_20220 = r(mean)
+sum ESCS20221	
+local m_20221 = r(mean)
+
+twoway 	///
+					(kdensity ESCS20120, 				lcolor("red%30")	lwidth(normal)) ///
+					(kdensity ESCS20121, 				lcolor("blue%30")	lwidth(normal)) ///
+					(kdensity ESCS20220, 				lcolor("red%80")	lwidth(thick)) ///
+					(kdensity ESCS20221, 				lcolor("blue%80")	lwidth(thick)) ///
+					(pcarrowi 4.5 `m_20120' 4.5 `m_20220', 		lcolor("red") 		mcolor("red")	lwidth(medium) barbsize(medium)) ///
+					(pcarrowi 3.5 `m_20121' 3.5 `m_20221', 	lcolor("blue") 		mcolor("blue")	lwidth(medium)) ///
+					///(pcspike 3 `m_20120' 3 `m_20220', 		lcolor("red") 		lwidth(medium) barbsize(medium)) ///
+					///(pcspike 2.5 `m_20121' 2.5 `m_20221', 	lcolor("blue") 		lwidth(medium)) ///			
+					, ///
+					text(4.7 `=(`m_20120'+`m_20220')/2' "Only children learning loss", ///
+						 size(small) box bcolor(white) bfcolor(white) bmargin(small)) ///
+					text(3.7 `=(`m_20121'+`m_20221')/2' "Siblings learning loss", ///
+						 size(small) box bcolor(white) bfcolor(white) bmargin(small)) ///
+					legend(order(1 "2012 (Only children)" 2 "2012 (Siblings)" 3 "2022 (Only children)" 4 "2022 (Siblings)" ) col(2) pos(6)) ///
+					ytitle(Density of distribution) ///
+					ylabel(0(1)5, nogrid) ///
+					///xline(0, lcolor(gs8)) ///
+					xline(`m_20120', lcolor(red%10)	lwidth(thin)) ///
+					xline(`m_20121', lcolor(blue%10)	lwidth(thin)) ///
+					xline(`m_20220', lcolor(red%10)	lwidth(thin)) ///
+					xline(`m_20221', lcolor(blue%10)	lwidth(thin)) ///
+					///`m_20121' `m_20220' `m_20221', lcolor("${red_3}%80" "${blue_3}%80" "${red_1}%80" "${blue_1}%80")) ///
+					xlabel(-.3(.1).4, nogrid) ///
+					xtitle("Standardized PISA scores") ///
+					note("")	
+				capture qui graph export "$FIGURES\Descriptive\PISA_distribution_2012_2022_ses.png", replace			
+				capture qui graph export "$FIGURES\Descriptive\PISA_distribution_2012_2022_ses.pdf", replace		
 		
 
 		
