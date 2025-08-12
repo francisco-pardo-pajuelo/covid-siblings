@@ -35,7 +35,8 @@ program define main
 	twfe_placebo_grades both_parents
 	
 	*- Event Study 
-	event_gpa
+	event_gpa		siblings oldest 						// other_filters "e.g. rural_young_hed_both"
+	event_gpa		siblings oldest rural_young_hed_both 	// other_filters "e.g. rural_young_hed_both"
 	
 
 	event_cohort_grade
@@ -116,16 +117,15 @@ end
 capture program drop twfe_summary
 program define twfe_summary
 
+
 args treatment_type subsample       //treatment_type: treatment type (generally by # of siblings). 
 
-*- Main categories for TWFE from A, B, C, D
-di "TWFE: Summary (A,B,C,D) - `treatment_type' - `subsample'"		
-		
 capture assert "`treatment_type'" != ""
 if _rc!=0 di "Need to select type: usual is -siblings-"
 
 capture assert "`subsample'" != ""
-if _rc!=0 di "Need to select subsample: can be -all-"				
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
 
 	clear
 
@@ -134,11 +134,11 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 		foreach only_covid in "all" "20-21"  {
 			foreach level in "all" "elm" "sec" {
 					
-			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
-			if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
-			if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+				if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+				if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
 
-			estimates clear
+				estimates clear
 				global x = "$x_all"
 				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
 				
@@ -3154,15 +3154,21 @@ capture program drop event_gpa
 program define event_gpa	
 	
 	
-colorpalette  HCL blues, selec(1 6 11) nograph
-return list
 
-local blue_1 = "`r(p1)'"
-local blue_2 = "`r(p2)'"
-local blue_3 = "`r(p3)'"
+
+args treatment_type subsample other_filters     //treatment_type: treatment type (generally by # of siblings). 
+
+capture assert "`treatment_type'" != ""
+if _rc!=0 di "Need to select type: usual is -siblings-"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+
 
 if ${max_sibs}==4 local legend_child_${max_sibs} = "4 children"	
 if ${max_sibs}==4 local legend_sib_${max_sibs} = "3 siblings"	
+
 *- GPA Overall 
 estimates clear
 
@@ -3172,49 +3178,72 @@ clear
 
 foreach only_covid in "all" "20-21" {
 	foreach level in "all" "elm" "sec" {
-		foreach young in "" /*"0" "1"*/ {
-			foreach area in  "all" /*"urb" "rur"*/  { 
-				foreach lives_both_parents in  "all" /*"both" "notboth"*/  { 
-					foreach hed in "all" /*"hed" "nhed"*/  { //none or at least one. # No change
-						foreach res in "all" /*"alls"*/ /*"nint"*/ /*"ncom" "lses" "nqui"*/ { //all sample with data, No internet, no computer, low ses, no quiet room
-							foreach v in "std_gpa_m" "std_gpa_c" "std_gpa_m_adj" "std_gpa_c_adj"  "pass_math" "pass_read"  {
-								di "`v' - `area' - `hed' - `level' - `res'"
+		//foreach young in "" /*"0" "1"*/ {
+		//	foreach area in  "all" /*"urb" "rur"*/  { 
+		//		foreach lives_both_parents in  "all" /*"both" "notboth"*/  { 
+		//			foreach hed in "all" /*"hed" "nhed"*/  { //none or at least one. # No change
+						///foreach res in "all" /*"alls"*/ /*"nint"*/ /*"ncom" "lses" "nqui"*/ { //all sample with data, No internet, no computer, low ses, no quiet room
+							foreach v in "std_gpa_m" "std_gpa_c" "std_gpa_m_adj" "std_gpa_c_adj"  "pass_math" "pass_read" "higher_ed_parent"  {
+								di "`v' - `treatment_type' - `subsample' - `other_filters'"
 							
+							if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+							if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+							if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
 
-							if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
-							if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
-							if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
-							if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
-							if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
-							if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all								
-							
-				
+							estimates clear
 							global x = "$x_all"
-							if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"							
+							if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
 							
-							use `v' id_per_umc year_t_?? urban_siagie higher_ed_parent lives_with_mother lives_with_father *has_internet *has_comp *low_ses *quiet_room year grade treated post treated_post  id_ie fam_order_${fam_type} fam_total_${fam_type} ${x} using "$TEMP\pre_reg_covid${covid_data}", clear
-										
+							use ///
+							/*OUTCOME*/		`v'  ///
+							/*ID*/ 			id_ie id_per_umc year grade ///
+							/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
+							/*DID*/			treated post treated_post ///
+							/*EVENT*/		year_t_?? ///
+							/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+							/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
+							/*B*/			/*GRADE AND MALE*/ ///
+							/*C*/			///closest_age_gap* ///
+							/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
+							/*Other*/		/**has_internet *has_comp *low_ses *quiet_room*/ ///
+							using "$TEMP\pre_reg_covid${covid_data}", clear
+							
+							*- School has internet
+							merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
+
+							
+							if "`treatment_type'"=="internet" {
+								drop treated treated_post
+								gen treated = internet==1
+								gen treated_post = treated*post
+								local lab_control = "No Internet"
+								local lab_treated = "Internet"
+							}	
+
+							if "`treatment_type'"=="parent_ed" {
+								drop treated treated_post
+								gen treated = (educ_cat_mother==3)
+								gen treated_post = treated*post
+								local lab_control = "Mother no higher ed."
+								local lab_treated = "Mother some higher ed."
+							}
+
+							if "`treatment_type'"=="both_parents" {
+								drop treated treated_post
+								gen treated = (lives_with_mother==1 & lives_with_father==1)
+								gen treated_post = treated*post
+								local lab_control = "Does not live with both"
+								local lab_treated = "Lives with both parents"
+							}	
+							
+							if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+							if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+							if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+							if "`subsample'" == "all" 		di "All siblings"
+		
 							*- Remove early grades and years
 							keep if year>=2016
 							drop if grade==0
-							
-							*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-							if "`only_covid'" == "20-21" keep if year<=2021		
-
-							*- Divide sample based on grade in 2020
-							//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
-							
-							*- Not enough pre-years
-							//drop if inlist(grade_2020,1,2)==1
-							//drop if grade_2020==3 & year<=2017 //<=2017 Would only include those who repeated..
-							//drop if grade_2020==4 & year<=2016 //<=2016 Would only include those who repeated..						
-										
-							
-							if "`area'" == "rur" keep if urban_siagie == 0
-							if "`area'" == "urb" keep if urban_siagie == 1
-							
-							if "`hed'" == "no" 	keep if higher_ed_parent == 0
-							if "`hed'" == "yes" keep if higher_ed_parent == 1
 							
 							if "`level'" == "all" {
 								keep if grade>=1 & grade<=11
@@ -3243,170 +3272,162 @@ foreach only_covid in "all" "20-21" {
 								gen young = inlist(grade,7,8)==1 if inlist(grade,7,8,9,10,11)
 								local young_lab = "7th-8th grade"
 								local old_lab 	= "9th-11th grade"
-								}
-								
-							if "`lives_both_parents'" == "both" {
-								keep if lives_with_mother==1 & lives_with_father==1
-							}
+								}							
 							
-							if "`lives_both_parents'" == "notboth" {
-								keep if (lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1) | (lives_with_mother==0 & lives_with_father==0)
-								//Some missing cases will be excluded so yes/no dont add up to all
-							}							
+							*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
+							if "`only_covid'" == "20-21" keep if year<=2021			
+							
+							
+							if strmatch("`other_filters'","*rural*")==1 		keep if urban_siagie==0
+							if strmatch("`other_filters'","*urban*")==1 		keep if urban_siagie==1
+							
+							if strmatch("`other_filters'","*parent_nhed*")==1 	keep if higher_ed_parent == 0
+							if strmatch("`other_filters'","*parent_hed*")==1 	keep if higher_ed_parent == 1	
+							
+							if strmatch("`other_filters'","*both*")==1 			keep if lives_with_mother==1 & lives_with_father==1
+							if strmatch("`other_filters'","*notboth*")==1 		keep if (lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1) | (lives_with_mother==0 & lives_with_father==0)						
+							
+							if strmatch("`other_filters'","*young*")==1 		keep if young==1				
+							if strmatch("`other_filters'","*old*")==1 			keep if young==0						
+							
 									
+							/*		
 							if "`res'" == "all" 		keep if 1==1
 							if "`res'" == "alls" 		keep if has_internet!=.
 							if "`res'" == "nint" 		keep if has_internet==0
 							if "`res'" == "ncom" 		keep if has_comp==0
 							if "`res'" == "lses" 		keep if low_ses==1
 							if "`res'" == "nqui" 		keep if quiet_room==0
+							*/
 							
-							
-							local vlab = "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files	
-							local tlab = "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files	
-			
-							if "`v'" == "std_gpa_m" {
-								local vlab = "gm"
-								local tlab = "Standardized mathematics GPA"
-							}
-							
-							if "`v'" == "std_gpa_c" {
-								local vlab = "gc"
-								local tlab = "Standardized reading GPA"
-							}
-							
-							if "`v'" == "std_gpa_m_adj" {
-								local vlab = "am"
-								local tlab = "Standardized mathematics GPA (adj)"
-							}
-							
-							if "`v'" == "std_gpa_c_adj" {
-								local vlab = "ac"
-								local tlab = "Standardized reading GPA (adj)"
-							}							
-							
-							if "`v'" == "pass_math" {
-								local vlab = "pm"
-								local tlab = "Passed mathematics"
-							}						
-							
-							if "`v'" == "pass_read" {
-								local vlab = "pc"
-								local tlab = "Passed reading"
-							}	
-							
-							if "`v'" == "higher_ed_parent" {
-								local vlab = "he"
-								local tlab = "Has parent with higher education"
-							}	
-							
-							local level_lab = ""
-							if "`level'" == "elm" local level_lab = "p"
-							if "`level'" == "sec" local level_lab = "s"
-							
-							local area_lab = ""
-							if "`area'" == "urb" local area_lab = "u"
-							if "`area'" == "rur" local area_lab = "r"
-							
-							local lives_lab = ""
-							if "`lives_both_parents'" == "both" local lives_lab = "b"
-							if "`lives_both_parents'" == "notboth" local lives_lab = "n"
-							
-							local hed_lab = ""
-							if "`hed'" == "hed" 	local hed_lab = "h"
-							if "`hed'" == "nhed" local hed_lab = "n"
-							
+							local vlab 		= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+							local xtitle 	= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+							if "`v'" == "std_gpa_m" 		{
+								local vlab = "gpa_m"
+								local xtitle = "Standardized Mathematics GPA"
+								}
+							if "`v'" == "std_gpa_c" 		{
+								local vlab = "gpa_c"
+								local xtitle = "Standardized Reading GPA"
+								}
+							if "`v'" == "std_gpa_m_adj" 		{
+								local vlab = "gpa_m_adj"
+								local xtitle = "Standardized Mathematics GPA"
+								}
+							if "`v'" == "std_gpa_c_adj" 		{
+								local vlab = "gpa_c_adj"
+								local xtitle = "Standardized Reading GPA"
+								}
+							if "`v'" == "pass_math" 		{
+								local vlab = "pass_m"
+								local xtitle = "% A's Mathematics"
+								}
+							if "`v'" == "pass_read" 		{
+								local vlab = "pass_c"
+								local xtitle = "% A's Reading"
+								}
+							if "`v'" == "approved" 		{
+								local vlab = "pass"
+								local xtitle = "Grade Promotion"
+								}
+							if "`v'" == "approved_first" 		{
+								local vlab = "passf"
+								local xtitle = "Grade Promotion without recovery"
+								}
+							if "`v'" == "higher_ed_parent" 		{
+								local vlab = "hed_parent"
+								local xtitle = "% Parent with higher education"
+								}	
+										
+						
+							/*
 							local res_lab = ""
 							if "`res'" == "alls" local res_lab = "s"
 							if "`res'" == "nint" local res_lab = "i"
 							if "`res'" == "ncom" local res_lab = "c"
 							if "`res'" == "lses" local res_lab = "l"
 							if "`res'" == "nqui" local res_lab = "q"
+							*/
+							
 							//merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(`v'_*) nogen
 							
 							*- Event Study
-							//OC vs size =2/3
+							//OC vs size =2/3/4
 							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if fam_total_${fam_type}<=${max_sibs}, a(year grade id_ie)
-							estimates store e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'1 //'e' for event study
+							estimates store event_`vlab'
 							
 							//OC vs size =2
 							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(year grade id_ie)
-							estimates store e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'2
+							estimates store event_`vlab'_2
 							
 							//OC vs size =3
 							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,3)==1 , a(year grade id_ie)
-							estimates store e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'3
+							estimates store event_`vlab'_3
 							
-							if ${max_sibs} == 4 eststo e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'4 :reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,4)==1 , a(year grade id_ie)
-							/*
-							*- TWFE 
-							//OC vs size =2
-							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(year grade id_ie)
-							estimates store t`vlab'_`area'_`hed'_`level'_`res'2
-							
-							//OC vs size =3
-							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,3)==1 , a(year grade id_ie)
-							estimates store t`vlab'_`area'_`hed'_`level'_`res'3	
-							
-							if ${max_sibs} == 4 eststo t`vlab'_`area'_`hed'_`level'_`res'4 :reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,4)==1 , a(year grade id_ie)
-							*/
-							
+							if ${max_sibs} == 4 eststo event_`vlab'_4 :reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,4)==1 , a(year grade id_ie)
+						
 							
 							local drop_vars = ""
-							if "`level'" == "elm" & "`young'" == "1" local drop_vars = "year_t_b5 year_t_b4 year_t_b3"
-							
-							coefplot 	(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'1, drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
-										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'2, drop(year_t_b6 `drop_vars') mcolor("${blue_3}") ciopts(bcolor("${blue_3}")) lcolor("${blue_3}")) ///
-										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'3, drop(year_t_b6 `drop_vars') mcolor("${blue_2}") ciopts(bcolor("${blue_2}")) lcolor("${blue_2}")) ///
-										(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'4, drop(year_t_b6 `drop_vars') mcolor("${blue_1}") ciopts(bcolor("${blue_1}")) lcolor("${blue_1}")) ///
+							if "`level'" == "elm" & strmatch("`other_filters'","*young*") local drop_vars = "year_t_b5 year_t_b4 year_t_b3"
+						
+							coefplot 	(event_`vlab'_1, drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
 										drop(year_t_b6 year_t_b5 year_t_b4) ///
-										leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
+										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
 										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
 										yline(0,  lcolor(gs10))  ///
-										ytitle("Effect") ///
+										ytitle("`xtitle'") ///
+										ylab(-.1(.02).04) ///
+										///xline(2019.5 2021.5) ///
+										subtitle("`tlab'") ///
+										legend(pos(6) col(4))
+					
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+							
+							coefplot 	(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") ciopts(bcolor("${ek_blue}")) lcolor("${ek_blue}")) ///
+										, ///
+										omitted ///
+										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
+										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										yline(0,  lcolor(gs10))  ///
+										ytitle("`xtitle'") ///
+										ylab(-.1(.02).04) ///
+										///xline(2019.5 2021.5) ///
+										subtitle("`tlab'") ///
+										legend(pos(6) col(4))
+					
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace								
+							
+							coefplot 	///(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'1, drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
+										(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") 	ciopts(bcolor("${ek_blue}")) 	lcolor("${ek_blue}")) ///
+										(event_`vlab'_3, drop(year_t_b6 `drop_vars') mcolor("${ek_green}") 	ciopts(bcolor("${ek_green}")) 	lcolor("${ek_green}")) ///
+										(event_`vlab'_4, drop(year_t_b6 `drop_vars') mcolor("${ek_red}") 	ciopts(bcolor("${ek_red}")) 	lcolor("${ek_red}")) ///
+										, ///
+										omitted ///
+										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
+										leg(order(1 "1 sibling" 3 "2 siblings" 5 "`legend_sib_${max_sibs}'")) ///
+										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										yline(0,  lcolor(gs10))  ///
+										ytitle("`xtitle'") ///
 										ylab(-.1(.02).04) ///
 										///xline(2019.5 2021.5) ///
 										subtitle("`tlab'") ///
 										legend(pos(6) col(4))
 							
-							capture qui graph export "$FIGURES\Event Study\covid_`v'_`area'_`lives_both_parents'_`hed'_`level'`young'_`only_covid'_`res'`i'${covid_data}.png", replace	
-							capture qui graph export "$FIGURES\Event Study\covid_`v'_`area'_`lives_both_parents'_`hed'_`level'`young'_`only_covid'_`res'`i'${covid_data}.pdf", replace								
-							
+							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace							
 							}
-							
-										
-						/*				
-						forvalues i = 1/4 {
-							coefplot 	em_`area'_`hed'_`level'_`res'`i' ec_`area'_`hed'_`level'_`res'`i', ///
-										omitted ///
-										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
-										leg(order(1 "GPA Math" 3 "GPA Comm")) ///
-										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023") ///
-										yline(0,  lcolor(gs10))  ///
-										ytitle("Effect") ///
-										ylab(-.1(.02).04) ///
-										subtitle("Panel A: GPA") ///
-										legend(pos(6) col(3)) ///
-										name(panel_A_GPA_`area'_`hed'_`level'_`res'`i',replace)	
-							*/
-							//graph save "$FIGURES\covid_gpa_`vlab'_`area'_`hed'_`level'`young'_`res'`i'.gph" , replace	
-							//capture qui graph export "$FIGURES\covid_gpa_`vlab'_`area'_`hed'_`level'`young'_`res'`i'.eps", replace	
-
-						
-						}
-						estimates drop e*	
-						
 					}
-				
-				}
 			}
-		}
-	}
-}
-
+		
 end
 
 ********************************************************************************
@@ -4067,16 +4088,16 @@ no education?
 		foreach only_covid in "all" "20-21" {
 			foreach level in "all" "elm" "sec" {
 			
-			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
-			if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
-			if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
-			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
-			if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
-			if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all
-			
-			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
-			
-			estimates clear
+				if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
+				if ${covid_test} == 1 & inlist("`level'","sec")==1 						continue
+				if ${covid_test} == 1 & inlist("`only_covid'","all")==1 				continue
+				if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`level'"!="elm" 		continue //until final version, not needed.
+				if inlist("`v'","std_gpa_c_adj","pass_read")==1 & "`only_covid'"!="all" continue //until final version, not needed.
+				if inlist("`v'","prim_on_time")==1 				& "`only_covid'"=="all" continue //testing for now so no need to do it all
+				
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1				continue
+				
+				estimates clear
 				global x = "$x_all"
 				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
 				

@@ -142,7 +142,7 @@ program define clean_data
 	foreach g in "2p" "4p" /*"6p"*/ "2s" {	
 		if "`g'"!="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g') //m:1 because there are missings
 		if "`g'"=="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_student_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g') //m:1 because there are missings
-		rename _m merge_ece_surbase_`g'
+		rename _m merge_ece_survey_base_`g'
 		rename (aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g') (base_aspiration_`g' base_internet_`g' base_pc_`g' base_laptop_`g' base_radio_`g')	
 		}
 		
@@ -359,8 +359,8 @@ program define clean_data
 		male_siagie public_siagie urban_siagie min_socioec_index_ie_cat educ_mother educ_father lives_with_mother lives_with_father ///
 		quart_* grade_size* class_size* closest_age_gap*${fam_type} base* ///
 		covid_preg_sib covid_0_2_sib covid_2_4_sib t_born*  ///
-		year_2p peso*  socioec* *has_internet *has_comp *low_ses *quiet_room ///
-		approved* std* math comm score* satisf* prim_on_time ///
+		year_2p year_4p year_2s peso*  socioec* *has_internet *has_comp *low_ses *quiet_room ///
+		approved* std* math comm score* satisf* prim_on_time aspiration* ///
 		using "$TEMP\long_siagie_ece", clear
 
 		keep if fam_total_${fam_type}<=${max_sibs}
@@ -449,9 +449,9 @@ program define clean_data
 		bys id_per_umc: egen first_year = min(year)
 		bys id_per_umc: egen last_year = max(year)
 		compress
-	save "$TEMP\pre_reg_covid", replace
+		save "$TEMP\pre_reg_covid", replace
 
-	if ${covid_test}==1  {
+		if ${covid_test}==1  {
 		use "$TEMP\pre_reg_covid", clear
 
 		bys id_ie: egen u = max(cond(_n==1,runiform(),.))

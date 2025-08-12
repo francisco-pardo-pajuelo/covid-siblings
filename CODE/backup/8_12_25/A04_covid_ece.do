@@ -15,8 +15,8 @@ program define main
 	//Pairs of ECE years with pre-post COVID
 	//twfe_survey	
 	twfe_ece
-	//twfe_ece_baseline_scores
-	twfe_gpa_baseline_survey
+	twfe_ece_baseline_scores
+	twfe_ece_baseline_survey
 	
 	
 
@@ -629,377 +629,384 @@ capture program drop twfe_ece
 program define twfe_ece	
 	
 	
-use "$TEMP\pre_reg_covid${covid_data}", clear
-
-estimates clear
-
-keep if fam_total_${fam_type}<=4
-keep if fam_order_${fam_type}==1
-
-gen fe=1
-
-gen byte asp_not_school_fam_2p 	= inlist(aspiration_fam_2p,1,2) 	if aspiration_fam_2p!=.
-gen byte asp_college2_fam_2p 	= inlist(aspiration_fam_2p,3,4,5) 	if aspiration_fam_2p!=.
-gen byte asp_college4_fam_2p 	= inlist(aspiration_fam_2p,4,5) 	if aspiration_fam_2p!=.
-
-gen byte asp_not_school_fam_4p 	= inlist(aspiration_fam_4p,1,2) 	if aspiration_fam_4p!=.
-gen byte asp_college2_fam_4p 	= inlist(aspiration_fam_4p,3,4,5) 	if aspiration_fam_4p!=.
-gen byte asp_college4_fam_4p 	= inlist(aspiration_fam_4p,4,5) 	if aspiration_fam_4p!=.
-
-gen byte asp_not_school_stu_2s 	= inlist(aspiration_stu_2s,1,2) 	if aspiration_stu_2s!=.
-gen byte asp_college2_stu_2s 	= inlist(aspiration_stu_2s,3,4,5) 	if aspiration_stu_2s!=.
-gen byte asp_college4_stu_2s 	= inlist(aspiration_stu_2s,4,5) 	if aspiration_stu_2s!=.
-
-global x 		= "male i.educ_mother i.educ_father urban" //spanish
-global baseline_score_2p = "base_com_std_2p base_math_std_2p" //spanish
+use "$TEMP\siagie_append", clear	
 
 
-*------------
-*- Table X: TWFE on ECE Scores, expectations and SES
-*-------------
+keep id_ie id_per_umc year level grade section_siagie male_siagie region_siagie public_siagie urban_siagie lives_with_mother lives_with_father approved approved_first math comm std_gpa_m_adj std_gpa_c_adj
 
-gen sample_1 = 1 if grade==2 & (year==2019 | year==2022)
-gen sample_2 = 1 if grade==4
-gen sample_3 = 1 if grade==4 & (year==2018 | year==2024)
-gen sample_4 = 1 if grade==8
+*- Attach Family variables
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
 
-
-rename (asp_not_school_fam_2p asp_not_school_fam_4p asp_not_school_stu_2s) 	(asp_not_school_2p asp_not_school_4p asp_not_school_2s)
-rename (asp_college4_fam_2p asp_college4_fam_4p asp_college4_stu_2s) 		(asp_college4_2p asp_college4_4p asp_college4_2s)
-
-foreach size in /*"2"*/ "3" "4" {
-	foreach v in "score_math_std" "score_com_std" "asp_not_school" "asp_college4" "socioec_index" {
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type}) 
+	rename _m merge_siblings
 	
-	di as result "*********************" _n as text "Size: `size'" _n  "Var: `v'" _n as result "*********************"	
 	
-	*- Panel A: 2nd Grade
-				//eststo `v'_2p_`size'	: reghdfe `v'_2p 		treated_post treated post fe		if inlist(fam_total_${fam_type},1,`size')==1 & sample_1==1, a(id_ie year)
-				eststo `v'_2p_x_`size'	: reghdfe `v'_2p 		treated_post treated post fe ${x}	if inlist(fam_total_${fam_type},1,`size')==1 & sample_1==1, a(id_ie year)
-			
-	*- Panel B: 4th grade
-				//eststo `v'_4p_`size'	: reghdfe `v'_4p 		treated_post treated post fe		if inlist(fam_total_${fam_type},1,`size')==1 & sample_2==1, a(id_ie year)
-				eststo `v'_4p_x_`size'	: reghdfe `v'_4p 		treated_post treated post fe ${x}	if inlist(fam_total_${fam_type},1,`size')==1 & sample_2==1, a(id_ie year)
-			
+*- Attach ECE/Survey data
 
-	*- Panel B census: 4th grade (only census)
-				//eststo `v'_4p_c_`size'	: reghdfe `v'_4p 		treated_post treated post fe		if inlist(fam_total_${fam_type},1,`size')==1 & sample_3==1, a(id_ie year)
-				//eststo `v'_4p_c_x_`size'	: reghdfe `v'_4p 		treated_post treated post fe ${x}	if inlist(fam_total_${fam_type},1,`size')==1 & sample_3==1, a(id_ie year)
+	*- Match ECE IDs
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_2p", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_2p
+	//tab grade merge_2p, row nofreq
+	rename (id_estudiante source) (id_estudiante_2p source_2p)
+
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_4p", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_4p
+	//tab grade merge_4p, row nofreq
+	rename (id_estudiante source) (id_estudiante_4p source_4p)
+	
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_6p", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_6p
+	//tab grade merge_4p, row nofreq
+	rename (id_estudiante source) (id_estudiante_6p source_6p)	
+
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_2s", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_2s
+	//tab grade merge_2s, row nofreq
+	rename (id_estudiante source) (id_estudiante_2s source_2s)
+
+	*- Match ECE exams
+	merge m:1 id_estudiante_2p using  "$TEMP\ece_2p", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year urban) //m:1 because there are missings
+	rename _m merge_ece_2p
+	rename (year score_math_std score_com_std score_acad_std) (year_2p score_math_std_2p score_com_std_2p score_acad_std_2p)
+	rename (socioec_index socioec_index_cat) (socioec_index_2p socioec_index_cat_2p)
+	rename (urban) (urban_2p)
+	
+	merge m:1 id_estudiante_4p using "$TEMP\ece_4p", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_ece_4p
+	rename (year score_math_std score_com_std score_acad_std) (year_4p score_math_std_4p score_com_std_4p score_acad_std_4p)
+	rename (socioec_index socioec_index_cat) (socioec_index_4p socioec_index_cat_4p)
+	
+	merge m:1 id_estudiante_6p using "$TEMP\em_6p", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_ece_6p
+	rename (year score_math_std score_com_std score_acad_std) (year_6p score_math_std_6p score_com_std_6p score_acad_std_6p)
+	rename (socioec_index socioec_index_cat) (socioec_index_6p socioec_index_cat_6p)
+	
+	merge m:1 id_estudiante_2s using "$TEMP\ece_2s", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_ece_2s
+	rename (year score_math_std score_com_std score_acad_std) (year_2s score_math_std_2s score_com_std_2s score_acad_std_2s)
+	rename (socioec_index socioec_index_cat) (socioec_index_2s socioec_index_cat_2s)
+
+	*- Match EM exams
+	merge m:1 id_estudiante_2p using  "$TEMP\em_2p", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_m_2p
+	replace year_2p = year if year_2p==.
+	replace score_math_std_2p 	= score_math_std 	if score_math_std_2p==.
+	replace score_com_std_2p 	= score_com_std 	if score_com_std_2p==.
+	replace score_acad_std_2p 	= score_acad_std 	if score_acad_std_2p==.
+	replace socioec_index_2p = socioec_index if socioec_index_2p ==.
+	replace socioec_index_cat_2p = socioec_index_cat if socioec_index_cat_2p ==.
+	drop score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year	
+	
+	merge m:1 id_estudiante_4p using "$TEMP\em_4p", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_m_4p
+	replace year_4p = year if year_4p==.
+	replace score_math_std_4p 	= score_math_std 	if score_math_std_4p==.
+	replace score_com_std_4p 	= score_com_std 	if score_com_std_4p==.
+	replace score_acad_std_4p 	= score_acad_std 	if score_acad_std_4p==.
+	replace socioec_index_4p = socioec_index if socioec_index_4p ==.
+	replace socioec_index_cat_4p = socioec_index_cat if socioec_index_cat_4p ==.
+	drop score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year
+	
+	/*
+	merge m:1 id_estudiante_6p using "$TEMP\em_6p", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_m_6p
+	replace year_6p = year if year_6p==.
+	replace score_math_std_6p 	= score_math_std 	if score_math_std_6p==.
+	replace score_com_std_6p 	= score_com_std 	if score_com_std_6p==.
+	replace score_acad_std_6p 	= score_acad_std 	if score_acad_std_6p==.
+	replace socioec_index_6p = socioec_index if socioec_index_6p ==.
+	replace socioec_index_cat_6p = socioec_index_cat if socioec_index_cat_6p ==.
+	drop score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year
+	*/
+	merge m:1 id_estudiante_2s using "$TEMP\em_2s", keep(master match) keepusing(score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year) //m:1 because there are missings
+	rename _m merge_m_2s
+	replace year_2s = year if year_2s==.
+	replace score_math_std_2s 	= score_math_std 	if score_math_std_2s==.
+	replace score_com_std_2s 	= score_com_std 	if score_com_std_2s==.
+	replace score_acad_std_2s 	= score_acad_std 	if score_acad_std_2s==.
+	replace socioec_index_2s = socioec_index if socioec_index_2s ==.
+	replace socioec_index_cat_2s = socioec_index_cat if socioec_index_cat_2s ==.
+	drop score_math_std score_com_std score_acad_std socioec_index socioec_index_cat year
+
+	
+	*- Match ECE survey
+	merge m:1 id_estudiante_2p using "$TEMP\ece_family_2p", keep(master match) keepusing(aspiration_2p) //m:1 because there are missings
+	rename _m merge_ece_survey_fam_2p
+	rename aspiration_2p aspiration_fam_2p
+	
+	merge m:1 id_estudiante_4p using "$TEMP\ece_family_4p", keep(master match) keepusing(aspiration_4p gender_subj_?_4p) //m:1 because there are missings
+	rename _m merge_ece_survey_fam_4p
+	rename aspiration_4p aspiration_fam_4p
+	
+	merge m:1 id_estudiante_6p using "$TEMP\ece_family_6p", keep(master match) keepusing(aspiration_6p gender_subj_?_6p) //m:1 because there are missings
+	rename _m merge_ece_survey_fam_6p	
+	rename aspiration_6p aspiration_fam_6p
+	
+	merge m:1 id_estudiante_6p using "$TEMP\ece_student_6p", keep(master match) keepusing(aspiration_6p) //m:1 because there are missings
+	rename _m merge_ece_survey_stud_6p	
+	rename aspiration_6p aspiration_stu_6p	
+	
+	merge m:1 id_estudiante_2s using "$TEMP\ece_student_2s", keep(master match) keepusing(aspiration_2s lives_with_*_2s total_siblings_2s) //m:1 because there are missings
+	rename _m merge_ece_survey_stud_2s
+	rename aspiration_2s aspiration_stu_2s
+
+
+	*- Match with SIRIES (applications and enrollment)
+	//merge m:1 id_per_umc using "$TEMP\applied", keep(master match) keepusing()
+	
+	*- Aspirations
+	gen byte asp_college2_fam_2p = inlist(aspiration_fam_2p,3,4,5) if aspiration_fam_2p!=.
+	gen byte asp_college2_fam_4p = inlist(aspiration_fam_4p,3,4,5) if aspiration_fam_4p!=.
+	gen byte asp_college2_fam_6p = inlist(aspiration_fam_6p,3,4,5) if aspiration_fam_6p!=.
+	gen byte asp_college2_stu_6p = inlist(aspiration_stu_6p,3,4,5) if aspiration_stu_6p!=.
+	gen byte asp_college2_stu_2s = inlist(aspiration_stu_2s,3,4,5) if aspiration_stu_2s!=.	
+	gen byte asp_college4_fam_2p = inlist(aspiration_fam_2p,4,5) if aspiration_fam_2p!=.
+	gen byte asp_college4_fam_4p = inlist(aspiration_fam_4p,4,5) if aspiration_fam_4p!=.
+	gen byte asp_college4_fam_6p = inlist(aspiration_fam_6p,4,5) if aspiration_fam_6p!=.
+	gen byte asp_college4_stu_6p = inlist(aspiration_stu_6p,4,5) if aspiration_stu_6p!=.
+	gen byte asp_college4_stu_2s = inlist(aspiration_stu_2s,4,5) if aspiration_stu_2s!=.
+	
+	*- University variables (application, enrollment, graduation, peers)
+	merge 1:1 id_per_umc using "$TEMP\student_umc_uni",  keep(master match) nogen	
+	
+	
+	
+	
+	
+	
+*- Potential years
+use "$TEMP\ece_2p", clear
+append using "$TEMP\em_2p"	
+keep if year>=2018 & year<=2024
+bys year: gen N=_N
+keep if N>50000
+tab year
+
+use "$TEMP\ece_4p", clear
+append using "$TEMP\em_4p"
+keep if year>=2018 & year<=2024
+bys year: gen N=_N
+keep if N>50000
+tab year
+
+
+use "$TEMP\ece_2s", clear
+append using "$TEMP\em_2s"
+keep if year>=2018 & year<=2024
+bys year: gen N=_N
+keep if N>50000
+tab year
+
+
+
+*-- 2p:
+	use "$TEMP\ece_2p", clear
+	append using "$TEMP\em_2p"
+	keep if year>=2018 & year<=2024
+	//keep if year==2018 | year==2024
+
+	merge 1:1 id_estudiante_2p using "$TEMP\ece_family_2p", keep(master match) 
+	drop _m
+
+	*- Match ECE IDs - 2p
+	rename id_estudiante_2p id_estudiante
+	merge m:1 id_estudiante using "$TEMP\match_siagie_ece_2p", keep(master match) keepusing(id_per_umc) 
+	keep if _m==3
+	drop _m
+	rename aspiration_2p aspiration_fam_2p
+
+	*- Attach Family variables
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type}) 
+	rename _m merge_siblings
+
+
+	gen treated = (fam_total_${fam_type}>1)
+	gen post = year>=2020
+	gen post_2019 = year>=2019
+	gen post_2024 = year>=2024
+	gen treated_post = treated*post
+	gen treated_post_2019 = treated*post_2019
+	gen treated_post_2024 = treated*post_2024
+	keep if fam_total_${fam_type}<=4
+	gen fe=1
+	compress
+	
+	
+	gen byte asp_college2_fam_2p 	= inlist(aspiration_fam_2p,3,4,5) if aspiration_fam_2p!=.
+	gen byte asp_college4_fam_2p 	= inlist(aspiration_fam_2p,4,5) if aspiration_fam_2p!=.
+	gen byte asp_not_school_fam_2p 	= inlist(aspiration_fam_2p,1,2) if aspiration_fam_2p!=.
+	
+	global x = "male i.edu_father_2p i.edu_mother_2p urban spanish"
+
+	reghdfe score_math 				treated_post treated post fe, a(id_ie year)
+	reghdfe score_com 				treated_post treated post fe, a(id_ie year)
+	reghdfe score_math_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe score_com_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe score_acad_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe asp_not_school_fam_2p 	treated_post treated post fe, a(id_ie year)
+	//reghdfe asp_college2_fam_2p 	treated_post treated post fe, a(id_ie year)
+	reghdfe asp_college4_fam_2p 	treated_post treated post fe, a(id_ie year)	
+	reghdfe socioec_index 			treated_post treated post fe, a(id_ie year)
+	
+	reghdfe score_math 				treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_com 				treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_math_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_com_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_acad_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe asp_not_school_fam_2p 	treated_post treated post ${x} fe, a(id_ie year)
+	//reghdfe asp_college2_fam_2p 	treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe asp_college4_fam_2p 	treated_post treated post ${x} fe, a(id_ie year)
+
+
+*-- 4p:
+	use "$TEMP\ece_4p", clear
+	append using "$TEMP\em_4p"
+	keep if year>=2018 & year<=2024
+	//keep if year==2018 | year==2024
+
+	merge 1:1 id_estudiante_4p using "$TEMP\ece_family_4p", keep(master match) 
+	drop _m
+
+	*- Match ECE IDs - 4p
+	rename id_estudiante_4p id_estudiante
+	merge m:1 id_estudiante using "$TEMP\match_siagie_ece_4p", keep(master match) keepusing(id_per_umc) 
+	keep if _m==3
+	drop _m
+	rename aspiration_4p aspiration_fam_4p
+
+	*- Attach Family variables
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type}) 
+	rename _m merge_siblings
+
+
+	gen treated = (fam_total_${fam_type}>1)
+	gen post = year>=2020
+	gen post_2019 = year>=2019
+	gen post_2024 = year>=2024
+	gen treated_post = treated*post
+	gen treated_post_2019 = treated*post_2019
+	gen treated_post_2024 = treated*post_2024
+	keep if fam_total_${fam_type}<=4
+	gen fe=1
+	compress
+	
+	
+	gen byte asp_college2_fam_4p 	= inlist(aspiration_fam_4p,3,4,5) if aspiration_fam_4p!=.
+	gen byte asp_college4_fam_4p 	= inlist(aspiration_fam_4p,4,5) if aspiration_fam_4p!=.
+	gen byte asp_not_school_fam_4p 	= inlist(aspiration_fam_4p,1,2) if aspiration_fam_4p!=.
+	
+	global x = "male i.edu_father_4p i.edu_mother_4p urban spanish"
+
+	reghdfe score_math 				treated_post treated post fe, a(id_ie year)
+	reghdfe score_com 				treated_post treated post fe, a(id_ie year)
+	reghdfe score_math_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe score_com_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe score_acad_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe asp_not_school_fam_4p 	treated_post treated post fe, a(id_ie year)
+	//reghdfe asp_college2_fam_4p 	treated_post treated post fe, a(id_ie year)
+	reghdfe asp_college4_fam_4p 	treated_post treated post fe, a(id_ie year)	
+	reghdfe socioec_index 	treated_post treated post fe, a(id_ie year)
+	
+	reghdfe score_math 				treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_com 				treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_math_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_com_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_acad_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe asp_not_school_fam_4p 	treated_post treated post ${x} fe, a(id_ie year)
+	//reghdfe asp_college2_fam_4p 	treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe asp_college4_fam_4p 	treated_post treated post ${x} fe, a(id_ie year)
+
+
+*-- 2s:
+	use "$TEMP\ece_2s", clear
+	append using "$TEMP\em_2s"
+	keep if year>=2018 & year<=2024
+	//keep if year==2018 | year==2024
+
+	merge 1:1 id_estudiante_2s using "$TEMP\ece_student_2s", keep(master match) 
+	drop _m
+
+	*- Match ECE IDs - 2s
+	rename id_estudiante_2s id_estudiante
+	merge m:1 id_estudiante using "$TEMP\match_siagie_ece_2s", keep(master match) keepusing(id_per_umc) 
+	keep if _m==3
+	drop _m
+	rename aspiration_2s aspiration_fam_2s
+
+	*- Attach Family variables
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type}) 
+	rename _m merge_siblings
+
+
+	drop if year==2020
+	gen treated = (fam_total_${fam_type}>1)
+	gen post = year>=2020
+	gen treated_post = treated*post
+	keep if fam_total_${fam_type}<=4
+	gen fe=1
+	compress
+	
+	
+	gen byte asp_college2_fam_2s 	= inlist(aspiration_fam_2s,3,4,5) if aspiration_fam_2s!=.
+	gen byte asp_college4_fam_2s 	= inlist(aspiration_fam_2s,4,5) if aspiration_fam_2s!=.
+	gen byte asp_not_school_fam_2s 	= inlist(aspiration_fam_2s,1,2) if aspiration_fam_2s!=.
+	
+	global x = "male i.edu_father_2s i.edu_mother_2s urban spanish"
+
+	reghdfe score_math 				treated_post treated post fe, a(id_ie year)
+	reghdfe score_math 				treated_post treated post fe if inlist(fam_total_${fam_type},1,4)==1 & year==2019 | year==2023, a(id_ie year) //still same sign (positive)
+	reghdfe score_com 				treated_post treated post fe, a(id_ie year)
+	reghdfe score_math_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe score_com_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe score_acad_std 			treated_post treated post fe, a(id_ie year)
+	reghdfe asp_not_school_fam_2s 	treated_post treated post fe, a(id_ie year)
+	//reghdfe asp_college2_fam_2s 	treated_post treated post fe, a(id_ie year)
+	reghdfe asp_college4_fam_2s 	treated_post treated post fe, a(id_ie year)	
+	
+	reghdfe score_math 				treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_com 				treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_math_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_com_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe score_acad_std 			treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe asp_not_school_fam_2s 	treated_post treated post ${x} fe, a(id_ie year)
+	//reghdfe asp_college2_fam_2s 	treated_post treated post ${x} fe, a(id_ie year)
+	reghdfe asp_college4_fam_2s 	treated_post treated post ${x} fe, a(id_ie year)
+
 		
-	
-	*- Panel C 8th grade (only those with potential baseline 2p scores (2014))
-				//eststo `v'_2s_`size'			: 	reghdfe `v'_2s 		treated_post treated post fe							if inlist(fam_total_${fam_type},1,`size')==1 & sample_4==1, a(id_ie year)
-				//eststo `v'_2s_x_`size'			: 	reghdfe `v'_2s 		treated_post treated post fe ${x}						if inlist(fam_total_${fam_type},1,`size')==1 & sample_4==1, a(id_ie year)
-				eststo `v'_2s_x_base_`size'		:	reghdfe `v'_2s 		treated_post treated post fe ${x} ${baseline_score_2p}	if inlist(fam_total_${fam_type},1,`size')==1 & sample_4==1, a(id_ie year)
-	
-	}
-}
-
-
-
-****
-***
-**
-* Table based on household resources
-**
-***
-****
-
-	capture erase "$TABLES\twfe_ece.tex"
-	
-	****** TABLE HEADER
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", replace write
-	file write table_tex	/// HEADER OPTIONS OF TABLE
-						"\makeatletter" _n ///
-						"\@ifclassloaded{beamer}{%" _n ///
-						"	\centering" _n ///
-						"	\resizebox{0.6\textwidth}{!}%" _n ///
-						"}{%" _n ///
-						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
-						"	\centering" _n ///
-						"	\caption{TWFE on GPA controlling for baseline standardized exams}" _n ///
-						"	\label{tab:twfe_ece}" _n ///
-						"	\resizebox{0.7\textwidth}{!}%" _n ///
-						"}" _n ///
-						"{" _n ///
-						"\makeatother"	 _n 
-	file close table_tex
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write
-	file write table_tex	/// HEADER OPTIONS OF TABLE
-					"\begin{tabular}{lccc}" _n ///
-					/// HEADER OF TABLE
-					"\toprule" _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& \multicolumn{3}{c}{TWFE} \\"  _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& 1 sibling & 2 siblings & 3 siblings  \\" _n ///
-					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}" _n ///	
-					"& (1) & (2) & (3)\\" _n ///
-					"\bottomrule" _n ///
-					"&  &  &  \\" _n 
-	file close table_tex
-	
-	******* TABLE CONTENT	
+	reghdfe socioec_index 				treated_post treated post fe, a(id_ie year)
 	
 
-	
-	
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write
-	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel A: 2nd grade students } \\" _n
-	file close table_tex	
-	
-	estout   score_math_std_2p_x_2 score_math_std_2p_x_3 score_math_std_2p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   score_com_std_2p_x_2 score_com_std_2p_x_3 score_com_std_2p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   asp_not_school_2p_x_2 asp_not_school_2p_x_3 asp_not_school_2p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Max Expectation: Graduate school") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   asp_college4_2p_x_2 asp_college4_2p_x_3 asp_college4_2p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Max Expectation: 4-year college") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   socioec_index_2p_x_2 socioec_index_2p_x_3 socioec_index_2p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "SES") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
-	
-	
-	
-	
-	
-	
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write
-	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel B: 4th grade students } \\" _n
-	file close table_tex	
-	
-	estout   score_math_std_4p_x_2 score_math_std_4p_x_3 score_math_std_4p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   score_com_std_4p_x_2 score_com_std_4p_x_3 score_com_std_4p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   asp_not_school_4p_x_2 asp_not_school_4p_x_3 asp_not_school_4p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Max Expectation: Graduate school") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   asp_college4_4p_x_2 asp_college4_4p_x_3 asp_college4_4p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Max Expectation: 4-year college") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   socioec_index_4p_x_2 socioec_index_4p_x_3 socioec_index_4p_x_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "SES") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
-	
-	
-	
-	
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write
-	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel C: 8th grade students } \\" _n
-	file close table_tex	
-	
-	estout   score_math_std_2s_x_base_2 score_math_std_2s_x_base_3 score_math_std_2s_x_base_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   score_com_std_2s_x_base_2 score_com_std_2s_x_base_3 score_com_std_2s_x_base_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   asp_not_school_2s_x_base_2 asp_not_school_2s_x_base_3 asp_not_school_2s_x_base_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Max Expectation: Graduate school") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   asp_college4_2s_x_base_2 asp_college4_2s_x_base_3 asp_college4_2s_x_base_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Max Expectation: 4-year college") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   socioec_index_2s_x_base_2 socioec_index_2s_x_base_3 socioec_index_2s_x_base_4 ///
-	using "$TABLES\twfe_ece.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "SES") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
-	
-	
 
-	********* END TABLE
-	
-	file open  table_tex	using "$TABLES\twfe_ece.tex", append write
-	file write table_tex	/// HEADER OPTIONS OF TABLE							
-	_n "\bottomrule" _n ///
-		"\end{tabular}" _n ///
-		"}" _n ///
-		"\@ifclassloaded{beamer}{%" _n ///
-		"}{%" _n ///
-		"	\end{table}" _n ///
-		"}" _n 
-	file close table_tex	
-	
-	
 
 	
 end
@@ -1250,140 +1257,172 @@ end
 
 ************************************************************************************
 
-capture program drop twfe_gpa_baseline_survey
-program define twfe_gpa_baseline_survey
+capture program drop twfe_ece_baseline_survey
+program define twfe_ece_baseline_survey
 
+/*
+▶ 1. 2° (2015,2016) → 6° (2019,2020)
+▶ 2. 4° (2016,2018) → 6°/7° (2018/2019,2020/2021)
+▶ 3. 8° (2018,2019) → 9° (2019/2020)
+▶ 4. 8° (2015,2016) → college app (2019/2020)
+*/
 
+foreach g_pair in "g2_6" "g4_6" "g4_7" "g8_9" /*"g8_u"*/  "g2_8" {
 
-	*------------
-	*- Table X: TWFE on GPA controlling for baseline scores
-	*------------
+if "`g_pair'" == "g2_6" {
+	local g_ece = "2p"
+	local ece_db = "ece_`g_ece'"
+	local ece_db_survey = "ece_family_`g_ece'"
+	
+	local year_ece_pre 		=  2015
+	local year_ece_post 	=  2016
+	local year_siagie_pre 	=  2019
+	local year_siagie_post 	=  2020
+	local grade_ece			=  2	
+	local grade_siagie		=  6
+}
 
+if "`g_pair'" == "g4_6" {
+	local g_ece = "4p"
+	local ece_db = "ece_`g_ece'"
+	local ece_db_survey = "ece_family_`g_ece'"
+	
+	local year_ece_pre 		=  2016
+	local year_ece_post 	=  2018
+	local year_siagie_pre 	=  2018
+	local year_siagie_post 	=  2020
+	local grade_ece			=  4	
+	local grade_siagie		=  6
+}
 
-	/*
-	- 1. 2° (2015,2016) 					→ 6° (2019,2020)
-	- 2. 2° (2014,2016) + 4° (2016,2018) 	→ 6° (2018,2020)
-	- 3. 2° (2014,2016) + 4° (2016,2018) 	→ 7° (2019,2021)
-	- 4. 2° (2012,2013) + 8° (2018,2019) 	→ 9° (2019/2020)
-	▶ 5. 8° (2015,2016) → college app (2019/2020)
-	*/
+if "`g_pair'" == "g4_7" {
+	local g_ece = "4p"
+	local ece_db = "ece_`g_ece'"
+	local ece_db_survey = "ece_family_`g_ece'"
+	
+	local year_ece_pre 		=  2016
+	local year_ece_post 	=  2018
+	local year_siagie_pre 	=  2019
+	local year_siagie_post 	=  2021
+	local grade_ece			=  4	
+	local grade_siagie		=  7
+}
 
-	estimates clear
-	use "$TEMP\pre_reg_covid${covid_data}", clear
+if "`g_pair'" == "g8_9" {
+	local g_ece = "2s"
+	local ece_db = "ece_`g_ece'"
+	local ece_db_survey = "ece_student_`g_ece'"
+	
+	local year_ece_pre 		=  2018
+	local year_ece_post 	=  2019
+	local year_siagie_pre 	=  2019
+	local year_siagie_post 	=  2020
+	local grade_ece			=  8	
+	local grade_siagie		=  9
+}
 
-	sort grade year
+use   "$TEMP\siagie_append", clear
 
-	gen fe=1
+keep if year==`year_siagie_pre' | year==`year_siagie_post'
+keep if grade==`grade_siagie'	
 
-	keep if fam_total_${fam_type}<=4
-	keep if fam_order_${fam_type}==1
+keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie urban_siagie lives_with_mother lives_with_father approved approved_first std_gpa_m_adj std_gpa_c_adj
 
-	gen pair_1 = ((year==2019 | year==2020) & grade==6)
-	gen pair_2 = ((year==2018 | year==2020) & grade==6) 
-	gen pair_3 = ((year==2019 | year==2021) & grade==7)
-	gen pair_4 = ((year==2019 | year==2020) & grade==9)
+	*- Match ECE IDs
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_`g_ece'", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_`g_ece'
+	//tab grade merge_`g_ece', row nofreq
+	rename (id_estudiante source) (id_estudiante_`g_ece' source_`g_ece')
+	
+	*- Match Baseline ECE exams
+	rename year year_siagie
+	merge m:1 id_estudiante_`g_ece'  using  "$TEMP\\`ece_db'", keep(master match) keepusing(year score_math score_com score_math_std score_com_std score_acad_std socioec_index socioec_index_cat label_* urban) //m:1 because there are missings
+	rename _m merge_ece_base_`g_ece'
+	rename (year score_math score_com score_math_std score_com_std score_acad_std) (year_`g_ece' base_score_math_`g_ece' base_score_com_`g_ece' base_math_std_`g_ece' base_com_std_`g_ece' base_acad_std_`g_ece')
+	rename (socioec_index socioec_index_cat) (base_socioec_index_`g_ece' base_socioec_index_cat_`g_ece')
+	rename (urban) (base_urban_`g_ece')
+	rename year_siagie year
+	
+	keep if (year==`year_siagie_pre' & year_`g_ece'==`year_ece_pre') | (year==`year_siagie_post' & year_`g_ece'==`year_ece_post')
 
-	keep if pair_1==1 | pair_2==1 | pair_3 ==1 | pair_4==1
+	*- Match ECE survey
+	merge m:1 id_estudiante_`g_ece' using "$TEMP\\`ece_db_survey'", keep(master match) keepusing(aspiration_`g_ece' internet_`g_ece' pc_`g_ece' laptop_`g_ece' radio_`g_ece') //m:1 because there are missings
+	rename _m merge_ece_survey_fam_`g_ece'
+	rename aspiration_`g_ece' aspiration_fam_`g_ece'
 
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
 
-	*- We stack each pair of years
-	forvalues i = 1(1)4 {
-		preserve
-			keep if pair_`i' == 1
-			keep 	id_per_umc id_ie year grade fam_total_${fam_type} fam_order_${fam_type} ///
-					score* std* ///
-					treated_post treated post ///
-					base_score* base_socioec* base_internet* base_pc* base_radio* base_aspiration* 				
-			gen pair = `i'
-			tempfile pair_`i'
-			save `pair_`i'', replace
-		restore
-	}
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type}) 
+	rename _m merge_siblings
 
-	clear
-	append using `pair_1'
-	append using `pair_2'
-	append using `pair_3'
-	append using `pair_4'
-
-	*- In each case, we take the most recent ECE survey results (when there is more than 1 available year)
-
-	foreach v in "score_math" "score_com" "socioec_index" "socioec_index_cat" "internet" "pc" "radio" "aspiration" {
-		gen base_`v' 		= base_`v'_2p if pair==1
-		replace base_`v' 	= base_`v'_4p if pair==2
-		replace base_`v' 	= base_`v'_4p if pair==3
-		replace base_`v'	= base_`v'_2s if pair==4
-	}
-			
-	*- Achievement quartiles
-	egen base_score_acad = rmean(base_score_math base_score_com)	
-	gen	 base_score_acad_Q = .
-	forvalues i = 1(1)4 {
-		xtile temp =  base_score_acad 		if pair == `i', nq(4)
-		replace base_score_acad_Q = temp 	if pair == `i'
-		drop temp
-		}
-
-
-		/*
-		
-		egen base_score_`subj'_1 = rmean(base_score_`subj'_2p)
-		egen base_score_`subj'_2 = rmean(/*base_score_`subj'_2p*/ base_score_`subj'_4p)
-		egen base_score_`subj'_3 = rmean(/*base_score_`subj'_2p*/ base_score_`subj'_4p)
-		egen base_score_`subj'_4 = rmean(/*base_score_`subj'_2p*/ base_score_`subj'_2s)
-		
-		//There is some overlap between pair_1 and pair_2. We will prioritize more information (2° and 4°) in those cases
-		gen base_score_`subj' = base_score_`subj'_2 if pair_2==1
-		replace base_score_`subj' = base_score_`subj'_1 if pair_1==1 & base_score_`subj'==.
-		replace base_score_`subj' = base_score_`subj'_3 if pair_3==1 & base_score_`subj'==.
-		replace base_score_`subj' = base_score_`subj'_4 if pair_4==1 & base_score_`subj'==.
-		*/
-
-
+	drop year_`g_ece'
+	rename *_`g_ece' *
+	
 	compress
+	
+	save "$TEMP\erase_twfe_ece_`g_pair'", replace
+}		
+	
+	
+clear
+append using "$TEMP\erase_twfe_ece_g2_6"
+gen g_pair = 1
+append using "$TEMP\erase_twfe_ece_g4_6"
+replace g_pair = 2 if g_pair==.
+append using "$TEMP\erase_twfe_ece_g4_7"
+replace g_pair = 3 if g_pair==.
+append using "$TEMP\erase_twfe_ece_g8_9"
+replace g_pair = 4 if g_pair==.
 
+	
+	
+	keep if fam_total_${fam_type}<=4
+	gen treated = (fam_total_${fam_type}>1)
+	gen post = year>=2020
+	gen treated_post = treated*post
+	
+	
 
-	global x_score 	= "base_score_math base_score_com"
-	global x_ses 	= "base_socioec_index"
-
-	foreach size in /*"2_4"*/ "2" "3" "4" {
-	//local size = "2_4"
-		preserve
-			di as result "*********************" _n as text "Size: `size'" _n as result "*********************"
-			if "`size'" == "2_4" 	keep if fam_total_${fam_type}<=4 //avoid these to ease interpretation, otherwise the weighted average changes.
-			if "`size'" == "2" 		keep if inlist(fam_total_${fam_type},1,2)==1
-			if "`size'" == "3" 		keep if inlist(fam_total_${fam_type},1,3)==1
-			if "`size'" == "4" 		keep if inlist(fam_total_${fam_type},1,4)==1	
-			foreach subj in "m" "c" {
-			
-			
-			//local subj = "m"
-				eststo gpa_`subj'_all_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses}, a(id_ie grade year pair)
-				
-				//Effect by SES
-				eststo gpa_`subj'_ses1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==1, a(id_ie grade year pair)
-				//eststo gpa_`subj'_ses2_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==2, a(id_ie grade year pair)
-				//eststo gpa_`subj'_ses3_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==3, a(id_ie grade year pair)
-				eststo gpa_`subj'_ses4_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==4, a(id_ie grade year pair)
-				
-				//Effect by Resources
-				eststo gpa_`subj'_pc_int0_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_internet==0 & base_pc==0, a(id_ie grade year pair)
-				eststo gpa_`subj'_pc_int1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_internet==1 & base_pc==1, a(id_ie grade year pair)
+	foreach size in "2_4" "2" "3" "4" {
+	preserve
+		di as result "*********************" _n as text "Size: `size'" _n as result "*********************"
+		if "`size'" == "2-4" 	keep if fam_total_${fam_type}<=4
+		if "`size'" == "2" 		keep if inlist(fam_total_${fam_type},1,2)==1
+		if "`size'" == "3" 		keep if inlist(fam_total_${fam_type},1,3)==1
+		if "`size'" == "4" 		keep if inlist(fam_total_${fam_type},1,4)==1	
+		foreach subj in "m" "c" {
 		
-				//Effect by Academic achievement
-				eststo gpa_`subj'_acad1_`size'		: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==1, a(id_ie grade year pair)
-				//eststo gpa_`subj'_acad2_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==2, a(id_ie grade year pair)
-				//eststo gpa_`subj'_acad3_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==3, a(id_ie grade year pair)
-				eststo gpa_`subj'_acad4_`size'		: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==4, a(id_ie grade year pair)
-		
-				//Effect by Expectations
-				eststo gpa_`subj'_asp_low_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if inlist(base_aspiration,1,2)==1, a(id_ie grade year pair)
-				//eststo gpa_`subj'_asp_med_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, a(id_ie grade year pair)
-				eststo gpa_`subj'_asp_hig_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post ${x_score} ${x_ses} if inlist(base_aspiration,4,5)==1, a(id_ie grade year pair)
-			}
-		restore
+			eststo gpa_`subj'_all_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index, a(id_ie g_pair)
+			eststo gpa_`subj'_1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==1, a(id_ie g_pair)
+			eststo gpa_`subj'_2_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==2, a(id_ie g_pair)
+			eststo gpa_`subj'_3_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==3, a(id_ie g_pair)
+			eststo gpa_`subj'_4_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com if g_pair==4, a(id_ie g_pair)
+			
+			//Effect by SES
+			eststo gpa_`subj'_ses1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==1, a(id_ie g_pair)
+			eststo gpa_`subj'_ses2_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==2, a(id_ie g_pair)
+			eststo gpa_`subj'_ses3_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==3, a(id_ie g_pair)
+			eststo gpa_`subj'_ses4_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if base_socioec_index_cat==4, a(id_ie g_pair)
+			
+			//Effect by Resources
+			eststo gpa_`subj'_pc_int0_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==0 & pc==0, a(id_ie g_pair)
+			eststo gpa_`subj'_pc_int1_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if internet==1 & pc==1, a(id_ie g_pair)
+
+			
+			//Effect by Aspirations
+			eststo gpa_`subj'_asp_low_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,1)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_med_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,2)==1, a(id_ie g_pair)
+			eststo gpa_`subj'_asp_hig_`size'	: reghdfe std_gpa_`subj'_adj treated_post treated post base_score_math base_score_com base_socioec_index if inlist(aspiration_fam,4,5)==1, a(id_ie g_pair)
 		}
-
+	restore
+	}
+	//Interesting... if Computer or internet, results partly go away. But not if there is a laptop...?
 
 
 ****
@@ -1417,17 +1456,17 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
-					"\begin{tabular}{lccc}" _n ///
+					"\begin{tabular}{lcccc}" _n ///
 					/// HEADER OF TABLE
 					"\toprule" _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& \multicolumn{3}{c}{TWFE} \\"  _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& 1 sibling & 2 siblings & 3 siblings  \\" _n ///
-					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}" _n ///	
-					"& (1) & (2) & (3)\\" _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& \multicolumn{4}{c}{TWFE} \\"  _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
+					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
+					"& (1) & (2) & (3) & (4) \\" _n ///
 					"\bottomrule" _n ///
-					"&  &  &  \\" _n 
+					"&  &  & &  \\" _n 
 	file close table_tex
 	
 	******* TABLE CONTENT	
@@ -1438,11 +1477,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel A: All studentes } \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel A: All studentes } \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_all_2 gpa_m_all_3 gpa_m_all_4  ///
+	estout   gpa_m_all_2_4 gpa_m_all_2 gpa_m_all_3 gpa_m_all_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1454,10 +1493,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_all_2 gpa_c_all_3 gpa_c_all_4  ///
+	estout   gpa_c_all_2_4 gpa_c_all_2 gpa_c_all_3 gpa_c_all_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1473,11 +1512,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel B: Low SES Households (Q1)} \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel B: Low SES Households (Q1)} \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_ses1_2 gpa_m_ses1_3 gpa_m_ses1_4  ///
+	estout   gpa_m_ses1_2_4 gpa_m_ses1_2 gpa_m_ses1_3 gpa_m_ses1_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1489,10 +1528,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_ses1_2 gpa_c_ses1_3 gpa_c_ses1_4  ///
+	estout   gpa_c_ses1_2_4 gpa_c_ses1_2 gpa_c_ses1_3 gpa_c_ses1_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1508,11 +1547,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel C: High SES Households (Q4)} \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel C: High SES Households (Q4)} \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_ses4_2 gpa_m_ses4_3 gpa_m_ses4_4  ///
+	estout   gpa_m_ses4_2_4 gpa_m_ses4_2 gpa_m_ses4_3 gpa_m_ses4_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1524,10 +1563,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_ses4_2 gpa_c_ses4_3 gpa_c_ses4_4  ///
+	estout   gpa_c_ses4_2_4 gpa_c_ses4_2 gpa_c_ses4_3 gpa_c_ses4_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1542,11 +1581,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel D: Households with no PC or Internet} \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel D: Households with no PC or Internet} \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_pc_int0_2 gpa_m_pc_int0_3 gpa_m_pc_int0_4  ///
+	estout   gpa_m_pc_int0_2_4 gpa_m_pc_int0_2 gpa_m_pc_int0_3 gpa_m_pc_int0_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1558,10 +1597,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_pc_int0_2 gpa_c_pc_int0_3 gpa_c_pc_int0_4  ///
+	estout   gpa_c_pc_int0_2_4 gpa_c_pc_int0_2 gpa_c_pc_int0_3 gpa_c_pc_int0_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1576,11 +1615,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel E: Households with both PC and Internet} \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel E: Households with both PC and Internet} \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_pc_int1_2 gpa_m_pc_int1_3 gpa_m_pc_int1_4  ///
+	estout   gpa_m_pc_int1_2_4 gpa_m_pc_int1_2 gpa_m_pc_int1_3 gpa_m_pc_int1_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1592,10 +1631,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_1.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_pc_int1_2 gpa_c_pc_int1_3 gpa_c_pc_int1_4  ///
+	estout   gpa_c_pc_int1_2_4 gpa_c_pc_int1_2 gpa_c_pc_int1_3 gpa_c_pc_int1_4  ///
 	using "$TABLES\twfe_ece_survey_1.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1652,17 +1691,17 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
-					"\begin{tabular}{lccc}" _n ///
+					"\begin{tabular}{lcccc}" _n ///
 					/// HEADER OF TABLE
 					"\toprule" _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& \multicolumn{3}{c}{TWFE} \\"  _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& 1 sibling & 2 siblings & 3 siblings  \\" _n ///
-					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}" _n ///	
-					"& (1) & (2) & (3)\\" _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& \multicolumn{4}{c}{TWFE} \\"  _n ///
+					"\cmidrule(lr){2-5}" _n ///	
+					"& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
+					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
+					"& (1) & (2) & (3) & (4) \\" _n ///
 					"\bottomrule" _n ///
-					"&  &  &  \\" _n 
+					"&  &  & &  \\" _n 
 	file close table_tex
 	
 	******* TABLE CONTENT	
@@ -1670,11 +1709,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel A: All studentes } \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel A: All studentes } \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_all_2 gpa_m_all_3 gpa_m_all_4  ///
+	estout   gpa_m_all_2_4 gpa_m_all_2 gpa_m_all_3 gpa_m_all_4  ///
 	using "$TABLES\twfe_ece_survey_2.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1686,44 +1725,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_all_2 gpa_c_all_3 gpa_c_all_4  ///
-	using "$TABLES\twfe_ece_survey_2.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	
-	
-	
-	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
-	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel B: Student in bottom quartile of achievement} \\" _n
-	file close table_tex	
-	
-	estout   gpa_m_acad1_2 gpa_m_acad1_3 gpa_m_acad1_4  ///
-	using "$TABLES\twfe_ece_survey_2.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   gpa_c_acad1_2 gpa_c_acad1_3 gpa_c_acad1_4  ///
+	estout   gpa_c_all_2_4 gpa_c_all_2 gpa_c_all_3 gpa_c_all_4  ///
 	using "$TABLES\twfe_ece_survey_2.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1739,11 +1744,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel C: Student in top quartile of achievement} \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel B: Parents or students who expect the maximum level of education will be high school graduation} \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_acad4_2 gpa_m_acad4_3 gpa_m_acad4_4  ///
+	estout   gpa_m_asp_low_2_4 gpa_m_asp_low_2 gpa_m_asp_low_3 gpa_m_asp_low_4  ///
 	using "$TABLES\twfe_ece_survey_2.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1755,44 +1760,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_acad4_2 gpa_c_acad4_3 gpa_c_acad4_4  ///
-	using "$TABLES\twfe_ece_survey_2.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Reading") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
-
-	
-	
-	
-	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
-	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel D: Maximum level of education expected: Elementary or High School} \\" _n
-	file close table_tex	
-	
-	estout   gpa_m_asp_low_2 gpa_m_asp_low_3 gpa_m_asp_low_4  ///
-	using "$TABLES\twfe_ece_survey_2.tex", ///
-	append style(tex) ///
-	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
-	keep(treated_post) ///
-	varlabels(treated_post "Mathematics") ///   //"\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}"
-	///indicate("School FE" = fe, labels("Yes" "No")) ///
-	///stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "Observations")) ///
-	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
-	
-	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
-	file write table_tex ///	
-					"&  &  &   \\" _n  
-	file close table_tex		
-	
-	estout   gpa_c_asp_low_2 gpa_c_asp_low_3 gpa_c_asp_low_4  ///
+	estout   gpa_c_asp_low_2_4 gpa_c_asp_low_2 gpa_c_asp_low_3 gpa_c_asp_low_4  ///
 	using "$TABLES\twfe_ece_survey_2.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1808,11 +1779,11 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write
 	file write table_tex ///	
-					"&  &  &   \\" _n  ///
-					"\multicolumn{4}{l}{Panel E: Maximum level of education expected: 4-year college or graduate} \\" _n
+					"&  &  & &  \\" _n  ///
+					"\multicolumn{5}{l}{Panel C: Parents or students expect to finish 4-year college education} \\" _n
 	file close table_tex	
 	
-	estout   gpa_m_asp_hig_2 gpa_m_asp_hig_3 gpa_m_asp_hig_4  ///
+	estout   gpa_m_asp_hig_2_4 gpa_m_asp_hig_2 gpa_m_asp_hig_3 gpa_m_asp_hig_4  ///
 	using "$TABLES\twfe_ece_survey_2.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1824,10 +1795,10 @@ program define twfe_gpa_baseline_survey
 	
 	file open  table_tex	using "$TABLES\twfe_ece_survey_2.tex", append write	
 	file write table_tex ///	
-					"&  &  &   \\" _n  
+					"&  &  & &  \\" _n  
 	file close table_tex		
 	
-	estout   gpa_c_asp_hig_2 gpa_c_asp_hig_3 gpa_c_asp_hig_4  ///
+	estout   gpa_c_asp_hig_2_4 gpa_c_asp_hig_2 gpa_c_asp_hig_3 gpa_c_asp_hig_4  ///
 	using "$TABLES\twfe_ece_survey_2.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
@@ -1853,8 +1824,6 @@ program define twfe_gpa_baseline_survey
 		"}" _n 
 	file close table_tex	
 	
-	
-		
 	
 	
 

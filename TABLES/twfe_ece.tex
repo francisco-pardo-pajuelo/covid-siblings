@@ -5,47 +5,84 @@
 }{%
        \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
        \centering
-       \caption{TWFE on 8th grade GPA and standardized exams controlling for baseline 2nd grade standardized exams}
+       \caption{TWFE on GPA controlling for baseline standardized exams}
        \label{tab:twfe_ece}
-       \resizebox{0.95\textwidth}{!}%
+       \resizebox{0.7\textwidth}{!}%
 }
 {
 \makeatother
-\begin{tabular}{lcccc}
+\begin{tabular}{lccc}
 \toprule
-\cmidrule(lr){2-5}
-& \multicolumn{4}{c}{TWFE} \\
-\cmidrule(lr){2-5}
-& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\
-\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
-& (1) & (2) & (3) & (4) \\
+\cmidrule(lr){2-4}
+& \multicolumn{3}{c}{TWFE} \\
+\cmidrule(lr){2-4}
+& 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}
+& (1) & (2) & (3)\\
 \bottomrule
-&  &  & &  \\
-&  &  & &  \\
-\multicolumn{5}{l}{Panel A: GPA } \\
-Mathematics         &      -0.099***&      -0.011   &      -0.036***&      -0.059***\\
-                    &     (0.009)   &     (0.009)   &     (0.011)   &     (0.015)   \\
-                    &               &               &               &               \\
-Observations        &     326,669   &     279,833   &     225,092   &     179,575   \\
+&  &  &  \\
+&  &  &   \\
+\multicolumn{4}{l}{Panel A: 2nd grade students } \\
+Mathematics         &      -0.015*  &      -0.060***&      -0.069***\\
+                    &     (0.009)   &     (0.011)   &     (0.015)   \\
  
-&  &  & &  \\
-Reading             &      -0.099***&      -0.010   &      -0.031***&      -0.034** \\
-                    &     (0.009)   &     (0.009)   &     (0.010)   &     (0.015)   \\
-                    &               &               &               &               \\
-Observations        &     326,669   &     280,846   &     225,840   &     180,218   \\
+&  &  &   \\
+Reading             &      -0.015*  &      -0.046***&      -0.054***\\
+                    &     (0.009)   &     (0.010)   &     (0.014)   \\
  
-&  &  & &  \\
-\multicolumn{5}{l}{Panel B: Standardized Exams } \\
-Mathematics         &      -0.034***&      -0.017** &      -0.044***&      -0.071***\\
-                    &     (0.006)   &     (0.007)   &     (0.008)   &     (0.011)   \\
-                    &               &               &               &               \\
-Observations        &     409,527   &     282,640   &     227,403   &     181,370   \\
+&  &  &   \\
+Max Expectation: Graduate school&       0.008***&      -0.003   &      -0.008*  \\
+                    &     (0.002)   &     (0.003)   &     (0.005)   \\
  
-&  &  & &  \\
-Reading             &      -0.013** &       0.002   &      -0.022***&      -0.046***\\
-                    &     (0.006)   &     (0.006)   &     (0.008)   &     (0.011)   \\
-                    &               &               &               &               \\
-Observations        &     409,690   &     282,769   &     227,486   &     181,466   \\
+&  &  &   \\
+Max Expectation: 4-year college&      -0.015***&      -0.001   &       0.012*  \\
+                    &     (0.004)   &     (0.005)   &     (0.007)   \\
+ 
+&  &  &   \\
+SES                 &       0.001   &      -0.003   &      -0.014   \\
+                    &     (0.007)   &     (0.009)   &     (0.013)   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{Panel B: 4th grade students } \\
+Mathematics         &      -0.014***&      -0.060***&      -0.108***\\
+                    &     (0.005)   &     (0.004)   &     (0.006)   \\
+ 
+&  &  &   \\
+Reading             &      -0.029***&      -0.069***&      -0.110***\\
+                    &     (0.005)   &     (0.004)   &     (0.006)   \\
+ 
+&  &  &   \\
+Max Expectation: Graduate school&       0.006***&       0.005***&       0.002   \\
+                    &     (0.001)   &     (0.001)   &     (0.002)   \\
+ 
+&  &  &   \\
+Max Expectation: 4-year college&      -0.016***&      -0.023***&      -0.031***\\
+                    &     (0.002)   &     (0.002)   &     (0.003)   \\
+ 
+&  &  &   \\
+SES                 &       0.003   &       0.012***&       0.006   \\
+                    &     (0.004)   &     (0.003)   &     (0.005)   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{Panel C: 8th grade students } \\
+Mathematics         &      -0.018***&      -0.038***&      -0.051***\\
+                    &     (0.006)   &     (0.007)   &     (0.009)   \\
+ 
+&  &  &   \\
+Reading             &       0.002   &      -0.015** &      -0.022** \\
+                    &     (0.006)   &     (0.007)   &     (0.009)   \\
+ 
+&  &  &   \\
+Max Expectation: Graduate school&      -0.003   &      -0.009   &       0.001   \\
+                    &     (0.008)   &     (0.009)   &     (0.010)   \\
+ 
+&  &  &   \\
+Max Expectation: 4-year college&      -0.013   &       0.020   &       0.015   \\
+                    &     (0.011)   &     (0.012)   &     (0.014)   \\
+ 
+&  &  &   \\
+SES                 &       0.014***&       0.034***&       0.059***\\
+                    &     (0.005)   &     (0.005)   &     (0.007)   \\
  
 
 \bottomrule
