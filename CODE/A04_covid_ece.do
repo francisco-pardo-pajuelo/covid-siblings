@@ -831,7 +831,7 @@ program define twfe_gpa_baseline_survey
 		local title_t2_pair_2 = "TWFE on 6th grade GPA by 4th grade baseline achievement and expectations"
 		local title_t2_pair_3 = "TWFE on 7th grade GPA by 4th grade baseline achievement and expectations"
 		local title_t2_pair_4 = "TWFE on 9th grade GPA by 8th grade baseline achievement and expectations"
-	}
+	
 		
 	estimates clear
 		foreach size in /*"2_4"*/ "2" "3" "4" {
