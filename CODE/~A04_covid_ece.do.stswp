@@ -819,6 +819,20 @@ program define twfe_gpa_baseline_survey
 	
 	
 	foreach pair in "all" "1" "2" "3" "4" {
+
+		local title_t1_pair_all = "TWFE on GPA by baseline resources"
+		local title_t1_pair_1 = "TWFE on 6th grade GPA by 2nd grade baseline resources"
+		local title_t1_pair_2 = "TWFE on 6th grade GPA by 4th grade baseline resources"
+		local title_t1_pair_3 = "TWFE on 7th grade GPA by 4th grade baseline resources"
+		local title_t1_pair_4 = "TWFE on 9th grade GPA by 8th grade baseline resources"
+		
+		local title_t2_pair_all = "TWFE on GPA by baseline achievement and expectations"
+		local title_t2_pair_1 = "TWFE on 6th grade GPA by 2nd grade baseline achievement and expectations"
+		local title_t2_pair_2 = "TWFE on 6th grade GPA by 4th grade baseline achievement and expectations"
+		local title_t2_pair_3 = "TWFE on 7th grade GPA by 4th grade baseline achievement and expectations"
+		local title_t2_pair_4 = "TWFE on 9th grade GPA by 8th grade baseline achievement and expectations"
+	}
+		
 	estimates clear
 		foreach size in /*"2_4"*/ "2" "3" "4" {
 		//local size = "2_4"
@@ -883,8 +897,8 @@ program define twfe_gpa_baseline_survey
 							"}{%" _n ///
 							"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 							"	\centering" _n ///
-							"	\caption{TWFE on GPA by baseline resources}" _n ///
-							"	\label{tab:twfe_ece_survey_1_pair`pair'}" _n ///
+							"	\caption{`title_t1_pair_`pair''}" _n ///
+							"	\label{tab:twfe_gpa_baseline_survey_1_pair`pair'}" _n ///
 							"	\resizebox{0.65\textwidth}{!}%" _n ///
 							"}" _n ///
 							"{" _n ///
@@ -1118,7 +1132,7 @@ program define twfe_gpa_baseline_survey
 						"}{%" _n ///
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
-						"	\caption{WFE on GPA by baseline achievement and expectat}" _n ///
+						"	\caption{`title_tpair_`pair''}" _n ///
 						"	\label{tab:twfe_gpa_baseline_survey_2_pair`pair'}" _n ///
 						"	\resizebox{0.65\textwidth}{!}%" _n ///
 						"}" _n ///
