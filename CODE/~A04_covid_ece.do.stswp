@@ -1118,7 +1118,7 @@ program define twfe_gpa_baseline_survey
 						"}{%" _n ///
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
-						"	\caption{WFE on GPA by baseline achievement and expectations}" _n ///
+						"	\caption{WFE on GPA by baseline achievement and expectat}" _n ///
 						"	\label{tab:twfe_gpa_baseline_survey_2_pair`pair'}" _n ///
 						"	\resizebox{0.65\textwidth}{!}%" _n ///
 						"}" _n ///

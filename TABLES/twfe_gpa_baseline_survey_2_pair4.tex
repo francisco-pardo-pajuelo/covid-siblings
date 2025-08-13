@@ -1,0 +1,86 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.6\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{WFE on GPA by baseline achievement and expectations}
+       \label{tab:twfe_gpa_baseline_survey_2_pair4}
+       \resizebox{0.65\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lccc}
+\toprule
+\cmidrule(lr){2-4}
+& \multicolumn{3}{c}{TWFE} \\
+\cmidrule(lr){2-4}
+& 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}
+& (1) & (2) & (3)\\
+\bottomrule
+&  &  &  \\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel A: All studentes}} \\
+\hspace{3mm}Mathematics&      -0.032***&      -0.053***&      -0.074***\\
+                    &     (0.006)   &     (0.008)   &     (0.014)   \\
+ 
+%&  &  &   \\
+\hspace{3mm}Reading &      -0.018***&      -0.035***&      -0.045***\\
+                    &     (0.006)   &     (0.008)   &     (0.014)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     466,128   &     384,809   &     339,142   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel B: Student in bottom quartile of achievement}} \\
+\hspace{3mm}Mathematics&       0.001   &      -0.043***&      -0.104***\\
+                    &     (0.012)   &     (0.015)   &     (0.023)   \\
+ 
+%&  &  &   \\
+\hspace{3mm}Reading &       0.012   &      -0.049***&      -0.079***\\
+                    &     (0.012)   &     (0.016)   &     (0.024)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     100,937   &      86,703   &      76,726   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel C: Student in top quartile of achievement}} \\
+\hspace{3mm}Mathematics&      -0.062***&      -0.100***&      -0.171***\\
+                    &     (0.012)   &     (0.018)   &     (0.037)   \\
+ 
+%&  &  &   \\
+\hspace{3mm}Reading &      -0.030** &      -0.065***&      -0.091** \\
+                    &     (0.012)   &     (0.018)   &     (0.037)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     127,522   &     100,695   &      88,372   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel D: Max Expectation: Finish school}} \\
+\hspace{3mm}Mathematics&       0.028   &       0.033   &      -0.071   \\
+                    &     (0.025)   &     (0.032)   &     (0.052)   \\
+ 
+%&  &  &   \\
+\hspace{3mm}Reading &       0.017   &       0.060*  &      -0.031   \\
+                    &     (0.026)   &     (0.034)   &     (0.056)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&      25,985   &      21,700   &      18,777   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel E: Max Expectation: 4-year college or grad school}} \\
+\hspace{3mm}Mathematics&      -0.036***&      -0.061***&      -0.084***\\
+                    &     (0.007)   &     (0.009)   &     (0.016)   \\
+ 
+%&  &  &   \\
+\hspace{3mm}Reading &      -0.019***&      -0.043***&      -0.059***\\
+                    &     (0.007)   &     (0.009)   &     (0.016)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     389,469   &     319,269   &     281,150   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}

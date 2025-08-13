@@ -11,3 +11,28 @@
 }
 {
 \makeatother
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\
+& \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2024}  \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-6}
+& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\
+& (1) & (2) & (3) & (4) & (5) \\
+\bottomrule
+&  &  &  & &  \\
+\multirow{2}{*}{\shortstack[l]{Younger sibling born after \\ school-entry cutoff}}&       0.002   &      -0.015   &      -0.014   &       0.000   &      -0.027   \\
+                    &     (0.024)   &     (0.021)   &     (0.022)   &     (0.017)   &     (0.022)   \\
+Local Linear        &         Yes   &         Yes   &         Yes   &         Yes   &         Yes   \\
+                    &               &               &               &               &               \\
+Observations        &      28,314   &      28,313   &      34,703   &      34,725   &      33,622   \\
+Counterfactual mean &      -0.073   &      -0.033   &       0.194   &       0.288   &      -0.004   \\
+Bandwidth           &         120   &         120   &         120   &         120   &         120   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}
