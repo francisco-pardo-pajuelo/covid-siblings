@@ -385,6 +385,13 @@ program define clean_data
 		label define educ_cat_mother 1 "Did not complete secondary education" 2 "Completed secondary education" 3 "Some level of higher education"
 		label values educ_cat_mother 
 		
+		*-- Father's education
+		gen educ_cat_father = 1 if inlist(educ_father,2,3,4)==1
+		replace educ_cat_father = 2 if inlist(educ_father,5)==1
+		replace educ_cat_father = 3 if inlist(educ_father,6,7,8)==1
+		label define educ_cat_father 1 "Did not complete secondary education" 2 "Completed secondary education" 3 "Some level of higher education"
+		label values educ_cat_father 		
+		
 		//gen lives_parents = .
 		//replace lives_parents = 0 if lives_with_mother==0 & lives_with_father==0
 		//gen dif_caretaker = 0 if id_caretaker!=""

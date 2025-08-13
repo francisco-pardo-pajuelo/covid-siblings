@@ -4,10 +4,7 @@ capture program drop main
 program define main 
 
 	setup_COVID_A02
-	
-	*- Descriptive statistics
-	descriptive_statistics
-	
+		
 	*- Raw trends
 	raw_gpa_trends siblings oldest
 	raw_gpa_trends siblings all
@@ -20,7 +17,9 @@ program define main
 	raw_gpa_trends both_parents	oldest
 	raw_gpa_trends t_born		oldest
 	raw_gpa_trends t_born_Q2	oldest
-
+	
+	*- Descriptive statistics
+	descriptive_statistics
 	
 
 end
@@ -90,7 +89,7 @@ program define setup_COVID_A02
 end
 
 ********************************************************************************
-* Descriptive
+* Descript
 ********************************************************************************
 
 capture program drop descriptive_statistics
