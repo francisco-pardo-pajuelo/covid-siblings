@@ -2,10 +2,10 @@
 %\newpage
 
 \setcounter{figure}{0}
-\renewcommand\thefigure{A\thechapter.\arabic{figure}}    
+\renewcommand\thefigure{A.\arabic{figure}}    
 
 \setcounter{table}{0}
-\renewcommand{\thetable}{A\thechapter.\arabic{table}}
+\renewcommand{\thetable}{A.\arabic{table}}
 
 
 \begin{center}
@@ -30,10 +30,26 @@
 \input{./TABLES/twfe_gpa_baseline_survey_1_pair3.tex}
 \input{./TABLES/twfe_gpa_baseline_survey_1_pair4.tex}
 
-\input{./TABLES/twfe_gpa_baseline_survey_1_pair1.tex}
-\input{./TABLES/twfe_gpa_baseline_survey_1_pair2.tex}
-\input{./TABLES/twfe_gpa_baseline_survey_1_pair3.tex}
-\input{./TABLES/twfe_gpa_baseline_survey_1_pair4.tex}
+\input{./TABLES/twfe_gpa_baseline_survey_2_pair1.tex}
+\input{./TABLES/twfe_gpa_baseline_survey_2_pair2.tex}
+\input{./TABLES/twfe_gpa_baseline_survey_2_pair3.tex}
+\input{./TABLES/twfe_gpa_baseline_survey_2_pair4.tex}
+
+
+\begin{figure}[htbp]
+         \centering
+        \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_grades_pass_math_siblings.pdf}
+        \caption{\% of students with an A in Mathematics for each grade 1st-1th}
+        \label{fig:trend_pass_grades}
+\end{figure}
+
+\begin{figure}[htbp]
+         \centering
+        \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_grades_std_gpa_m_adj_siblings.pdf}
+        \caption{Average GPA standardized within school-grade-year for each grade 1st-1th}
+        \label{fig:trend_gpa_grades}
+\end{figure}
+
 
 
 \begin{figure}[htbp]
