@@ -98,13 +98,13 @@ program define clean_data
 
 	preserve
 			use "$TEMP\id_siblings", clear
-			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?
+			keep id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st
 			tempfile id_siblings_sample
 			save `id_siblings_sample', replace
 	restore
 
 	*- Match Family info
-	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year?) 
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st) 
 	rename _m merge_siblings
 
 	*- Match ECE IDs
@@ -139,24 +139,48 @@ program define clean_data
 		rename (urban) (base_urban_`g')
 		}
 		
+	*- Variables common in all 3 grades	
 	foreach g in "2p" "4p" /*"6p"*/ "2s" {	
-		if "`g'"!="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g') //m:1 because there are missings
-		if "`g'"=="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_student_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g') //m:1 because there are missings
+		if "`g'"=="2p"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') //m:1 because there are missings
+		if "`g'"=="4p"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') //m:1 because there are missings
+		if "`g'"=="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_student_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') //m:1 because there are missings
 		rename _m merge_ece_survey_base_`g'
-		rename (aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g') (base_aspiration_`g' base_internet_`g' base_pc_`g' base_laptop_`g' base_radio_`g')	
+		rename (aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') (base_aspiration_`g' base_internet_`g' base_pc_`g' base_laptop_`g' base_radio_`g' base_edu_mother_`g' base_edu_father_`g')	
 		}
+		
+	*- Variables only common to one or some grades:
+	merge m:1 id_estudiante_2p  using "$TEMP\ece_family_2p", keep(master match) keepusing(age_cat_mother_?? lengua_materna_mother_?? hh_size_?? bedrooms_?? quiet_room_?? study_space_?? books_cat_?? years_prek_?? has_repeated_2nd_??) nogen
+	rename 	(age_cat_mother_??		lengua_materna_mother_?? 		hh_size_?? 		bedrooms_?? 		quiet_room_?? 		study_space_?? 		books_cat_?? 		years_prek_?? 		has_repeated_2nd_??) ///
+			(base_age_cat_mother_??	base_lengua_materna_mother_?? 	base_hh_size_?? base_bedrooms_?? 	base_quiet_room_?? 	base_study_space_?? base_books_cat_?? 	base_years_prek_?? 	base_has_repeated_2nd_??) ///
+	
+	merge m:1 id_estudiante_4p  using "$TEMP\ece_family_4p", keep(master match) keepusing(age_cat_mother_?? lengua_materna_mother_?? years_prek_??) nogen
+	rename 	(age_cat_mother_??		lengua_materna_mother_?? 		years_prek_??) ///
+			(base_age_cat_mother_??	base_lengua_materna_mother_?? 	base_years_prek_??)
+	
+	merge m:1 id_estudiante_2s  using "$TEMP\ece_student_2s", keep(master match) keepusing(lengua_?? did_prek_?? has_repeated_??) nogen
+	rename 	(lengua_?? 		did_prek_?? 		has_repeated_??) ///
+			(base_lengua_?? base_did_prek_?? 	base_has_repeated_??)
+	
+	
+		
+	/*
+	2p: edu_mother_`g' edu_father_`g' lengua_used_mother_`g'
+	4p: edu_mother_`g' edu_father_`g' lengua_used_mother_`g'
+	2s: edu_mother_`g' edu_father_`g' lengua_used_mother_`g'
+	*/
 		
 	rename year_siagie year
 
-	*- Match ECE exams
+	*- Match ECE exams and outcomes
 	foreach g in "2p" "4p" "6p" "2s" {
 		foreach v in "score_math" "score_com" "score_math_std" "score_com_std" "score_acad_std" "label_m" "label_c" "socioec_index" "socioec_index_cat" "urban" "spanish" "peso_m" "peso_c" {
 			gen `v'_`g' = . 
 		} 
 	}
 	
+	
 	foreach g in "2p" "4p" /*"6p"*/ "2s" {
-		merge m:1 id_estudiante_`g' year using "$TEMP\ece_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat urban spanish peso*) //m:1 because there are missings		
+		merge m:1 id_estudiante_`g' year using "$TEMP\ece_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat urban spanish peso_?) //m:1 because there are missings		
 		rename _m merge_ece_`g'
 		rename peso_l peso_c
 		//replace year_`g' = year if year_`g'==.
@@ -169,16 +193,18 @@ program define clean_data
 		replace label_c_`g'				= label_c 			if label_c_`g'			==.
 		replace socioec_index_`g' 		= socioec_index 	if socioec_index_`g' 	==.
 		replace socioec_index_cat_`g' 	= socioec_index_cat if socioec_index_cat_`g' ==.
-		replace urban_`g' 				= urban 			if urban_`g' ==.
+		//replace urban_`g' 				= urban 			if urban_`g' ==.
 		replace spanish_`g' 			= spanish 			if spanish_`g' ==.
 		replace peso_m_`g'				= peso_m			if peso_m_`g'			==.
 		replace peso_c_`g'				= peso_c			if peso_c_`g'			==.		
-		drop score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat peso_? //year	
+		
+		isvar score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat urban spanish peso_m peso_c
+		drop  `r(varlist)'
 	}
 
 	*- Match EM exams
 	foreach g in "2p" "4p" "6p" "2s" {
-		merge m:1 id_estudiante_`g' year using  "$TEMP\em_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c  socioec_index socioec_index_cat urban spanish peso*) //m:1 because there are missings
+		merge m:1 id_estudiante_`g' year using  "$TEMP\em_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c  socioec_index socioec_index_cat urban spanish peso_?) //m:1 because there are missings
 		rename _m merge_m_`g'
 		rename peso_l peso_c
 		//replace year_`g' = year if year_`g'==.
@@ -191,11 +217,13 @@ program define clean_data
 		replace label_c_`g'				= label_c 			if label_c_`g'			==.
 		replace socioec_index_`g' 		= socioec_index 	if socioec_index_`g' 	==.
 		replace socioec_index_cat_`g' 	= socioec_index_cat if socioec_index_cat_`g' ==.
-		replace urban_`g' 				= urban 			if urban_`g' ==.
+		//replace urban_`g' 				= urban 			if urban_`g' ==.
 		replace spanish_`g' 			= spanish 			if spanish_`g' ==.
 		replace peso_m_`g'				= peso_m			if peso_m_`g'			==.
 		replace peso_c_`g'				= peso_c			if peso_c_`g'			==.
-		drop score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat peso_? //year	
+		
+		isvar score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat urban spanish peso_m peso_c
+		drop  `r(varlist)'	
 	}
 
 	*- Match ECE survey
@@ -250,6 +278,7 @@ program define clean_data
 		}
 		
 	*-- Baseline Resources/SES
+	/*
 	foreach g in "2p" "4p" "2s" {
 		//We used family before, but OC have no siblings so better to have a comparable sample.
 		bys id_per_umc: egen has_internet_`g' = max(cond(year<=2019,internet_`g',.)) 	
@@ -259,12 +288,13 @@ program define clean_data
 		}
 
 	bys id_per_umc: egen quiet_room = min(cond(year<=2019,quiet_room_4p,.)) 
-
-	egen has_internet 	= rmax(has_internet_2p has_internet_4p) if has_internet_2p!=. | has_internet_4p!=.
-	egen has_comp 		= rmax(has_pc_2p has_laptop_2p has_pc_4p has_laptop_4p) if has_pc_2p!=. | has_laptop_2p!=. | has_pc_4p!=. | has_laptop_4p!=.
-	egen low_ses 		= rmin(is_low_ses_2p is_low_ses_4p) if is_low_ses_2p!=. | is_low_ses_4p!=.
+	*/
+	//egen has_internet 	= rmax(has_internet_2p has_internet_4p) if has_internet_2p!=. | has_internet_4p!=.
+	//egen has_comp 		= rmax(has_pc_2p has_laptop_2p has_pc_4p has_laptop_4p) if has_pc_2p!=. | has_laptop_2p!=. | has_pc_4p!=. | has_laptop_4p!=.
+	//egen low_ses 		= rmin(is_low_ses_2p is_low_ses_4p) if is_low_ses_2p!=. | is_low_ses_4p!=.
 	
 	*-- Overall Resources/SES (more sample but endogenous)
+	/*
 	foreach g in "2p" "4p" "2s" {
 		//We used family before, but OC have no siblings so better to have a comparable sample.
 		bys id_per_umc: egen full_has_internet_`g' = max(cond(internet_`g'!=.,internet_`g',.)) 	
@@ -278,6 +308,7 @@ program define clean_data
 	egen full_has_internet 	= rmax(full_has_internet_2p full_has_internet_4p full_has_internet_2s) 													if full_has_internet_2p!=. 	| full_has_internet_4p!=. | full_has_internet_2s!=.
 	egen full_has_comp 		= rmax(full_has_pc_2p 		full_has_laptop_2p full_has_pc_4p full_has_laptop_4p full_has_pc_2s full_has_laptop_2s) 	if full_has_pc_2p!=. 		| full_has_laptop_2p!=. | full_has_pc_4p!=. | full_has_laptop_4p!=. | full_has_pc_2s!=. | full_has_laptop_2s!=.
 	egen full_low_ses 		= rmin(full_is_low_ses_2p 	full_is_low_ses_4p full_is_low_ses_2s) 																		if full_is_low_ses_2p!=. 	| full_is_low_ses_4p!=.	
+	*/
 	
 	*- School average SES - Quartiles
 	merge m:1 id_ie using "$TEMP\school_SES", keepusing(socioec_index_ie_cat)
@@ -290,8 +321,8 @@ program define clean_data
 	bys id_ie							: egen 	grade_size_average=mean(enrollment_grade_year)
 	bys id_ie							: egen 	class_size_average=mean(enrollment_class_grade_year)
 	
-	tabstat grade_size_average, by(grade)
-	tabstat class_size_average, by(grade)
+	//tabstat grade_size_average, by(grade)
+	//tabstat class_size_average, by(grade)
 	
 	foreach unit in "class" "grade" {
 		gen quart_`unit'_size = .
@@ -326,6 +357,7 @@ program define clean_data
 	
 	drop if grade==0	
 
+	drop _merge
 	
 	describe
 	compress
@@ -355,11 +387,14 @@ program define clean_data
 	*- Create Event Study vars	
 	use 	///
 		id_per_umc id_ie grade year ///
-		fam_order_${fam_type} fam_total_${fam_type} ///
+		fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type} ///
 		male_siagie public_siagie urban_siagie min_socioec_index_ie_cat educ_mother educ_father lives_with_mother lives_with_father ///
-		quart_* grade_size* class_size* closest_age_gap*${fam_type} base* ///
+		quart_* grade_size* class_size* closest_age_gap*${fam_type} ///
+		base* ///
+		age_mother_1st age_mother_1st_oldest_${fam_type} ///
 		covid_preg_sib covid_0_2_sib covid_2_4_sib t_born*  ///
-		year_2p year_4p year_2s peso*  socioec* *has_internet *has_comp *low_ses *quiet_room ///
+		year_entry_1st ///
+		year_2p year_4p year_2s peso*  socioec* /**has_internet *has_comp *low_ses *quiet_room*/ ///
 		approved* std* math comm score* satisf* prim_on_time aspiration* ///
 		using "$TEMP\long_siagie_ece", clear
 
@@ -371,26 +406,45 @@ program define clean_data
 		gen treated_post = treated*post
 		
 		*- Parent's education
+		label define educ_cat 1 "Did not complete secondary education" 2 "Completed secondary education" 3 "Some level of higher education"
+		label define survey_educ_2p_4p 1 "No studies" 2 "Incomplete Primary" 3 "Complete Primary" 4 "Incomplete Secondary" 5 "Complete Secondary" 6 "Incomplete Ocupational Education" 7 "Complete Ocupational Education" 8 "Incomplete 2-year college" 9 "Complete 2-year college" 10 "Incomplete 5-year college" 11 "Complete 5-year college" 12 "Post-Graduate"
+		label define survey_educ_2s 1 "No studies" 2 "Incomplete Primary" 3 "Complete Primary" 4 "Incomplete Secondary" 5 "Complete Secondary" 6 "Incomplete 2-year college" 7 "Complete 2-year college" 8 "Incomplete 5-year college" 9 "Complete 5-year college" 10 "Post-Graduate"
+		
+		//lab li edu // educ_mother and educ_father  ->  1 None 2 Primary Incomplete 3 Primary Complete 4 Secondary Incomplete   5 Secondary Complete  6 Higher Incomplete 7 Higher Complete 8 Post-grad
 		*-- Higher Ed parents
 		gen byte higher_ed_mother 		= inlist(educ_mother,7,8) if educ_mother!=. & educ_mother!=1
 		gen byte higher_ed_father 		= inlist(educ_father,7,8) if educ_father!=. & educ_father!=1
 		//drop educ_mother educ_father
 		gen byte higher_ed_parent		= (higher_ed_mother==1 | higher_ed_father==1) if higher_ed_mother!=. | higher_ed_father!=.
 		drop higher_ed_mother higher_ed_father
-		
-		*-- Mother's education
+
+		*-- Mother's education (SIAGIE)
 		gen educ_cat_mother = 1 if inlist(educ_mother,2,3,4)==1
 		replace educ_cat_mother = 2 if inlist(educ_mother,5)==1
 		replace educ_cat_mother = 3 if inlist(educ_mother,6,7,8)==1
-		label define educ_cat_mother 1 "Did not complete secondary education" 2 "Completed secondary education" 3 "Some level of higher education"
-		label values educ_cat_mother 
+		label values educ_cat_mother educ_cat 
 		
-		*-- Father's education
+		*-- Father's education (SIAGIE)
 		gen educ_cat_father = 1 if inlist(educ_father,2,3,4)==1
 		replace educ_cat_father = 2 if inlist(educ_father,5)==1
 		replace educ_cat_father = 3 if inlist(educ_father,6,7,8)==1
-		label define educ_cat_father 1 "Did not complete secondary education" 2 "Completed secondary education" 3 "Some level of higher education"
-		label values educ_cat_father 		
+		label values educ_cat_father educ_cat
+ 		
+		*-- Mother's education (SURVEY)
+		label values base_edu*2p base_edu*4p survey_educ_2p_4p
+		label values base_edu*2s survey_educ_2s
+		
+		foreach g in "2p" "4p" "2s" {
+			foreach adult in "mother" "father" {
+				gen base_educ_cat_`adult'_`g' = 1 if inlist(base_edu_`adult'_`g',1,2,3,4)==1
+				replace base_educ_cat_`adult'_`g' = 2 if inlist(base_edu_`adult'_`g',5)==1
+				replace base_educ_cat_`adult'_`g' = 3 if inlist(base_edu_`adult'_`g',6,7,8,9,10,11,12)==1 //in 2S only matters until 10. There is no 11 or 12.
+			}
+		}
+	
+		label values base_educ_cat_*_2p base_educ_cat_*_4p educ_cat
+		label values base_educ_cat_*_2s survey_educ_2s
+		
 		
 		//gen lives_parents = .
 		//replace lives_parents = 0 if lives_with_mother==0 & lives_with_father==0
@@ -398,8 +452,10 @@ program define clean_data
 		
 		*- Standardize ECE scores based on reference year (2007 for 2P and 2013 for the rest. Those are the years with 500 mean and 100 SD). This as opposed to yearly standardization.
 		foreach g in "2p" "4p" "2s" {
-			//replace score_math_`g' = (score_math_`g'-500)/100
-			//replace score_com_`g' = (score_com_`g'-500)/100
+			replace score_math_`g' = (score_math_`g'-500)/100
+			replace score_com_`g' = (score_com_`g'-500)/100
+			replace base_score_math_`g' = (base_score_math_`g'-500)/100
+			replace base_score_com_`g' = (base_score_com_`g'-500)/100
 		}
 		
 		*- Passed Math and Reading
@@ -458,15 +514,12 @@ program define clean_data
 		compress
 		save "$TEMP\pre_reg_covid", replace
 
-		if ${covid_test}==1  {
-			use "$TEMP\pre_reg_covid", clear
+		bys id_ie: egen u = max(cond(_n==1,runiform(),.))
+		keep if u <0.1
 
-			bys id_ie: egen u = max(cond(_n==1,runiform(),.))
-			keep if u <0.1
-
-			save "$TEMP\pre_reg_covid_TEST", replace
-		}
+		save "$TEMP\pre_reg_covid_TEST", replace
 	
+
 end
 
 ********************************************************************************

@@ -6,7 +6,8 @@ program define main
 	setup_COVID_A02
 	
 	*- Descriptive statistics
-	descriptive_statistics
+	descriptive_statistics oldest
+	descriptive_statistics all
 	
 	*- Raw trends
 	raw_gpa_trends siblings oldest
@@ -96,19 +97,37 @@ end
 capture program drop descriptive_statistics
 program define descriptive_statistics
 
-
+args subsample
 
 global descriptive_A = "urban_siagie public_siagie grade male_siagie"
 global descriptive_B = "approved approved_first std_gpa_m_adj std_gpa_c_adj"
 global descriptive_C = "lives_both lives_one lives_with_mother lives_with_father educ_cat_father1 educ_cat_father2 educ_cat_father3 educ_cat_mother1 educ_cat_mother2 educ_cat_mother3"
-
+global descriptive_D = "base_socioec_index_2p  base_hh_size_2p base_bedrooms_2p base_radio_2p base_internet_2p base_pc_2p base_laptop_2p base_books_6more base_quiet_room_2p"
+global descriptive_E = "base_score_com_2p base_score_math_2p base_did_3years_prek base_has_repeated_2nd_2p"
+global descriptive_F = "base_mother_sec_complete base_mother_higher base_spanish base_asp_school  base_asp_coll4"
 
 use "$TEMP\pre_reg_covid${covid_data}", clear
 
-keep if runiform()<0.01
-	
-//TEMPORARY UNTIL FIXED
-clonevar educ_cat_father = educ_cat_mother
+
+*- Panel D: Household Resources (2nd grade)
+recode base_years_prek_2p (4=1) (1 2 3 5 = 0), gen(base_did_3years_prek)
+recode base_books_cat_2p (1 2 = 0) (3 4 5 6 7 =1), gen(base_books_6more)
+
+*- Panel F: Parent's characteristics (2nd grade)
+recode base_educ_cat_mother_2p (2 = 1) (1 3 = 0), gen(base_mother_sec_complete)
+recode base_educ_cat_mother_2p (3 = 1) (1 2 = 0), gen(base_mother_higher)
+recode base_aspiration_2p (1 2 = 1) (3 4 5 = 0), gen(base_asp_school)
+recode base_aspiration_2p (4 5 = 1) (1 2 3 = 0), gen(base_asp_coll4)
+recode base_lengua_materna_mother_2p (1 = 1) (2 3 4 5 = 0), gen(base_spanish)
+
+*- By subsample:
+assert inlist("`subsample'","all","oldest")==1
+
+if "`subsample'" == "oldest" {
+	keep if fam_order_${fam_type}==1
+}
+
+//keep if runiform()<0.01
 
 tab educ_cat_mother, gen(educ_cat_mother)
 tab educ_cat_father, gen(educ_cat_father)
@@ -118,20 +137,23 @@ gen lives_one = ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mot
 
 	
 * Store results for each group separately
-foreach panel in "A" "B" "C" {
+foreach panel in "A" "B" "C" "D" "E" "F" {
 	forvalues size = 1/4 {
 		estpost tabstat ${descriptive_`panel'} if fam_total_${fam_type} == `size', statistics(mean) columns(statistics)
 		estimates store desc_`panel'_`size'
 	}
 }
 
+//assert 1==0
 
-	file open  table_tex	using "$TABLES\descriptives.tex", replace write
+//local subsample = "oldest"
+
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", replace write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
 						"\makeatletter" _n ///
 						"\@ifclassloaded{beamer}{%" _n ///
 						"	\centering" _n ///
-						"	\resizebox{0.6\textwidth}{!}%" _n ///
+						"	\resizebox{0.5\textwidth}{!}%" _n ///
 						"}{%" _n ///
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
@@ -143,13 +165,13 @@ foreach panel in "A" "B" "C" {
 						"\makeatother"	 _n 
 	file close table_tex
 	
-	file open  table_tex	using "$TABLES\descriptives.tex", append write
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
 					"\begin{tabular}{lcccc}" _n ///
 					/// HEADER OF TABLE
 					"\toprule" _n ///
 					"\cmidrule(lr){2-4}" _n ///	
-					"& \multicolumn{3}{c}{TWFE}  \\"  _n ///
+					"& \multicolumn{4}{c}{TWFE}  \\"  _n ///
 					"\cmidrule(lr){2-4}" _n ///	
 					"& Only children & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
 					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
@@ -160,54 +182,108 @@ foreach panel in "A" "B" "C" {
 	
 	******* TABLE CONTENT
 	
-	file open  table_tex	using "$TABLES\descriptives.tex", append write
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel A: School and student characteristics}} \\" _n
 	file close table_tex	
 	
 * Combine all groups in one table
-esttab desc_A_1 desc_A_2 desc_A_3 desc_A_4 using "$TABLES\descriptives.tex", append  ///
+	esttab desc_A_1 desc_A_2 desc_A_3 desc_A_4 using "$TABLES\descriptives_S`subsample'.tex", append  ///
     cells("mean(fmt(3))") ///
-    noobs nonumber nomtitle  ///
+    noobs nonumber nomtitle nolines   ///
     collabels("" "" "" "") ///
 	mgroups(none) ///
     varlabels(urban_siagie "\% Urban" public_siagie "\% Public School" grade "Average Grade" male_siagie "\% Male" /* etc */) ///
     booktabs fragment
 	
-	file open  table_tex	using "$TABLES\descriptives.tex", append write
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel B: Academic characteristics}} \\" _n
 	file close table_tex	
 	
 * Combine all groups in one table
-esttab desc_B_1 desc_B_2 desc_B_3 desc_B_4 using "$TABLES\descriptives.tex", append  ///
+esttab desc_B_1 desc_B_2 desc_B_3 desc_B_4 using "$TABLES\descriptives_S`subsample'.tex", append  ///
     cells("mean(fmt(3))") ///
-    noobs nonumber nomtitle  ///
+    noobs nonumber nomtitle nolines   ///
     collabels("" "" "" "") ///
 	mgroups(none) ///
     varlabels(approved "\% Grade promotion" approved_first "\% Grade promotion without recovery" std_gpa_m_adj "Standardized GPA (Mathematics) " std_gpa_c_adj "Standardized GPA (Reading)" /* etc */) ///
     booktabs fragment
 	
-	file open  table_tex	using "$TABLES\descriptives.tex", append write
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel C: Parent's characteristics}} \\" _n
 	file close table_tex	
-global descriptive_C = "    "
-* Combine all groups in one table
-esttab desc_C_1 desc_C_2 desc_C_3 desc_C_4 using "$TABLES\descriptives.tex", append  ///
+
+	* Combine all groups in one table
+esttab desc_C_1 desc_C_2 desc_C_3 desc_C_4 using "$TABLES\descriptives_S`subsample'.tex", append  ///
     cells("mean(fmt(3))") ///
-    noobs nonumber nomtitle  ///
+    noobs nonumber nomtitle nolines   ///
     collabels("" "" "" "") ///
 	mgroups(none) ///
     varlabels(lives_both "\% Lives with both parents" lives_one "\% Lives with one parent" lives_with_mother "\% Lives with Mother" lives_with_father "\% Lives with Father" educ_cat_father1 "\% Father without complete secondary" educ_cat_father2 "\% Father with complete secondary" educ_cat_father3 "\% Father with some level of higher ed." educ_cat_mother1 "\% Father without complete secondary" educ_cat_mother2 "\% Father with complete secondary" educ_cat_mother3 "\% Father with some level of higher ed." /* etc */) ///
     booktabs fragment	
 	
+	
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
+	file write table_tex ///	
+					"&  &  &   \\" _n  ///
+					"\multicolumn{4}{l}{\textit{Panel D: Household Resources (2nd grade: 2015, 2016)}} \\" _n
+	file close table_tex
+	
+
+
+	* Combine all groups in one table
+esttab desc_D_1 desc_D_2 desc_D_3 desc_D_4 using "$TABLES\descriptives_S`subsample'.tex", append  ///
+    cells("mean(fmt(3))") ///
+    noobs nonumber nomtitle nolines   ///
+    collabels("" "" "" "") ///
+	mgroups(none) ///
+    varlabels(base_socioec_index_2p "SES" base_hh_size_2p "HH size" base_bedrooms_2p "\# of bedrooms" base_radio_2p "\% Radio" base_internet_2p "\% Internet" base_pc_2p "\% PC" base_laptop_2p "\% Laptop" base_books_6more "\% 6+ books" base_quiet_room_2p "\% Quiet room to study" /* etc */) ///
+    booktabs fragment		
+	
+	
+	
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
+	file write table_tex ///	
+					"&  &  &   \\" _n  ///
+					"\multicolumn{4}{l}{\textit{Panel E: Academic Performance (2nd grade: 2015, 2016)}} \\" _n
+	file close table_tex
+	
+	* Combine all groups in one table
+esttab desc_E_1 desc_E_2 desc_E_3 desc_E_4 using "$TABLES\descriptives_S`subsample'.tex", append  ///
+    cells("mean(fmt(3))") ///
+    noobs nonumber nomtitle nolines   ///
+    collabels("" "" "" "") ///
+	mgroups(none) ///
+    varlabels(base_score_com_2p "standardized Reading score" base_score_math_2p "standardized Mathematics score" base_did_3years_prek "Did 3 years of Pre-K" base_has_repeated_2nd_2p "Has repeated a grade" /* etc */) ///
+    booktabs fragment		
+		
+	
+	
+	
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
+	file write table_tex ///	
+					"&  &  &   \\" _n  ///
+					"\multicolumn{4}{l}{\textit{Panel F: Parent's Characteristics (2nd grade: 2015, 2016)}} \\" _n
+	file close table_tex	
+	
+	
+	* Combine all groups in one table
+esttab desc_F_1 desc_F_2 desc_F_3 desc_F_4 using "$TABLES\descriptives_S`subsample'.tex", append  ///
+    cells("mean(fmt(3))") ///
+    noobs nonumber nomtitle nolines   ///
+    collabels("" "" "" "") ///
+	mgroups(none) ///
+    varlabels(base_mother_sec_complete "\% Mother with complete secondary" base_mother_higher "\% Mother with 4-year college" base_spanish "\% Spanish" base_asp_school "\%Education expectation: High School" base_asp_coll4 "\%Education expectation: 4-year college" /* etc */) ///
+    booktabs fragment			
+	
 	********* END TABLE
 	
-	file open  table_tex	using "$TABLES\descriptives.tex", append write
+	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
 	file write table_tex	/// HEADER OPTIONS OF TABLE							
 	_n "\bottomrule" _n ///
 		"\end{tabular}" _n ///

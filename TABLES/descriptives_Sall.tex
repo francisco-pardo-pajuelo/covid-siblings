@@ -1,0 +1,85 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.5\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{Descriptive Statistics}
+       \label{tab:descriptive}
+       \resizebox{0.8\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+\cmidrule(lr){2-4}
+& \multicolumn{4}{c}{TWFE}  \\
+\cmidrule(lr){2-4}
+& Only children & 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4)\\
+\bottomrule
+&  &  &  & \\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel A: School and student characteristics}} \\
+            &            &            &            &            \\
+\% Urban    &       0.812&       0.808&       0.734&       0.615\\
+\% Public School&       0.681&       0.713&       0.813&       0.900\\
+Average Grade&       6.072&       5.543&       5.592&       5.671\\
+\% Male     &       0.511&       0.511&       0.510&       0.508\\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel B: Academic characteristics}} \\
+            &            &            &            &            \\
+\% Grade promotion&       0.953&       0.965&       0.954&       0.937\\
+\% Grade promotion without recovery&       0.826&       0.849&       0.823&       0.797\\
+Standardized GPA (Mathematics) &       0.016&       0.046&      -0.024&      -0.100\\
+Standardized GPA (Reading)&       0.022&       0.045&      -0.030&      -0.107\\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel C: Parent's characteristics}} \\
+            &            &            &            &            \\
+\% Lives with both parents&       0.493&       0.528&       0.512&       0.491\\
+\% Lives with one parent&       0.178&       0.160&       0.154&       0.147\\
+\% Lives with Mother&       0.768&       0.736&       0.709&       0.679\\
+\% Lives with Father&       0.670&       0.682&       0.666&       0.647\\
+\% Father without complete secondary&       0.302&       0.287&       0.380&       0.519\\
+\% Father with complete secondary&       0.428&       0.431&       0.410&       0.356\\
+\% Father with some level of higher ed.&       0.270&       0.282&       0.210&       0.125\\
+\% Father without complete secondary&       0.343&       0.345&       0.457&       0.609\\
+\% Father with complete secondary&       0.413&       0.408&       0.373&       0.301\\
+\% Father with some level of higher ed.&       0.244&       0.247&       0.170&       0.090\\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel D: Household Resources (2nd grade: 2015, 2016)}} \\
+            &            &            &            &            \\
+SES         &       0.122&       0.083&      -0.136&      -0.426\\
+HH size     &       4.949&       5.059&       5.584&       6.182\\
+\# of bedrooms&       2.846&       2.774&       2.822&       2.942\\
+\% Radio    &       0.683&       0.641&       0.644&       0.645\\
+\% Internet &       0.416&       0.428&       0.395&       0.354\\
+\% PC       &       0.454&       0.475&       0.432&       0.387\\
+\% Laptop   &       0.405&       0.423&       0.394&       0.357\\
+\% 6+ books &       0.574&       0.574&       0.531&       0.475\\
+\% Quiet room to study&       0.861&       0.853&       0.821&       0.780\\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel E: Academic Performance (2nd grade: 2015, 2016)}} \\
+            &            &            &            &            \\
+standardized Reading score&       0.702&       0.746&       0.599&       0.397\\
+standardized Mathematics score&       0.608&       0.698&       0.579&       0.400\\
+Did 3 years of Pre-K&       0.660&       0.643&       0.603&       0.547\\
+Has repeated a grade&       0.035&       0.030&       0.041&       0.058\\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel F: Parent's Characteristics (2nd grade: 2015, 2016)}} \\
+            &            &            &            &            \\
+\% Mother with complete secondary&       0.251&       0.267&       0.263&       0.232\\
+\% Mother with 4-year college&       0.398&       0.389&       0.287&       0.174\\
+\% Spanish  &       0.866&       0.848&       0.818&       0.768\\
+\%Education expectation: High School&       0.084&       0.077&       0.108&       0.161\\
+\%Education expectation: 4-year college&       0.808&       0.817&       0.755&       0.666\\
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}

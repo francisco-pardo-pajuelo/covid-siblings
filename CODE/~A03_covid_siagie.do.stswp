@@ -3348,7 +3348,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 		
 		capture qui graph export "$FIGURES\Descriptives\age_birth_example_b0_a1.png", replace	
 		capture qui graph export "$FIGURES\Descriptives\age_birth_example_b0_a1.pdf", replace
-	}
+		}
 		
 	
 end

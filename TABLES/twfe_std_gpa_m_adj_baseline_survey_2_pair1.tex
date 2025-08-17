@@ -1,0 +1,66 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.6\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{TWFE on 6th grade GPA by 2nd grade baseline achievement and expectations}
+       \label{tab:twfe_std_gpa_m_adj_baseline_survey_2_pair1}
+       \resizebox{0.65\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lccc}
+\toprule
+\cmidrule(lr){2-4}
+& \multicolumn{3}{c}{TWFE Effect on `xlabel} \\
+\cmidrule(lr){2-4}
+& 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}
+& (1) & (2) & (3)\\
+\bottomrule
+&  &  &  \\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel A: All studentes}} \\
+\hspace{3mm}        &      -0.047***&      -0.079***&      -0.076** \\
+                    &     (0.013)   &     (0.018)   &     (0.035)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     109,451   &      86,128   &      73,443   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel B: Low achievement students (Q1)}} \\
+\hspace{3mm}        &      -0.030   &      -0.083** &      -0.148** \\
+                    &     (0.032)   &     (0.041)   &     (0.072)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&      14,708   &      12,052   &      10,169   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel C: High achievement students (Q4)}} \\
+\hspace{3mm}        &      -0.058** &      -0.104***&       0.020   \\
+                    &     (0.026)   &     (0.038)   &     (0.083)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&      34,809   &      26,312   &      22,298   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel D: Low Education Expectations: Below 4-year college}} \\
+\hspace{3mm}        &       0.003   &      -0.092   &      -0.205   \\
+                    &     (0.063)   &     (0.083)   &     (0.141)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&       5,153   &       4,106   &       3,462   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel E: High Education Expectations: 4-year college and beyond}} \\
+\hspace{3mm}        &      -0.050***&      -0.073***&      -0.042   \\
+                    &     (0.015)   &     (0.021)   &     (0.043)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&      88,282   &      68,450   &      58,267   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}

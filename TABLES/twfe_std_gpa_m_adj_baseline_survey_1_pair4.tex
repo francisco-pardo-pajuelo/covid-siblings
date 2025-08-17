@@ -1,0 +1,66 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.6\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{TWFE on 9th grade GPA by 8th grade baseline resources}
+       \label{tab:twfe_std_gpa_m_adj_baseline_survey_1_pair4}
+       \resizebox{0.65\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lccc}
+\toprule
+\cmidrule(lr){2-4}
+& \multicolumn{3}{c}{TWFE Effect on `xlabel} \\
+\cmidrule(lr){2-4}
+& 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}
+& (1) & (2) & (3)\\
+\bottomrule
+&  &  &  \\
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel A: All studentes}} \\
+\hspace{3mm}        &      -0.031***&      -0.055***&      -0.069***\\
+                    &     (0.006)   &     (0.008)   &     (0.014)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     465,460   &     383,849   &     338,509   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel B: Low SES Households (Q1)}} \\
+\hspace{3mm}        &      -0.016   &      -0.025*  &      -0.043** \\
+                    &     (0.012)   &     (0.015)   &     (0.021)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     118,644   &     102,542   &      89,795   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel C: High SES Households (Q4)}} \\
+\hspace{3mm}        &      -0.037***&      -0.077***&      -0.079   \\
+                    &     (0.013)   &     (0.021)   &     (0.050)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&      91,899   &      72,454   &      64,874   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel D: Households with neither PC nor Internet}} \\
+\hspace{3mm}        &      -0.030***&      -0.061***&      -0.057*  \\
+                    &     (0.009)   &     (0.014)   &     (0.029)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     186,085   &     149,609   &     133,271   \\
+ 
+&  &  &   \\
+\multicolumn{4}{l}{\textit{Panel E: Households with both PC and Internet}} \\
+\hspace{3mm}        &      -0.030***&      -0.045***&      -0.090***\\
+                    &     (0.010)   &     (0.013)   &     (0.020)   \\
+                    &               &               &               \\
+\hspace{3mm}Observations&     152,962   &     129,743   &     112,794   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}

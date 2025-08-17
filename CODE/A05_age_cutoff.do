@@ -1638,6 +1638,8 @@ program define twfe_new_born
 	
 	tab grade treated if year==2020, m
 	
+	compress
+	
 	save "$TEMP\erase_born", replace
 	
 	use "$TEMP\erase_born", clear
