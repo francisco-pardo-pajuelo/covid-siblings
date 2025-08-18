@@ -43,6 +43,9 @@
 \usepackage{csquotes}
 \usepackage{setspace}
            
+%For line between text and footnote
+\renewcommand{\footnoterule}{\kern-3pt \hrule width \columnwidth \kern 2.6pt}
+
 
 %For number in equations with 'align'
 \newcommand{\tabnotes}[2]{\bottomrule \multicolumn{#1}{@{}p{0.70\linewidth}@{}}{\footnotesize #2 }\end{tabular}\end{table}}
@@ -67,7 +70,7 @@
 	urlcolor=magenta
 }
 
-\let\footnote\thanks
+%\let\footnote\thanks
 %Prevent Footnote from breaking pages
 \interfootnotelinepenalty=10000
 
