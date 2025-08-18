@@ -196,7 +196,7 @@ local subsample = "oldest"
     noobs nonumber nomtitle nolines   ///
     collabels("" "" "" "") ///
 	mgroups(none) ///
-    varlabels(size "% of sample" /* etc */) ///
+    varlabels(size "\% of sample" /* etc */) ///
     booktabs fragment	
 	
 	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
