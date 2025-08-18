@@ -109,6 +109,10 @@ global descriptive_F = "base_mother_sec_complete base_mother_higher base_spanish
 use "$TEMP\pre_reg_covid${covid_data}", clear
 
 
+keep if year==2015 | year==2016
+keep if grade==2
+
+
 *- Panel D: Household Resources (2nd grade)
 recode base_years_prek_2p (4=1) (1 2 3 5 = 0), gen(base_did_3years_prek)
 recode base_books_cat_2p (1 2 = 0) (3 4 5 6 7 =1), gen(base_books_6more)
@@ -134,7 +138,13 @@ tab educ_cat_father, gen(educ_cat_father)
 
 gen lives_both = (lives_with_mother==1 & lives_with_father==1) 
 gen lives_one = ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))
-
+	
+forvalues size = 1/4 {
+	gen size = fam_total_${fam_type}==`size'
+	estpost tabstat size, statistics(mean) columns(statistics)
+	estimates store desc_size`size'
+	drop size
+}
 	
 * Store results for each group separately
 foreach panel in "A" "B" "C" "D" "E" "F" {
@@ -146,7 +156,7 @@ foreach panel in "A" "B" "C" "D" "E" "F" {
 
 //assert 1==0
 
-//local subsample = "oldest"
+local subsample = "oldest"
 
 	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", replace write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
@@ -170,9 +180,7 @@ foreach panel in "A" "B" "C" "D" "E" "F" {
 					"\begin{tabular}{lcccc}" _n ///
 					/// HEADER OF TABLE
 					"\toprule" _n ///
-					"\cmidrule(lr){2-4}" _n ///	
-					"& \multicolumn{4}{c}{TWFE}  \\"  _n ///
-					"\cmidrule(lr){2-4}" _n ///	
+					///"\cmidrule(lr){2-5}" _n ///	
 					"& Only children & 1 sibling & 2 siblings & 3 siblings  \\" _n ///
 					"\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}" _n ///	
 					"& (1) & (2) & (3) & (4)\\" _n ///
@@ -181,6 +189,15 @@ foreach panel in "A" "B" "C" "D" "E" "F" {
 	file close table_tex
 	
 	******* TABLE CONTENT
+	
+* Combine all groups in one table
+	esttab desc_size? using "$TABLES\descriptives_S`subsample'.tex", append  ///
+    cells("mean(fmt(3))") ///
+    noobs nonumber nomtitle nolines   ///
+    collabels("" "" "" "") ///
+	mgroups(none) ///
+    varlabels(size "% of sample" /* etc */) ///
+    booktabs fragment	
 	
 	file open  table_tex	using "$TABLES\descriptives_S`subsample'.tex", append write
 	file write table_tex ///	
@@ -224,7 +241,7 @@ esttab desc_C_1 desc_C_2 desc_C_3 desc_C_4 using "$TABLES\descriptives_S`subsamp
     noobs nonumber nomtitle nolines   ///
     collabels("" "" "" "") ///
 	mgroups(none) ///
-    varlabels(lives_both "\% Lives with both parents" lives_one "\% Lives with one parent" lives_with_mother "\% Lives with Mother" lives_with_father "\% Lives with Father" educ_cat_father1 "\% Father without complete secondary" educ_cat_father2 "\% Father with complete secondary" educ_cat_father3 "\% Father with some level of higher ed." educ_cat_mother1 "\% Father without complete secondary" educ_cat_mother2 "\% Father with complete secondary" educ_cat_mother3 "\% Father with some level of higher ed." /* etc */) ///
+    varlabels(lives_both "\% Lives with both parents" lives_one "\% Lives with one parent" lives_with_mother "\% Lives with Mother" lives_with_father "\% Lives with Father" educ_cat_father1 "\% Father without complete secondary" educ_cat_father2 "\% Father with complete secondary" educ_cat_father3 "\% Father with some level of higher ed." educ_cat_mother1 "\% Mother without complete secondary" educ_cat_mother2 "\% Mother with complete secondary" educ_cat_mother3 "\% Mother with some level of higher ed." /* etc */) ///
     booktabs fragment	
 	
 	
@@ -278,7 +295,7 @@ esttab desc_F_1 desc_F_2 desc_F_3 desc_F_4 using "$TABLES\descriptives_S`subsamp
     noobs nonumber nomtitle nolines   ///
     collabels("" "" "" "") ///
 	mgroups(none) ///
-    varlabels(base_mother_sec_complete "\% Mother with complete secondary" base_mother_higher "\% Mother with 4-year college" base_spanish "\% Spanish" base_asp_school "\%Education expectation: High School" base_asp_coll4 "\%Education expectation: 4-year college" /* etc */) ///
+    varlabels(base_mother_sec_complete "\% Mother with complete secondary" base_mother_higher "\% Mother with some level of higher ed" base_spanish "\% Spanish" base_asp_school "\%Education expectation: High School" base_asp_coll4 "\%Education expectation: 4-year college" /* etc */) ///
     booktabs fragment			
 	
 	********* END TABLE
