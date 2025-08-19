@@ -153,13 +153,13 @@ program define clean_data
 	rename 	(age_cat_mother_??		lengua_materna_mother_?? 		hh_size_?? 		bedrooms_?? 		quiet_room_?? 		study_space_?? 		books_cat_?? 		years_prek_?? 		has_repeated_2nd_??) ///
 			(base_age_cat_mother_??	base_lengua_materna_mother_?? 	base_hh_size_?? base_bedrooms_?? 	base_quiet_room_?? 	base_study_space_?? base_books_cat_?? 	base_years_prek_?? 	base_has_repeated_2nd_??) ///
 	
-	merge m:1 id_estudiante_4p  using "$TEMP\ece_family_4p", keep(master match) keepusing(age_cat_mother_?? lengua_materna_mother_?? years_prek_??) nogen
-	rename 	(age_cat_mother_??		lengua_materna_mother_?? 		years_prek_??) ///
-			(base_age_cat_mother_??	base_lengua_materna_mother_?? 	base_years_prek_??)
+	merge m:1 id_estudiante_4p  using "$TEMP\ece_family_4p", keep(master match) keepusing(age_cat_mother_?? lengua_materna_mother_?? years_prek_?? /*FOR VALIDATION*/ hh_size_??) nogen
+	rename 	(age_cat_mother_??		lengua_materna_mother_?? 		years_prek_?? 		hh_size_??) ///
+			(base_age_cat_mother_??	base_lengua_materna_mother_?? 	base_years_prek_??	base_hh_size_??)
 	
-	merge m:1 id_estudiante_2s  using "$TEMP\ece_student_2s", keep(master match) keepusing(lengua_?? did_prek_?? has_repeated_??) nogen
-	rename 	(lengua_?? 		did_prek_?? 		has_repeated_??) ///
-			(base_lengua_?? base_did_prek_?? 	base_has_repeated_??)
+	merge m:1 id_estudiante_2s  using "$TEMP\ece_student_2s", keep(master match) keepusing(lengua_?? did_prek_?? has_repeated_?? /*FOR VALIDATION*/ hh_size_?? total_siblings_?? lives_with_mom_?? 		lives_with_dad_?? 		lives_with_siblings_?? lives_with_grandparents_?? lives_with_uncle_aunt_??) nogen
+	rename 	(lengua_?? 		did_prek_?? 		has_repeated_?? 		hh_size_??		total_siblings_?? 		lives_with_mom_?? 		lives_with_dad_?? 		lives_with_siblings_?? 		lives_with_grandparents_?? 		lives_with_uncle_aunt_??) ///
+			(base_lengua_?? base_did_prek_?? 	base_has_repeated_??	base_hh_size_??	base_total_siblings_??	base_lives_with_mom_?? 	base_lives_with_dad_?? 	base_lives_with_siblings_??	base_lives_with_grandparents_?? base_lives_with_uncle_aunt_??)
 	
 	
 		
