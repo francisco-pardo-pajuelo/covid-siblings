@@ -1,0 +1,25 @@
+\begin{table}[h]
+\centering
+\caption{Effect of Family Size on GPA}
+\label{tab:twfe_twins}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\hline
+& \multicolumn{3}{c}{Pre-Covid} & \multicolumn{3}{c}{Covid} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+& First Stage & Second Stage & N & First Stage & Second Stage & N \\
+\hline
+\textbf{Instrument: twin at second birth} & 0.805*** & & 2,462,619 & 0.867*** & & 1,930,246 \\
+(Sample: First child in families with two or more & (0.005) & & & (0.004) & & \\
+births) & & & & & & \\
+Number of children in family & & 0.007 & & & 0.012 & \\
+& & (0.010) & & & (0.010) & \\
+\textbf{Instrument: twin at third birth} & 0.813*** & & 1,861,964 & 0.874*** & & 1,272,826 \\
+(Sample: first and second children in families & (0.005) & & & (0.005) & & \\
+with three or more births) & & & & & & \\
+Number of children in family & & $-0.009$ & & & $-0.010$ & \\
+& & (0.010) & & & (0.012) & \\
+\hline
+\end{tabular}%
+}
+\end{table}

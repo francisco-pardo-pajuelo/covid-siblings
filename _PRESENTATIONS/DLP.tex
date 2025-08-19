@@ -235,13 +235,13 @@ Do students with siblings experience larger learning losses through the pandemic
             \centering
             \textbf{\% of A's in Mathematics}
             \vspace{0.2cm}
-            \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_total_elm_pass_math.pdf}
+            \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_total_elm_pass_math_siblings.pdf}
         \end{column}
         \begin{column}{0.48\textwidth}
             \centering
             \textbf{Standardized GPA in Mathematics}
             \vspace{0.2cm}
-            \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_total_elm_std_gpa_m_adj.pdf}
+            \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_total_elm_std_gpa_m_adj_siblings.pdf}
         \end{column}
     \end{columns}
     
@@ -285,21 +285,24 @@ Do students with siblings experience larger learning losses through the pandemic
 % ========================================
 % RESULTS
 % ========================================
+
 \begin{frame}
-    \frametitle{TWFE results}
+    \frametitle{Event Study - Mathematics GPA}
         {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/TWFE/covid_twfe_summ_all_all_gpa_m_adj_siblings_4.pdf}%\includegraphics{./FIGURES/TWFE/covid_twfe_sibs_summ_all_all_gpa_m_adj_siblings_4.pdf}
+       \includegraphics{./FIGURES/Event Study/covid_event_bysibs_all_all_std_gpa_m_adj_Tsiblings_Soldest_4.pdf}
       }
     }
 \end{frame}
 
 \begin{frame}
-    \frametitle{Event Study - Mathematics GPA}
+    \frametitle{TWFE results}
         {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Event Study/covid_std_gpa_m_adj_all_all_all_elm_all.pdf}
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
       }
     }
 \end{frame}
+
 
 \begin{frame}
 \frametitle{TWFE - Standardized Exams}
@@ -537,6 +540,32 @@ Bandwidth           &         365   &         365   &         365   &         36
     \frametitle{Income Shocks}
      
 
+\end{frame}
+
+\begin{frame}
+    \frametitle{Other potential strategies}
+        \begin{itemize}
+            \item Twin births: exogenous change in family size.
+            \begin{itemize}
+                \item Results are not significant
+                \item $\approx$ 1,000 observations per grade-year of first-born with twin siblings
+                \item This measures the effect of 3rd relative to 2nd child, not the effect of 2nd relative to 1st.
+            \end{itemize}
+            \item Same sex as instrument
+            \begin{itemize}
+                \item Has more power
+                \item `expected change' in family size but couple with our shock may become `unexpected'
+            \end{itemize}
+            
+        \end{itemize}
+     
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Effect of family size on GPA: Using Twin IV}
+    \input{./TABLES/MANUAL/twfe_twins.tex}
 \end{frame}
 
 % ========================================
