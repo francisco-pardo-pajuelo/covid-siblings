@@ -1,0 +1,38 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.7\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{Descriptive Statistics}
+       \label{tab:survey_educ}
+       \resizebox{0.8\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lccc}
+\toprule
+& No secondary education & Complete secondary & Higher education \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} 
+& (1) & (2) & (3) \\
+\bottomrule
+&  &  &  \\
+
+\multicolumn{4}{l}{\textit{Panel A: Survey vs Administrative data}} \\
+            &            &            &                        \\
+Did not complete secondary education & 0.745 & 0.248 & 0.040 \\
+Completed secondary education & 0.188 & 0.456 & 0.147 \\
+Some level of higher education & 0.067 & 0.295 & 0.813 \\            
+\\
+%\multicolumn{4}{l}{\textit{Panel B: Academic characteristics}} \\
+            &            &            &                       \\
+%\% Grade promotion&       0.931&       0.952&       0.934&       0.897\\
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}

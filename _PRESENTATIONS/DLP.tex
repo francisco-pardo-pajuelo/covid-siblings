@@ -169,16 +169,38 @@
 \begin{frame}
     \label{update_scott}
     \frametitle{Motivation}
+
+%anecdotes
+%facts
+%policy questions
+    
     \begin{enumerate}
         \item Persistent learning losses from Covid-19 across the world, especially in more vulnerable populations. %\textcolor{blue}{cite}
         \item With school closures and kids at home, parents spent more time in childcare and education.
         \item Unexpected changes in family size have negative spillovers. \textcolor{blue}{Black et al (2010)}
         \item No evidence of the role of family size in places with significant school closures.
         
-
+%Policy/counterfactual question:
+%important deep parameter:
+%Test of an important theoretical prediction:
         \begin{block}{Research Question}
-Do students with siblings experience larger learning losses through the pandemic compared to only children? Is this because of dilution of parental resources?
+Do children with siblings experience larger learning losses when households face an unexpected shocks?
 \end{block}
+    \end{enumerate}
+\end{frame}
+
+%Just enough of your methodology so results don't feel like magic
+%Not so much that you crowd out the ndings
+\begin{frame}
+    \label{update_scott}
+    \frametitle{This Paper}
+    \begin{enumerate}
+    \item I use a DID strategy to compare.... 
+    \item Both populations had equal trends before school closures.
+    \item What I find: I find students with siblings do xx worse in GPA and XX in standardized scores. 
+    \item parents reduced expectations in XX
+    \item Mechanisms
+    \item External validity
     \end{enumerate}
 \end{frame}
 
@@ -198,6 +220,20 @@ Do students with siblings experience larger learning losses through the pandemic
         %$\uparrow$ labor and earnings. Benefits $>>>$ Costs. \\
         %\small \textcolor{gray}{Jackson, Turner, Bastian (2025), Humphries et al (2025)}
 
+    \end{enumerate}
+\end{frame}
+
+
+
+\begin{frame}
+    \label{update_scott}
+    \frametitle{Background and Context}
+    \begin{enumerate}
+       \item Covid in Peru
+       \item School closures in Peru
+       \item What does this mean?
+       \item How much more were parents involved?
+       \item What happened to performance?
     \end{enumerate}
 \end{frame}
 
@@ -248,16 +284,28 @@ Do students with siblings experience larger learning losses through the pandemic
     
 \end{frame}
 
-
 % ========================================
-% EMPIRICAL STRATEGY
+% RESEARCH
 % ========================================
 \begin{frame}
-    \frametitle{Identification Strategy}
+    \frametitle{Research Design}
     
     \begin{block}{Identification Strategy}
     Differential changes between only children and children with siblings before and after the pandemic.
     \end{block}
+    
+    \begin{itemize}
+        \item \textbf{No anticipation:} Given the unexpected nature of the pandemic, families couldn't have chosen to have or not have children or be affected by school closures before they happened.
+        \item \textbf{}
+    \end{itemize}
+
+\end{frame}
+% ========================================
+% EMPIRICAL STRATEGY
+% ========================================
+\begin{frame}
+    \frametitle{Empirical Strategy}
+
     
     \textbf{Difference-in-Differences Specification:}
     \small
@@ -376,8 +424,7 @@ Observations        &     409,690   &     282,769   &     227,486   &     181,46
 
 \begin{frame}
     \frametitle{Birth Order}
-        {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_summ_all_all_gpa_m_adj_siblings_4.pdf}
+        {\resizebox{0.9\textwidth}{!}{ \includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
       }
     }    
 \end{frame}
@@ -476,7 +523,7 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 \begin{frame}
     \frametitle{Sibling disruption}
         {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_C_elm_all_gpa_m_adj_4.pdf}
+        \includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
       }
     }
 
@@ -485,7 +532,7 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 \begin{frame}
     \frametitle{Parental dilution}
         {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/covid_twfe_sibs_D_elm_all_gpa_m_adj_4.pdf}
+        \includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
       }
     }
 
@@ -574,7 +621,7 @@ Bandwidth           &         365   &         365   &         365   &         36
 \section{External Validity}
 
     \begin{frame}
-            \frametitle{Looking at PISA data)}
+            \frametitle{Looking at PISA data}
         \begin{itemize}
             \item International examination to 15 year olds
             \item 81 countries (37 OECD and 44 non-OECD).
@@ -611,5 +658,15 @@ Bandwidth           &         365   &         365   &         365   &         36
 % EXTERNAL VALIDITY
 % ========================================
 \section{Conclusions}
+
+
+    \begin{frame}
+            \frametitle{Conclusions}
+        \begin{itemize}
+            \item Should crisis interventions differentiate by family structure?
+            \item Does resource stress activate latent quantity-quality tradeoffs in family investment?"
+        \end{itemize}
+    \end{frame}
+
 
 \end{document}

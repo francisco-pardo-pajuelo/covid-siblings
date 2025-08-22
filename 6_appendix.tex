@@ -73,21 +73,6 @@
 
 \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-        \includegraphics[width=\textwidth]{./FIGURES/TWFE/twfe_age_youngest_g1_gpa_m_adj_Tsiblings_2_Soldest_4.pdf}
-        \caption{Change in gap between children with siblings and only childs}
-        \label{fig:fig_by_age_oldest}
-
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{./FIGURES/TWFE/twfe_age_youngest_g1_gpa_m_adj_Tsiblings_2_Soldest_4.pdf}
-        \caption{Change in gap between children with siblings and only childs}
-        \label{fig:fig_by_age_youngest}
-
-\end{figure}
 
 
 \input{./TABLES/rd_summ_K_m_a_365.tex}
@@ -201,19 +186,25 @@ By using older siblings, it is less and less likely to see them in lower grades 
 
 \section*{Appendix I: Issues to resolve} \label{sec:appI}
 
+\subsection{Administrative data vs survey data}
+
+In some years, we can compare administrative with survey data:
+
+\textbf{Mother's education}: \hyperref[tab:survey_educ]{Table \ref{tab:survey_educ}}
+This variable compares relatively well. 
+
+\textbf{Family members}: \hyperref[tab:survey_siblings]{Table \ref{tab:survey_siblings}}
+There are significant discrepancies in this variables. Only children report having no siblings more often than the other groups although at low rates (10\% vs 1\%) and less often living with siblings (74\% vs 90\%). However, the average number of siblings and household members shows no difference between the first two groups. When looking at family members they live with, the administrative data information does not accurately predict living conditions. \hyperref[tab:survey_living]{Table \ref{tab:survey_living}}. However, the admin data about living with their mother seems to be more precise than that of living with their father. Probably better to use 'lives with mother/doesnt live with mother' categories?
+
+\input{./TABLES/MANUAL/survey_educ.tex}
+%\input{./TABLES/descriptives_Soldest.tex}
+\input{./TABLES/MANUAL/survey_siblings.tex}
+\input{./TABLES/MANUAL/survey_living.tex}
 
 
-\subsection{Household Size and Estimated family size}
 
-
-When looking at \input{./TABLES/descriptives_Soldest.tex} I can see how the average household size in the only children and children with one sibling is similar. This is based on 2nd grade survey from 2015-2016.
-
-I do this for 2nd, 4th and 8th grade surveys. In some cases I have information about other family members.
-
-However, when looking at the \# of siblings reported by the survey, I get...
-
-\hyperref[tab:descriptive]{Table \ref{tab:descriptive}}
-
+%\hyperref[tab:descriptive]{Table \ref{tab:descriptive}}
+\clearpage
 \subsection{Size of effects with international evidence}
 
 TWFE using PISA scores go as big as 0.6 SD (\hyperref[fig:pisa]{Figure \ref{fig:pisa}}). Even though the time difference is 2012 v 2022, this is a very large effect considering I am focusing on the differential effect between children with siblings and only children. Looking into it, both years measure having siblings differently.
@@ -235,20 +226,34 @@ In the case of Peru, this difference is 64\% and 94\%, explaining big changes in
 
 \end{figure}
 
-
+\clearpage
 \subsection{Effects by age of oldest/youngest}
 
+Results are generally noisy. Some of them can be seen in \hyperref[fig:fig_by_age_oldest]{Table \ref{fig:fig_by_age_oldest}} by age of oldest and  \hyperref[fig:fig_by_age_youngest]{Table \ref{fig:fig_by_age_youngest}} by age of youngest.
+
+
+\begin{figure}[htbp]
+    \centering
+        \includegraphics[width=\textwidth]{./FIGURES/TWFE/twfe_age_oldest_g1_gpa_m_adj_Tsiblings_2_Ssecond_4.pdf}
+        \caption{TWFE on second-born sibling by age of oldest sibling}
+        \label{fig:fig_by_age_oldest}
+
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{./FIGURES/TWFE/twfe_age_youngest_g1_gpa_m_adj_Tsiblings_2_Soldest_4.pdf}
+        \caption{TWFE on first-born sibling by age of youngest sibling}
+    \label{fig:fig_by_age_youngest}
+
+\end{figure}
+
+\clearpage
 \subsection{Twin IV estimates}
 
 In \hyperref[tab:twfe_twins]{Table \ref{tab:twfe_twins}} I show results of number of children on GPA using twins as an IV.
 
 \input{./TABLES/MANUAL/twfe_twins.tex}
-
-
-
-\subsection{Effects by both/single parents}
-
-\subsection{Level of education survey vs admin data}
 
 
 
