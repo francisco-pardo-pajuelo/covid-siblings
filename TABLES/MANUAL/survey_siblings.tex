@@ -1,0 +1,38 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.7\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{Descriptive Statistics}
+       \label{tab:survey_siblings}
+       \resizebox{0.8\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+& Only children & 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4)\\
+\bottomrule
+&  &  &  & \\
+
+\multicolumn{4}{l}{\textit{Panel A: Survey vs Administrative data (8th grade)}} \\
+            &            &            &            &            \\
+\% no siblings in survey    & .102      & .01 & .006 & .005 \\
+\% lives with siblings & .74 & .90 & .90 & .89 \\
+\# of siblings in survey    &   2.63    &       2.66 &      3.36 &       4.21 \\
+\# household size & 5.97 & 6.03 & 6.46 & 6.92
+%\multicolumn{4}{l}{\textit{Panel B: Academic characteristics}} \\
+            &            &            &            &            \\
+%\% Grade promotion&       0.931&       0.952&       0.934&       0.897\\
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}
