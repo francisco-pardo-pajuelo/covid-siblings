@@ -3,22 +3,31 @@
 \caption{Effect of Family Size on GPA}
 \label{tab:twfe_twins}
 \resizebox{0.95\textwidth}{!}{%
-\begin{tabular}{lcccccc}
+\begin{tabular}{lHccccHcccc}
 \hline
-& \multicolumn{3}{c}{Pre-Covid} & \multicolumn{3}{c}{Covid} \\
-\cmidrule(lr){2-4} \cmidrule(lr){5-7}
-& First Stage & Second Stage & N & First Stage & Second Stage & N \\
+& \multicolumn{5}{c}{Pre-Covid} & \multicolumn{5}{c}{Covid (2020-2021)} \\
+\cmidrule(lr){2-6} \cmidrule(lr){7-11}
+& OLS & OLS & First & Second & N & OLS & OLS & First & Second & N \\
+& (no controls) & (controls) & Stage & Stage & & (no controls) & (controls) & Stage & Stage & \\
 \hline
-\textbf{Instrument: twin at second birth} & 0.805*** & & 2,462,619 & 0.867*** & & 1,930,246 \\
-(Sample: First child in families with two or more & (0.005) & & & (0.004) & & \\
-births) & & & & & & \\
-Number of children in family & & 0.007 & & & 0.012 & \\
-& & (0.010) & & & (0.010) & \\
-\textbf{Instrument: twin at third birth} & 0.813*** & & 1,861,964 & 0.874*** & & 1,272,826 \\
-(Sample: first and second children in families & (0.005) & & & (0.005) & & \\
-with three or more births) & & & & & & \\
-Number of children in family & & $-0.009$ & & & $-0.010$ & \\
-& & (0.010) & & & (0.012) & \\
+& & & & & & & & & & \\
+Instrument: first two children same sex & & & 0.050* & & 3,300,349 & & & 0.047* & & 2,809,126 \\
+\quad (Sample: first and second children in families & & & (0.001) & & & & & (0.001) & & \\
+\quad with two or more births) & & & & & & & & & & \\
+Number of children in family & $-0.081$* & $-0.070$* & & 0.063* & & $-0.119$* & $-0.101$* & & $-0.031$ & \\
+& (0.001) & (0.001) & & (0.022) & & (0.001) & (0.001) & & (0.025) & \\
+Instrument: twin at second birth & & & 0.813* & & 1,589,159 & & & 0.855* & & 1,240,864 \\
+\quad (Sample: First child in families with two or more & & & (0.006) & & & & & (0.006) & & \\
+\quad births) & & & & & & & & & & \\
+Number of children in family & $-0.090$* & $-0.056$* & & 0.012 & & $-0.125$* & $-0.085$* & & 0.009 & \\
+& (0.001) & (0.001) & & (0.012) & & (0.002) & (0.002) & & (0.013) & \\
+& & & & & & & & & & \\
+%Instrument: twin at third birth & & & 0.819* & & 1,195,717 & & & 0.866* & & 841,770 \\
+%\quad (Sample: first and second children in families & & & (0.006) & & & & & (0.006) & & \\
+%\quad with three or more births) & & & & & & & & & & \\
+%Number of children in family & $-0.104$* & $-0.090$* & & $-0.020$ & & $-0.118$* & $-0.101$* & & $-0.019$ & \\
+%& (0.002) & (0.002) & & (0.013) & & (0.002) & (0.002) & & (0.014) & \\
+%& & & & & & & & & & \\
 \hline
 \end{tabular}%
 }

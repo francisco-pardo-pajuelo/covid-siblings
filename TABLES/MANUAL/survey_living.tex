@@ -1,0 +1,40 @@
+\makeatletter
+\@ifclassloaded{beamer}{%
+       \centering
+       \resizebox{0.7\textwidth}{!}%
+}{%
+       \begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+       \centering
+       \caption{Descriptive Statistics}
+       \label{tab:survey_living}
+       \resizebox{0.8\textwidth}{!}%
+}
+{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+& Lives with no parents & Lives with father only & Lives with mother only &  Lives with both parents \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4)\\
+\bottomrule
+&  &  &  & \\
+
+\multicolumn{4}{l}{\textit{Panel A: Survey vs Administrative data}} \\
+            &            &            &            &            \\
+\% lives with mother & 0.899 & 0.845 & 0.929 & 0.931 \\
+\% lives with mother & 0.899 & 0.845 & 0.929 & 0.931 \\
+\% lives with father & 0.726 & 0.782 & 0.553 & 0.803 \\
+\% lives with grandparents & 0.287 & 0.289 & 0.342 & 0.263 \\
+\% lives with siblings & 0.824 & 0.813 & 0.774 & 0.837 \\
+\% lives with uncle/aunt & 0.243 & 0.248 & 0.295 & 0.225 \\
+%\multicolumn{4}{l}{\textit{Panel B: Academic characteristics}} \\
+            &            &            &            &            \\
+%\% Grade promotion&       0.931&       0.952&       0.934&       0.897\\
+
+\bottomrule
+\end{tabular}
+}
+\@ifclassloaded{beamer}{%
+}{%
+       \end{table}
+}
