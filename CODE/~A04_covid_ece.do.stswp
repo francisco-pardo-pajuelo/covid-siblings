@@ -7,8 +7,8 @@ program define main
 	
 	
 	*-Pairs of ECE years with pre-post COVID
-	twfe_ece siblings oldest
 	twfe_ece siblings all
+	twfe_ece siblings oldest
 	
 	twfe_gpa_baseline_survey_common	
 	twfe_gpa_baseline_survey_unique
@@ -227,7 +227,7 @@ foreach size in "2_4" "2" "3" "4" {
 		
 		if "${covid_data}" == "_TEST" {
 			di "TEST"
-			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_8_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
 			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 			}
 		if "${covid_data}" == "" {

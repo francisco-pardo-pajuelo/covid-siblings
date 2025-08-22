@@ -1,0 +1,534 @@
+capture program drop main
+program define main
+
+
+setup_iv
+
+twins
+sex_composition
+log_report
+
+pre_k
+
+household_vs_family_size
+
+
+
+end
+
+
+capture program drop setup_iv
+program define setup_iv
+
+
+	global x_complete = "male_siagie age_mother age_mother_1st_oldest_${fam_type} i.educ_cat_mother"
+	global x_complete_vars = "male_siagie age_mother age_mother_1st_oldest_${fam_type} educ_cat_mother"
+
+
+end
+
+
+capture program drop log_report
+program define log_report
+
+	capture log close _all
+
+	log using "$LOGS\twins_sex",  replace text name(twins_sex)
+	estimates dir ols*_tsize_*_n? iv_twin_*_n? ols*_ssize_* iv_same_sex*
+	
+	di "Instrument: twin at second birth "
+	estimates replay ols_tsize_pre_n2
+	
+	estimates replay ols_c_tsize_pre_n2
+	
+	estimates replay iv_twin_pre_n2_fam_total_2	
+	
+	estimates replay iv_twin_pre_n2
+	
+	estimates replay ols_tsize_post_n2
+	
+	estimates replay ols_c_tsize_post_n2
+	
+	estimates replay iv_twin_post_n2_fam_total_2
+	
+	estimates replay iv_twin_post_n2
+	
+
+	
+	estimates replay iv_twin_post_n2_fam_total_2
+	
+	di "Instrument: twin at third birth "
+	estimates replay ols_tsize_pre_n3
+	
+	estimates replay ols_c_tsize_pre_n3
+	
+	estimates replay iv_twin_pre_n3_fam_total_2
+	
+	estimates replay iv_twin_pre_n3
+	
+	estimates replay ols_tsize_post_n3
+	
+	estimates replay ols_c_tsize_post_n3
+	
+	estimates replay iv_twin_post_n3_fam_total_2
+	
+	estimates replay iv_twin_post_n3	
+	
+	
+
+	
+	di "Instrument: first two children same sex "	
+	estimates replay ols_ssize_pre_n3
+	
+	estimates replay ols_c_ssize_pre_n3
+	
+	estimates replay iv_sex_pre_n3_fam_total_2
+	
+	estimates replay i_sex_pre_n3
+	
+	estimates replay ols_ssize_post_n3
+	
+	estimates replay ols_c_ssize_post_n3
+	
+	estimates replay iv_sex_post_n3_fam_total_2
+	
+	estimates replay iv_sex_post_n3
+	
+	log close twins_sex
+
+
+end
+
+
+
+
+*----------
+*- Twins
+*----------
+capture program drop twins
+program define twins
+
+
+
+	
+
+	global fam_type = 2
+	
+	*- We estimate twin births
+	use "$TEMP\siagie_append", clear
+	sort id_per_umc
+	keep id_per_umc year grade std_gpa_m_adj
+	by id_per_umc: keep if _n==1
+	
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+
+	
+	*- Match Family info
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie) 
+	rename _m merge_siblings	
+	
+	
+	egen twin_id = group(id_fam_2 dob_siagie)
+	
+	duplicates tag twin_id, gen(ntwins)
+	replace ntwins = . if dob_siagie==.
+	
+	bys id_fam_2 (fam_order_${fam_type}): gen twin_birth = fam_order_${fam_type} if (twin_id==twin_id[_n+1] & twin_id!=twin_id[_n-1] & twin_id!=.)
+	
+	bys id_fam_2: egen treated_twins = min(cond(twin_birth!=.,twin_birth,.))
+	replace treated_twins = 0 if treated_twins==.
+	
+	label var twin_birth 	"# of birth of a twin. If 2nd and 3rd child are twins, then =2"
+	label var treated_twins 		"MIN # of birth of a twin assigned to family. 0 if no twins"
+	
+	
+	keep id_per_umc twin_id ntwins twin_birth treated_twins
+	tempfile ntwins
+	save `ntwins', replace
+	
+	*- We attach twin births 
+
+	
+	*- We estimate twin births
+	use "$TEMP\siagie_append", clear
+	sort id_per_umc
+	keep id_per_umc id_ie year grade std_gpa_m_adj male_siagie
+	
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie age_*_1st_oldest_2 dob_mother dob_father
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+	
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} exp_entry_year dob_siagie age_*_1st_oldest_2 dob_mother dob_father) 
+	rename _m merge_siblings	
+	
+	merge m:1 id_per_umc using `ntwins', keep(master match) keepusing(twin_id ntwins twin_birth treated_twins)
+	
+	*- Other demographic
+	gen age_mother = year - year(dob_mother) if year(dob_mother)>1901 & year(dob_mother)<2015 
+	
+	gen educ_cat_mother = 1 if inlist(educ_mother,2,3,4)==1
+	replace educ_cat_mother = 2 if inlist(educ_mother,5)==1
+	replace educ_cat_mother = 3 if inlist(educ_mother,6,7,8)==1
+	label values educ_cat_mother educ_cat 	
+			
+	compress
+	close
+	*- We now look at families with N children where the Nth birth are twins. We look at outcomes from N-1 children.
+	
+	*-- Case 0: We don't directly do DID, but estimate this pre and during covid.
+	
+	/*
+	2SLS
+	Y = famsize + e
+	famsize = twin + v
+	*/
+	
+	forvalues n = 2(1)3 {
+		open 
+		keep if fam_total_${fam_type}>=`n' & fam_total_${fam_type}<=5
+		keep if fam_order_${fam_type}<`n'
+		keep if grade>=1 & grade<=6
+		keep if treated_twins==0 | treated_twins==`n'
+		gen treated=(treated_twins==`n')
+		
+		egen nonmissing = rownonmiss(treated std_gpa_m_adj fam_total_2 grade year ${x_complete_vars})
+		keep if nonmissing == 9
+		
+		di as result "*******" _n as text "OLS NO CONTROLS" _n as result "*******"
+		reghdfe std_gpa_m_adj fam_total_2 if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_tsize_pre_n`n'
+		reghdfe std_gpa_m_adj fam_total_2 if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_tsize_post_n`n'
+		
+		di as result "*******" _n as text "OLS WITH CONTROLS" _n as result "*******"
+		reghdfe std_gpa_m_adj fam_total_2 ${x_complete} if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_c_tsize_pre_n`n'
+		reghdfe std_gpa_m_adj fam_total_2 ${x_complete}  if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_c_tsize_post_n`n'
+		
+		di as result "*******" _n as text "IV WITH CONTROLS" _n as result "*******"
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)  first savefirst savefprefix(iv_twin_pre_n`n'_)
+		estimates store iv_twin_pre_n`n'
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie) first savefirst savefprefix(iv_twin_post_n`n'_)
+		estimates store iv_twin_post_n`n'
+	}
+	
+	
+	
+	/*
+	*-- Case 1: families of at least 2 children. We compare first-borns (N=1) in families where the second child are twins or singletons.
+	open
+	keep if fam_total_${fam_type}>=2 & fam_total_${fam_type}<=4
+	keep if fam_order_${fam_type}==1
+	keep if treated_twins==0 | treated_twins==2
+	
+	gen treated=(treated_twins==2)
+	gen post = year>=2020
+	gen treated_post= treated*post
+	
+	local suf_2014 = "b6"
+	local suf_2015 = "b5"
+	local suf_2016 = "b4"
+	local suf_2017 = "b3"
+	local suf_2018 = "b2"
+	local suf_2019 = "o1"
+	local suf_2020 = "a0"
+	local suf_2021 = "a1"
+	local suf_2022 = "a2"
+	local suf_2023 = "a3"
+	local suf_2024 = "a4"
+
+	forvalues y = 2014(1)2024 {
+		gen byte year_`suf_`y'' = year==`y'
+		gen byte year_t_`suf_`y'' = year_`suf_`y''*treated
+	}	
+	
+	global x = "male_siagie"
+	global x = ""
+	
+	reghdfe std_gpa_m_adj treated_post treated post, a(year grade id_ie)
+	reghdfe std_gpa_m_adj treated_post treated post if year>=2018 & year<=2021 & grade<=6 & grade>=1, a(year grade id_ie)
+	reghdfe std_gpa_m_adj year_t_b? o.year_t_o1 year_t_a?  treated ${x} if grade<=6 & grade>=1 , a(year grade id_ie)
+	
+	collapse std_gpa_m_adj, by(grade year treated_twins)
+	
+	twoway ///
+			(line std_gpa_m_adj year if year>=2017 & treated_twins==0) ///
+			(line std_gpa_m_adj year if year>=2017 & treated_twins==2)
+	
+	
+	
+	*-- Case 2: families of at least 3 children. We compare first-borns (N=1) in families where the second child are twins or singletons.
+	open
+	keep if fam_total_${fam_type}>=2 & fam_total_${fam_type}<=4
+	keep if fam_order_${fam_type}==1
+	keep if treated_twins==0 | treated_twins==2
+	
+	gen treated=(treated_twins==2)
+	gen post = year>=2020
+	gen treated_post= treated*post
+	
+	local suf_2014 = "b6"
+	local suf_2015 = "b5"
+	local suf_2016 = "b4"
+	local suf_2017 = "b3"
+	local suf_2018 = "b2"
+	local suf_2019 = "o1"
+	local suf_2020 = "a0"
+	local suf_2021 = "a1"
+	local suf_2022 = "a2"
+	local suf_2023 = "a3"
+	local suf_2024 = "a4"
+
+	forvalues y = 2014(1)2024 {
+		gen byte year_`suf_`y'' = year==`y'
+		gen byte year_t_`suf_`y'' = year_`suf_`y''*treated
+	}	
+	
+	global x = "male_siagie"
+	global x = ""
+	
+	reghdfe std_gpa_m_adj treated_post treated post, a(year grade id_ie)
+	reghdfe std_gpa_m_adj treated_post treated post if year>=2018 & year<=2021 & grade<=6 & grade>=1, a(year grade id_ie)
+	reghdfe std_gpa_m_adj year_t_b? o.year_t_o1 year_t_a?  treated ${x} if grade<=6 & grade>=1 , a(year grade id_ie)
+	
+	
+	*/
+	/*
+	
+	
+	keep if dup==0 | dup==1
+	tab grade year if dup==1
+	
+	/*
+	keep if dup>=1
+	keep twins std_gpa_m_adj
+	bys twins: gen n=_n
+	reshape wide std_gpa_m_adj, i(twins) j(n)
+	*/
+	*/
+end
+
+
+
+*--------	
+*- Sex Composition
+*--------
+
+capture program drop sex_composition
+program define sex_composition
+	
+	
+	use "$TEMP\siagie_append", clear
+	sort id_per_umc
+	keep id_per_umc id_ie year grade std_gpa_m_adj male_siagie
+	
+		
+	preserve
+			use "$TEMP\id_siblings", clear
+			keep id_per_umc educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} closest_age_gap*${fam_type} exp_entry_year dob_siagie age_*_1st_oldest_2 dob_mother dob_father
+			tempfile id_siblings_sample
+			save `id_siblings_sample', replace
+	restore
+	
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(educ_caretaker educ_mother educ_father id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} exp_entry_year dob_siagie age_*_1st_oldest_2 dob_mother dob_father) 
+	rename _m merge_siblings	
+	
+	*- First two are same sex:
+	bys id_fam_${fam_type}: egen sex_1st = max(cond(fam_order_${fam_type}==1,male_siagie,.))
+	bys id_fam_${fam_type}: egen sex_2nd = max(cond(fam_order_${fam_type}==2,male_siagie,.))
+	gen same_sex = (sex_1st==sex_2nd) if fam_total_${fam_type}>=2
+	
+	*- Other demographic
+	gen age_mother = year - year(dob_mother) if year(dob_mother)>1901 & year(dob_mother)<2015 
+	
+	gen educ_cat_mother = 1 if inlist(educ_mother,2,3,4)==1
+	replace educ_cat_mother = 2 if inlist(educ_mother,5)==1
+	replace educ_cat_mother = 3 if inlist(educ_mother,6,7,8)==1
+	label values educ_cat_mother educ_cat 	
+			
+	
+	compress
+	close
+	*- We now look at families with N children where the Nth birth are twins. We look at outcomes from N-1 children.
+	
+	*-- Case 0: We don't directly do DID, but estimate this pre and during covid.
+	
+	/*
+	2SLS
+	Y = famsize + e
+	famsize = BB/GG + v
+	*/
+	
+	local n = 3 //In this case, n=3 means at least 2. So we change condition to >=(n-1) in family size
+		open  
+		keep if fam_total_${fam_type}>=(`n'-1) & fam_total_${fam_type}<=5
+		keep if fam_order_${fam_type}<`n'
+		keep if grade>=1 & grade<=6
+		keep if same_sex!=.
+		gen treated=(same_sex==1)
+		egen nonmissing = rownonmiss(treated std_gpa_m_adj fam_total_2 grade year ${x_complete_vars})
+		keep if nonmissing == 9
+		/*
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2017)  & grade>=1 & grade<=6, a(year grade id_ie)  first
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2018)  & grade>=1 & grade<=6, a(year grade id_ie)  first
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2019)  & grade>=1 & grade<=6, a(year grade id_ie)  first
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2020)  & grade>=1 & grade<=6, a(year grade id_ie)  first
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2021)  & grade>=1 & grade<=6, a(year grade id_ie)  first
+		ivreghdfe std_gpa_m_adj (fam_total_2=treated) if inlist(year,2022)  & grade>=1 & grade<=6, a(year grade id_ie)  first
+		*/
+		
+	
+		di as result "*******" _n as text "OLS WITH CONTROLS" _n as result "*******"
+		reghdfe std_gpa_m_adj fam_total_2 if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_ssize_pre_n`n'
+		reghdfe std_gpa_m_adj fam_total_2 if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_ssize_post_n`n'
+		
+		di as result "*******" _n as text "OLS WITH CONTROLS" _n as result "*******"
+		reghdfe std_gpa_m_adj fam_total_2 ${x_complete} if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_c_ssize_pre_n`n'
+		reghdfe std_gpa_m_adj fam_total_2 ${x_complete} if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie)
+		estimates store ols_c_ssize_post_n`n'
+		
+		di as result "*******" _n as text "OLS WITH CONTROLS" _n as result "*******"
+		local n=3
+		ivreghdfe std_gpa_m_adj ${x_complete} (fam_total_2=treated) if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)  first savefirst  savefprefix(iv_sex_pre_n`n'_)
+		estimates store iv_sex_pre_n`n'
+		ivreghdfe std_gpa_m_adj ${x_complete} (fam_total_2=treated) if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie) first savefirst  savefprefix(iv_sex_post_n`n'_)
+		estimates store iv_sex_post_n`n'
+	
+end	
+
+
+
+	
+*--------	
+*- Pre-K
+*--------
+
+capture program drop pre_k
+program define pre_k
+
+
+
+	use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_append", clear
+	//use id_per_umc grade year std_gpa_?_adj using "$TEMP\siagie_2024", clear
+	keep id_per_umc grade year std_gpa_?_adj
+	merge m:1 id_per_umc using "$TEMP\id_dob", keep(master match) keepusing(year_entry_1st dob_siagie)
+	beep	
+	
+	gen prek = .
+	replace prek = 5 if grade==0 & (year+1==year_entry_1st)
+	replace prek = 4 if grade==0 & (year+2==year_entry_1st)
+	replace prek = 3 if grade==0 & (year+3==year_entry_1st)	
+	replace prek = 2 if grade==0 & (year+4==year_entry_1st)	
+	//replace prek = 1 if grade==0 & (year+5==year_entry_1st)	
+	//replace prek = 0 if grade==0 & (year+6==year_entry_1st)	
+	
+end	
+
+
+*----------
+*- Household vs family size
+*----------
+capture program drop household_vs_family_size
+program define household_vs_family_size
+
+use "$TEMP\pre_reg_covid${covid_data}", clear
+
+//keep if fam_order_${fam_type}==1
+
+keep if inlist(year,2015,2016,2018,2019)
+keep if grade==8
+
+ds base_lives_with_mom_2s base_lives_with_dad_2s base_lives_with_grandparents_2s base_lives_with_siblings_2s base_lives_with_uncle_aunt_2s base_total_siblings_2s base_hh_size_2s base_edu_father_2s base_edu_mother_2s
+
+foreach v of var `r(varlist)' {
+	tab year_2s if `v'!=.
+}
+
+keep if inlist(year,2015,2016)
+
+
+recode base_educ_cat_mother_2s (1 = 1) (2 3 = 0), gen(base_mother_no_sec)
+recode base_educ_cat_mother_2s (2 = 1) (1 3 = 0), gen(base_mother_sec_complete)
+recode base_educ_cat_mother_2s (3 = 1) (1 2 = 0), gen(base_mother_higher)
+
+*- Relation in # of siblings
+*-- # of siblings in survey doesn't have '0' as an option, it rather reports '99', but that be mixed with missing values. We do a partial correction, assigning 0 to those with '99' except those who report living with their siblings, in which case we leave it as missing.
+replace base_total_siblings_2s = 0 if base_total_siblings_2s==99
+replace base_total_siblings_2s = . if base_lives_with_siblings_2s == 1 & base_total_siblings_2s==0
+
+tab base_total_siblings_2s if fam_total_${fam_type}==1 & year==2015,m 
+tab base_total_siblings_2s if fam_total_${fam_type}==2 & year==2015,m
+gen no_sibs = base_total_siblings_2s == 0 if base_total_siblings_2s!=.
+
+//Estimates
+mean base_total_siblings_2s, over(fam_total_${fam_type})
+mean no_sibs if year==2015, over(fam_total_${fam_type})
+mean base_lives_with_siblings_2s if year==2015, over(fam_total_${fam_type})
+mean base_hh_size_2s if year==2015, over(fam_total_${fam_type})
+
+*- Lives with parents
+gen  lives_parents_cat = .
+replace lives_parents_cat = 1 if lives_with_father==0 & lives_with_mother==0
+replace lives_parents_cat = 2 if lives_with_father==1 & lives_with_mother==0
+replace lives_parents_cat = 3 if lives_with_father==0 & lives_with_mother==1
+replace lives_parents_cat = 4 if lives_with_father==1 & lives_with_mother==1
+
+gen base_lives_with_both_2s = .
+replace base_lives_with_both_2s = 0 if  base_lives_with_mom_2s!=. & base_lives_with_dad_2s!=.
+replace base_lives_with_both_2s = 1 if  base_lives_with_mom_2s==1 & base_lives_with_dad_2s==1
+
+mean base_lives_with_*_2s , over(lives_parents_cat)
+mean base_mother_no_sec base_mother_sec_complete base_mother_higher, over(educ_cat_mother)
+
+((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))
+
+
+
+mean base_total_siblings_2s if fam_order_${fam_type}==1, over(fam_total_${fam_type})
+mean base_total_siblings_2s if fam_order_${fam_type}==1 & base_lives_with_mom_2s==1 & base_lives_with_dad_2s==1 & base_urban_2s==1, over(fam_total_${fam_type})
+
+keep if fam_total_${fam_type}<=10
+
+tab base_lives_with_dad_2s lives_with_father
+tab base_lives_with_mom_2s lives_with_mother
+
+tabstat base_lives_with_dad_2s, by(lives_with_father) 
+tabstat base_lives_with_mom_2s, by(lives_with_mother) 
+
+tabstat base_hh_size_2s if base_lives_with_dad_2s==1 & base_lives_with_mom_2s==1 & base_lives_with_grandparents_2s==0, by(fam_total_${fam_type})
+
+
+end
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

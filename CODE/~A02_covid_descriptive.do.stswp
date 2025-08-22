@@ -341,9 +341,9 @@ VarStandardiz index_parent_educ_inv, by(year grade) newvar(std_index)
 
 		foreach g in "2p" "4p" "6p" "2s" {
 			foreach adult in "mother" {
-				gen base_educ_cat_`adult'_`g' = 1 if inlist(base_edu_`adult'_`g',1,2,3,4)==1
-				replace base_educ_cat_`adult'_`g' = 2 if inlist(base_edu_`adult'_`g',5)==1
-				replace base_educ_cat_`adult'_`g' = 3 if inlist(base_edu_`adult'_`g',6,7,8,9,10,11,12)==1 //in 2S only matters until 10. There is no 11 or 12.
+				gen educ_cat_`adult'_`g' = 1 if inlist(edu_`adult'_`g',1,2,3,4)==1
+				replace educ_cat_`adult'_`g' = 2 if inlist(edu_`adult'_`g',5)==1
+				replace educ_cat_`adult'_`g' = 3 if inlist(edu_`adult'_`g',6,7,8,9,10,11,12)==1 //in 2S only matters until 10. There is no 11 or 12.
 			}
 		}
 		

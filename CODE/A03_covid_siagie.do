@@ -5,6 +5,18 @@ program define main
 
 	setup_COVID_A03
 	
+	
+	*------ Final Runs
+	//twfe_final
+	//event_final
+	twfe_2_4_6_8 siblings oldest 20_21
+	twfe_2_4_6_8 siblings all	 20_21
+	twfe_2_4_6_8 siblings oldest all
+	twfe_2_4_6_8 siblings all	 all
+	
+	event_gpa		siblings oldest 						// other_filters "e.g. rural_young_hed_both"
+	event_gpa		siblings all 						// other_filters "e.g. rural_young_hed_both"
+	
 
 	***** Main Results
 	*- TWFE Estimates *** EDITED
@@ -23,8 +35,8 @@ program define main
 	
 	
 	*- TWFE by age of oldest
-	twfe_age_sibling siblings oldest age_youngest
-	twfe_age_sibling siblings second age_oldest
+											//twfe_age_sibling siblings oldest age_youngest
+											//twfe_age_sibling siblings second age_oldest
 	
 											*- Placebo TWFE
 											//twfe_placebo internet
@@ -34,17 +46,25 @@ program define main
 											//twfe_cohorts //Should not be done as it does not address the age trend.
 	*- TWFE by grade
 	twfe_grades siblings
+	
 	*- Placebo TWFE by grade
 											//twfe_placebo_grades internet
-	twfe_placebo_grades parent_ed
-	twfe_placebo_grades both_parents
+	//twfe_placebo_grades parent_ed
+	//twfe_placebo_grades both_parents
 	
 	*- Event Study 
 	event_gpa		siblings oldest 						// other_filters "e.g. rural_young_hed_both"
 	event_gpa		siblings oldest rural_young_hed_both 	// other_filters "e.g. rural_young_hed_both"
 	
 
-	event_cohort_grade
+	//event_cohort_grade
+	
+	
+	/*
+	* TESTS
+	twfe_test 	siblings oldest
+	event_test 	siblings oldest
+	*/
 
 
 	
@@ -66,7 +86,7 @@ program define setup_COVID_A03
 	global main_outcomes=1
 	global main_outcome_1 = "std_gpa_m_adj"
 	global main_outcome_2 = "" //pass_math
-	global main_outcome_3 = "higher_ed_parent" //higher_ed_parent
+	global main_outcome_3 = "" //higher_ed_parent
 	
 	global main_loop = 0
 	global main_loop_level	= "all"
@@ -75,8 +95,11 @@ program define setup_COVID_A03
 	*- Global variables
 	global fam_type=2
 	global max_sibs = 4
-	global x_all = "male_siagie urban_siagie public_siagie"
-	global x_nohigher_ed = "male_siagie urban_siagie public_siagie"
+	global x_all 			= "male_siagie age_mother age_mother_1st_oldest_${fam_type} i.educ_cat_mother"
+	global x_all_vars 		= "male_siagie age_mother age_mother_1st_oldest_${fam_type} educ_cat_mother"
+	//global x_complete 		= "male_siagie age_mother age_mother_1st_oldest_${fam_type} i.educ_cat_mother"
+	//global x_complete_vars 	= "male_siagie age_mother age_mother_1st_oldest_${fam_type} educ_cat_mother"
+	global x_nohigher_ed 	= "male_siagie age_mother age_mother_1st_oldest_${fam_type}"
 	
 	
 	*- Colorpalette
@@ -136,7 +159,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" "higher_ed_parent" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21"  {
+		foreach only_covid in "all" "20_21"  {
 			foreach level in "all" "elm" "sec" {
 					
 				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -153,7 +176,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 				/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 				/*DID*/			treated post treated_post ///
 				/*EVENT*/		year_t_?? ///
-				/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
 				/*B*/			/*GRADE AND MALE*/ ///
 				/*C*/			///closest_age_gap* ///
@@ -199,7 +222,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 				drop if grade==0
 				
 				*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-				if "`only_covid'" == "20-21" keep if year<=2021
+				if "`only_covid'" == "20_21" keep if year<=2021
 				
 				*- Divide sample based on grade in 2020
 				//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
@@ -298,141 +321,141 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 		
 				* All students
 				di as result "*******" _n as text "All" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 				estimates store all_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade year id_ie)
 				estimates store all_`vlab'_2
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
 				estimates store all_`vlab'_3
-				if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
 				
 				*****
 				* Panel A: Confounders: Type of school
 				*****			
 				*- Urban/Rural
 				di as result "*******" _n as text "Urban" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==1 , a(grade year id_ie)
 				estimates store urb_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==1 , a(grade year id_ie)
 				estimates store urb_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==1  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==1  , a(grade year id_ie)
 				estimates store urb_`vlab'_3
-				if ${max_sibs} == 4 eststo urb_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo urb_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==1  , a(grade year id_ie)
 
 				di as result "*******" _n as text "Rural" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==0 , a(grade year id_ie)
 				estimates store rur_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==0 , a(grade year id_ie)
 				estimates store rur_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==0  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==0  , a(grade year id_ie)
 				estimates store rur_`vlab'_3
-				if ${max_sibs} == 4 eststo rur_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==0  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo rur_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==0  , a(grade year id_ie)
 				
 				*- Internet/No Internet
 				di as result "*******" _n as text "Internet in school" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & internet==1, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & internet==1, a(grade year id_ie)
 				estimates store int_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==1 , a(grade year id_ie)
 				estimates store int_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==1  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==1  , a(grade year id_ie)
 				estimates store int_`vlab'_3
-				if ${max_sibs} == 4 eststo int_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo int_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==1  , a(grade year id_ie)
 
 				di as result "*******" _n as text "No internet in school" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==0 , a(grade year id_ie)
 				estimates store nin_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==0 , a(grade year id_ie)
 				estimates store nin_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==0  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==0  , a(grade year id_ie)
 				estimates store nin_`vlab'_3
-				if ${max_sibs} == 4 eststo nin_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==0  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo nin_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==0  , a(grade year id_ie)
 				/*
 				*- Public/Private
 				di as result "*******" _n as text "Public" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & public_siagie==1, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & public_siagie==1, a(grade year id_ie)
 				estimates store all_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==1 , a(grade year id_ie)
 				estimates store pub_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==1  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==1  , a(grade year id_ie)
 				estimates store pub_`vlab'_3
-				if ${max_sibs} == 4 eststo pub_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo pub_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==1  , a(grade year id_ie)
 
 				di as result "*******" _n as text "Private" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==0, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==0, a(grade year id_ie)
 				estimates store all_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==0 , a(grade year id_ie)
 				estimates store pri_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==0  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==0  , a(grade year id_ie)
 				estimates store pri_`vlab'_3
-				if ${max_sibs} == 4 eststo pri_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==0  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo pri_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==0  , a(grade year id_ie)
 				*/
 				*- Low SES/High SES schools
 				di as result "*******" _n as text "Low SES IE" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==1 , a(grade year id_ie)
 				estimates store low_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==1 , a(grade year id_ie)
 				estimates store low_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==1  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==1  , a(grade year id_ie)
 				estimates store low_`vlab'_3
-				if ${max_sibs} == 4 eststo low_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo low_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==1  , a(grade year id_ie)
 
 				di as result "*******" _n as text "High SES IE" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==4, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==4, a(grade year id_ie)
 				estimates store hig_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==4 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==4 , a(grade year id_ie)
 				estimates store hig_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==4  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==4  , a(grade year id_ie)
 				estimates store hig_`vlab'_3
-				if ${max_sibs} == 4 eststo hig_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==4  , a(grade id_ie)	
+				if ${max_sibs} == 4 eststo hig_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==4  , a(grade year id_ie)	
 
 				*- By age
 				di as result "*******" _n as text "Younger cohort" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==1 , a(grade year id_ie)
 				estimates store young_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==1 , a(grade year id_ie)
 				estimates store young_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==1  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==1  , a(grade year id_ie)
 				estimates store young_`vlab'_3
-				if ${max_sibs} == 4 eststo young_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo young_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==1  , a(grade year id_ie)
 				
 				di as result "*******" _n as text "Older cohort" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==0, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==0, a(grade year id_ie)
 				estimates store old_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==0 , a(grade year id_ie)
 				estimates store old_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==0  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==0  , a(grade year id_ie)
 				estimates store old_`vlab'_3
-				if ${max_sibs} == 4 eststo old_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==0  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo old_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==0  , a(grade year id_ie)
 		
 				*- Birth Order
 				di as result "*******" _n as text "Oldest" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & inlist(fam_order_${fam_type},1)==1, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & inlist(fam_order_${fam_type},1)==1, a(grade year id_ie)
 				estimates store first_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & inlist(fam_order_${fam_type},1)==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & inlist(fam_order_${fam_type},1)==1 , a(grade year id_ie)
 				estimates store first_`vlab'_2
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade year id_ie)
 				estimates store first_`vlab'_3
-				if ${max_sibs} == 4 eststo first_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo first_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade year id_ie)
 					
 				*- Mother's education
 				di as result "*******" _n as text "Some level of higher education" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==3 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==3 , a(grade year id_ie)
 				estimates store edu3_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==3 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==3 , a(grade year id_ie)
 				estimates store edu3_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==3  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==3  , a(grade year id_ie)
 				estimates store edu3_`vlab'_3
-				if ${max_sibs} == 4 eststo edu3_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==3  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo edu3_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==3  , a(grade year id_ie)
 				
 				*- Lives with parents
 				di as result "*******" _n as text "Only lives with one parent" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)), a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)), a(grade year id_ie)
 				estimates store one_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)) , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)) , a(grade year id_ie)
 				estimates store one_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade year id_ie)
 				estimates store one_`vlab'_3
-				if ${max_sibs} == 4 eststo one_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade id_ie)
+				if ${max_sibs} == 4 eststo one_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade year id_ie)
 				
 				
 				if ${max_sibs}==4 local legend_child_${max_sibs} = "4 children"	
@@ -542,7 +565,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 					}
 				
 				
-//covid_twfe_summ_elm_20-21_gpa_m_2_Tsiblings_Soldest_4_TEST			
+//covid_twfe_summ_elm_20_21_gpa_m_2_Tsiblings_Soldest_4_TEST			
 				 
 				coefplot 	(all_`vlab'_2, mcolor("${ek_blue}") 	ciopts(color("${ek_blue}"))) ///
 							(all_`vlab'_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
@@ -663,7 +686,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" "higher_ed_parent" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21"  {
+		foreach only_covid in "all" "20_21"  {
 			foreach level in "all" "elm" "sec" {
 						
 			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -681,7 +704,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 			/*DID*/			treated post treated_post ///
 			/*EVENT*/		year_t_?? ///
-			/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+			/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 			/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
 			/*B*/			/*GRADE AND MALE*/ ///
 			/*C*/			///closest_age_gap* ///
@@ -727,7 +750,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			drop if grade==0
 				
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021			
+			if "`only_covid'" == "20_21" keep if year<=2021			
 			
 			*- Divide sample based on grade in 2020
 			//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
@@ -827,133 +850,133 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 	
 			* All students
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 			estimates store all_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade year id_ie)
 			estimates store all_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
 			estimates store all_`vlab'_3
-			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
 			
 			*****
 			* Panel A: Confounders: Type of school
 			*****			
 			*- Urban/Rural
 			di as result "*******" _n as text "Urban" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==1 , a(grade year id_ie)
 			estimates store urb_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==1 , a(grade year id_ie)
 			estimates store urb_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==1  , a(grade year id_ie)
 			estimates store urb_`vlab'_3
-			if ${max_sibs} == 4 eststo urb_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo urb_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==1  , a(grade year id_ie)
 
 			di as result "*******" _n as text "Rural" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==0 , a(grade year id_ie)
 			estimates store rur_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & urban_siagie==0 , a(grade year id_ie)
 			estimates store rur_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==0  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & urban_siagie==0  , a(grade year id_ie)
 			estimates store rur_`vlab'_3
-			if ${max_sibs} == 4 eststo rur_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==0  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo rur_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & urban_siagie==0  , a(grade year id_ie)
 			
 			*- Internet/No Internet
 			di as result "*******" _n as text "Internet in school" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==1 , a(grade year id_ie)
 			estimates store int_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==1 , a(grade year id_ie)
 			estimates store int_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==1  , a(grade year id_ie)
 			estimates store int_`vlab'_3
-			if ${max_sibs} == 4 eststo int_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo int_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==1  , a(grade year id_ie)
 
 			di as result "*******" _n as text "No internet in school" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==0 , a(grade year id_ie)
 			estimates store nin_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & internet==0 , a(grade year id_ie)
 			estimates store nin_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==0  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & internet==0  , a(grade year id_ie)
 			estimates store nin_`vlab'_3
-			if ${max_sibs} == 4 eststo nin_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==0  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo nin_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & internet==0  , a(grade year id_ie)
 			
 			*- Public/Private
 			di as result "*******" _n as text "Public" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==1 , a(grade year id_ie)
 			estimates store pub_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==1 , a(grade year id_ie)
 			estimates store pub_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==1  , a(grade year id_ie)
 			estimates store pub_`vlab'_3
-			if ${max_sibs} == 4 eststo pub_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo pub_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==1  , a(grade year id_ie)
 
 			di as result "*******" _n as text "Private" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==0 , a(grade year id_ie)
 			estimates store pri_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==0 , a(grade year id_ie)
 			estimates store pri_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==0  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==0  , a(grade year id_ie)
 			estimates store pri_`vlab'_3
-			if ${max_sibs} == 4 eststo pri_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==0  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo pri_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==0  , a(grade year id_ie)
 			
 			*- Low SES/High SES schools
 			di as result "*******" _n as text "Low SES IE" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==1 , a(grade year id_ie)
 			estimates store low_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==1 , a(grade year id_ie)
 			estimates store low_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==1  , a(grade year id_ie)
 			estimates store low_`vlab'_3
-			if ${max_sibs} == 4 eststo low_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo low_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==1  , a(grade year id_ie)
 
 			di as result "*******" _n as text "High SES IE" _n as result 
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==4 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==4 , a(grade year id_ie)
 			estimates store hig_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==4 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==4 , a(grade year id_ie)
 			estimates store hig_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==4  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==4  , a(grade year id_ie)
 			estimates store hig_`vlab'_3
-			if ${max_sibs} == 4 eststo hig_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==4  , a(grade id_ie)	
+			if ${max_sibs} == 4 eststo hig_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==4  , a(grade year id_ie)	
 
 			*- Low SES + Public
 			di as result "*******" _n as text "Low SES + Public" _n as result "*******"		
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==1 & public_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==1 & public_siagie==1 , a(grade year id_ie)
 			estimates store pubL_`vlab'	
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==1 & public_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==1 & public_siagie==1 , a(grade year id_ie)
 			estimates store pubL_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==1 & public_siagie==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==1 & public_siagie==1  , a(grade year id_ie)
 			estimates store pubL_`vlab'_3
-			if ${max_sibs} == 4 eststo pubL_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==1 &  public_siagie==1 , a(grade id_ie)
+			if ${max_sibs} == 4 eststo pubL_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==1 &  public_siagie==1 , a(grade year id_ie)
 
 	
 			*- High SES + Private
 			di as result "*******" _n as text "High SES + Private" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==4 & public_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & min_socioec_index_ie_cat==4 & public_siagie==0 , a(grade year id_ie)
 			estimates store priH_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==4 & public_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & min_socioec_index_ie_cat==4 & public_siagie==0 , a(grade year id_ie)
 			estimates store priH_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==4 & public_siagie==0, a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & min_socioec_index_ie_cat==4 & public_siagie==0, a(grade year id_ie)
 			estimates store priH_`vlab'_3
-			if ${max_sibs} == 4 eststo priH_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==4 &  public_siagie==0 , a(grade id_ie)				
+			if ${max_sibs} == 4 eststo priH_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & min_socioec_index_ie_cat==4 &  public_siagie==0 , a(grade year id_ie)				
 			*- Class size Q1 (Bottom 25%)
 			di as result "*******" _n as text "Low class size" _n as result "*******"		
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & quart_class_size==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & quart_class_size==1 , a(grade year id_ie)
 			estimates store sma_`vlab'		
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & quart_class_size==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & quart_class_size==1 , a(grade year id_ie)
 			estimates store sma_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & quart_class_size==1, a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & quart_class_size==1, a(grade year id_ie)
 			estimates store sma_`vlab'_3
-			if ${max_sibs} == 4 eststo sma_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & quart_class_size==1 , a(grade id_ie)	
+			if ${max_sibs} == 4 eststo sma_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & quart_class_size==1 , a(grade year id_ie)	
 
 	
 			*- Class size Q4 (Top 25%)
 			di as result "*******" _n as text "Top class size" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & quart_class_size==4 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & quart_class_size==4 , a(grade year id_ie)
 			estimates store big_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & quart_class_size==4 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & quart_class_size==4 , a(grade year id_ie)
 			estimates store big_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & quart_class_size==4, a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & quart_class_size==4, a(grade year id_ie)
 			estimates store big_`vlab'_3
-			if ${max_sibs} == 4 eststo big_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & quart_class_size==4 , a(grade id_ie)							
+			if ${max_sibs} == 4 eststo big_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & quart_class_size==4 , a(grade year id_ie)							
 			
 			
 			
@@ -1187,7 +1210,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" "higher_ed_parent" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21"  {
+		foreach only_covid in "all" "20_21"  {
 			foreach level in "all" "elm" "sec" {
 						
 			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -1205,7 +1228,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 			/*DID*/			treated post treated_post ///
 			/*EVENT*/		year_t_?? ///
-			/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+			/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 			/*A*/ 			min_socioec_index_ie_cat /*OTHER IN DEMOG*/ ///
 			/*B*/			/*GRADE AND MALE*/ ///
 			/*C*/			///closest_age_gap* ///
@@ -1253,7 +1276,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			drop if grade==0
 			
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021
+			if "`only_covid'" == "20_21" keep if year<=2021
 			
 			*- Divide sample based on grade in 2020
 			//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
@@ -1353,67 +1376,67 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 	
 			* All students
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 			estimates store all_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade year id_ie)
 			estimates store all_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
 			estimates store all_`vlab'_3
-			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
 			
 			*****
 			* Panel B: Confounders - Demographics
 			*****
 			*- Male/Female
 			di as result "*******" _n as text "Boys" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & male_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & male_siagie==1 , a(grade year id_ie)
 			estimates store mal_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & male_siagie==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & male_siagie==1 , a(grade year id_ie)
 			estimates store mal_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & male_siagie==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & male_siagie==1  , a(grade year id_ie)
 			estimates store mal_`vlab'_3
-			if ${max_sibs} == 4 eststo mal_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & male_siagie==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo mal_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & male_siagie==1  , a(grade year id_ie)
 
 			di as result "*******" _n as text "Girls" _n as result 
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & male_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & male_siagie==0 , a(grade year id_ie)
 			estimates store fem_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & male_siagie==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & male_siagie==0 , a(grade year id_ie)
 			estimates store fem_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & male_siagie==0  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & male_siagie==0  , a(grade year id_ie)
 			estimates store fem_`vlab'_3
-			if ${max_sibs} == 4 eststo fem_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & male_siagie==0  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo fem_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & male_siagie==0  , a(grade year id_ie)
 								
 			*- By level
 			di as result "*******" _n as text "Younger cohort" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & young==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & young==1 , a(grade year id_ie)
 			estimates store young_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==1 , a(grade year id_ie)
 			estimates store young_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==1  , a(grade year id_ie)
 			estimates store young_`vlab'_3
-			if ${max_sibs} == 4 eststo young_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo young_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==1  , a(grade year id_ie)
 			
 			di as result "*******" _n as text "Older cohort" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & young==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & young==0 , a(grade year id_ie)
 			estimates store old_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & young==0 , a(grade year id_ie)
 			estimates store old_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==0  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & young==0  , a(grade year id_ie)
 			estimates store old_`vlab'_3
-			if ${max_sibs} == 4 eststo old_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==0  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo old_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & young==0  , a(grade year id_ie)
 	
 			forvalues g = 1(1)11 {
 				di as result "*******" _n as text "`level' - `g'" _n as result "*******"
 				if "`level'" == "elm" & `g'>=7 continue
 				if "`level'" == "sec" & `g'<=6 continue
 				di "STILL HERE"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'_3
-				if ${max_sibs} == 4 eststo g`g'_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & grade==`g'  , a(grade id_ie)	
+				if ${max_sibs} == 4 eststo g`g'_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & grade==`g'  , a(grade year id_ie)	
 				}			
 			
 			if ${max_sibs}==4 local legend_child_${max_sibs} = "4 children"	
@@ -1939,7 +1962,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" "higher_ed_parent" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21"  {
+		foreach only_covid in "all" "20_21"  {
 			foreach level in "all" "elm" "sec" {
 						
 			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -1957,7 +1980,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 			/*DID*/			treated post treated_post ///
 			/*EVENT*/		year_t_?? ///
-			/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+			/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 			/*A*/ 			min_socioec_index_ie_cat /*OTHER IN DEMOG*/ ///
 			/*B*/			/*GRADE AND MALE*/ ///
 			/*C*/			closest_age_gap* ///
@@ -2005,7 +2028,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			drop if grade==0
 			
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021
+			if "`only_covid'" == "20_21" keep if year<=2021
 						
 			*- Divide sample based on grade in 2020
 			//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
@@ -2105,13 +2128,13 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 	
 			* All students
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 			estimates store all_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade year id_ie)
 			estimates store all_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
 			estimates store all_`vlab'_3
-			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
 			
 			*****
 			* Panel C: Mechanisms - Family structure - Siblings
@@ -2120,102 +2143,102 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			
 			*- Birth Order
 			di as result "*******" _n as text "Oldest" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & inlist(fam_order_${fam_type},1)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & inlist(fam_order_${fam_type},1)==1 , a(grade year id_ie)
 			estimates store first_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & inlist(fam_order_${fam_type},1)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & inlist(fam_order_${fam_type},1)==1 , a(grade year id_ie)
 			estimates store first_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade year id_ie)
 			estimates store first_`vlab'_3
-			if ${max_sibs} == 4 eststo first_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo first_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & inlist(fam_order_${fam_type},1)==1  , a(grade year id_ie)
 			
 			di as result "*******" _n as text "Middle" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) , a(grade year id_ie)
 			estimates store mid_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) , a(grade year id_ie)
 			estimates store mid_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type}))  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type}))  , a(grade year id_ie)
 			estimates store mid_`vlab'_3
-			if ${max_sibs} == 4 eststo mid_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) , a(grade id_ie)			
+			if ${max_sibs} == 4 eststo mid_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) , a(grade year id_ie)			
 			
 			di as result "*******" _n as text "Youngest" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & fam_order_${fam_type}==fam_total_${fam_type} , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & fam_order_${fam_type}==fam_total_${fam_type} , a(grade year id_ie)
 			estimates store last_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & fam_order_${fam_type}==fam_total_${fam_type} , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & fam_order_${fam_type}==fam_total_${fam_type} , a(grade year id_ie)
 			estimates store last_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & fam_order_${fam_type}==fam_total_${fam_type}  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & fam_order_${fam_type}==fam_total_${fam_type}  , a(grade year id_ie)
 			estimates store last_`vlab'_3
-			if ${max_sibs} == 4 eststo last_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & fam_order_${fam_type}==fam_total_${fam_type}  , a(grade id_ie)		
+			if ${max_sibs} == 4 eststo last_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & fam_order_${fam_type}==fam_total_${fam_type}  , a(grade year id_ie)		
 			
 			*- Gap <=2
 			di as result "*******" _n as text "Close Age sibling (<=2 year difference)" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store g02_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store g02_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store g02_`vlab'_3
-			if ${max_sibs} == 4 eststo g02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo g02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			/*
 			*- Gap 3-5
 			di as result "*******" _n as text "Close Age sibling (3-5 year difference)" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store g35_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store g35_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store g35_`vlab'_3
-			if ${max_sibs} == 4 eststo g35_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo g35_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			*/
 			*- Gap 6+
 			di as result "*******" _n as text "Close Age sibling (>=6 year difference)" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store g6m_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store g6m_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store g6m_`vlab'_3
-			if ${max_sibs} == 4 eststo g6m_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo g6m_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 					
 			*- Younger Gap <=2
 			di as result "*******" _n as text "Younger sibling within 2 years" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store y02_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store y02_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store y02_`vlab'_3
-			if ${max_sibs} == 4 eststo y02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo y02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_younger<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			
 			*- Same sex Gap <=2
 			di as result "*******" _n as text "Same sex sibling within 2 years" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store s02_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store s02_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store s02_`vlab'_3
-			if ${max_sibs} == 4 eststo s02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo s02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_samesex_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 
 			/*
 			*- Male gap <=2
 			di as result "*******" _n as text "Male sibling within 2 years" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store m02_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store m02_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store m02_`vlab'_3
-			if ${max_sibs} == 4 eststo m02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo m02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_male_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			
 			*- Female gap <=2
 			di as result "*******" _n as text "Female sibling within 3 years" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store f02_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
 			estimates store f02_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			estimates store f02_`vlab'_3
-			if ${max_sibs} == 4 eststo f02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo f02_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_female_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
 			*/
 
 			if ${max_sibs}==4 local legend_child_${max_sibs} = "4 children"	
@@ -2398,7 +2421,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" "higher_ed_parent" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21"  {
+		foreach only_covid in "all" "20_21"  {
 			foreach level in "all" "elm" "sec" {
 						
 			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -2416,7 +2439,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 			/*DID*/			treated post treated_post ///
 			/*EVENT*/		year_t_?? ///
-			/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+			/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 			/*A*/ 			min_socioec_index_ie_cat /*OTHER IN DEMOG*/ ///
 			/*B*/			/*GRADE AND MALE*/ ///
 			/*C*/			///closest_age_gap* ///
@@ -2464,7 +2487,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			drop if grade==0
 			
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021
+			if "`only_covid'" == "20_21" keep if year<=2021
 			
 			*- Divide sample based on grade in 2020
 			//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
@@ -2564,13 +2587,13 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 	
 			* All students
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 			estimates store all_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade year id_ie)
 			estimates store all_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
 			estimates store all_`vlab'_3
-			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
 			
 			
 			
@@ -2581,78 +2604,78 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			*- Parents Have some level of higher education
 			/*
 			di as result "*******" _n as text "Some Higher Ed" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & higher_ed_parent==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & higher_ed_parent==1 , a(grade year id_ie)
 			estimates store yhed_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & higher_ed_parent==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & higher_ed_parent==1 , a(grade year id_ie)
 			estimates store yhed_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & higher_ed_parent==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & higher_ed_parent==1  , a(grade year id_ie)
 			estimates store yhed_`vlab'_3
-			if ${max_sibs} == 4 eststo yhed_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & higher_ed_parent==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo yhed_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & higher_ed_parent==1  , a(grade year id_ie)
 			
 			di as result "*******" _n as text "No Higher ed" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & higher_ed_parent==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & higher_ed_parent==0 , a(grade year id_ie)
 			estimates store nhed_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & higher_ed_parent==0 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & higher_ed_parent==0 , a(grade year id_ie)
 			estimates store nhed_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & higher_ed_parent==0  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & higher_ed_parent==0  , a(grade year id_ie)
 			estimates store nhed_`vlab'_3
-			if ${max_sibs} == 4 eststo nhed_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & higher_ed_parent==0  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo nhed_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & higher_ed_parent==0  , a(grade year id_ie)
 			*/
 			*- Mother's education
 			di as result "*******" _n as text "Incomplete Secondary" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==1 , a(grade year id_ie)
 			estimates store edu1_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==1 , a(grade year id_ie)
 			estimates store edu1_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==1  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==1  , a(grade year id_ie)
 			estimates store edu1_`vlab'_3
-			if ${max_sibs} == 4 eststo edu1_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo edu1_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==1  , a(grade year id_ie)
 			
 			di as result "*******" _n as text "Completed Secondary" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==2 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==2 , a(grade year id_ie)
 			estimates store edu2_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==2 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==2 , a(grade year id_ie)
 			estimates store edu2_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==2  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==2  , a(grade year id_ie)
 			estimates store edu2_`vlab'_3
-			if ${max_sibs} == 4 eststo edu2_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==2  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo edu2_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==2  , a(grade year id_ie)
 			
 			di as result "*******" _n as text "Some level of higher education" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==3 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==3 , a(grade year id_ie)
 			estimates store edu3_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==3 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & educ_cat_mother==3 , a(grade year id_ie)
 			estimates store edu3_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==3  , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & educ_cat_mother==3  , a(grade year id_ie)
 			estimates store edu3_`vlab'_3
-			if ${max_sibs} == 4 eststo edu3_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==3  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo edu3_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & educ_cat_mother==3  , a(grade year id_ie)
 			
 			*- Lives with parents
 			di as result "*******" _n as text "Lives with both parents" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & (lives_with_mother==1 & lives_with_father==1) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & (lives_with_mother==1 & lives_with_father==1) , a(grade year id_ie)
 			estimates store both_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & (lives_with_mother==1 & lives_with_father==1) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & (lives_with_mother==1 & lives_with_father==1) , a(grade year id_ie)
 			estimates store both_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & (lives_with_mother==1 & lives_with_father==1) , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & (lives_with_mother==1 & lives_with_father==1) , a(grade year id_ie)
 			estimates store both_`vlab'_3
-			if ${max_sibs} == 4 eststo both_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & (lives_with_mother==1 & lives_with_father==1)  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo both_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & (lives_with_mother==1 & lives_with_father==1)  , a(grade year id_ie)
 			
 			di as result "*******" _n as text "Only lives with one parent" _n as result 
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)) , a(grade year id_ie)
 			estimates store one_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)) , a(grade year id_ie)
 			estimates store one_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade year id_ie)
 			estimates store one_`vlab'_3
-			if ${max_sibs} == 4 eststo one_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade id_ie)
+			if ${max_sibs} == 4 eststo one_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1))   , a(grade year id_ie)
 			
 			di as result "*******" _n as text "Doesn't live with parents" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & (lives_with_mother==0 & lives_with_father==0) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & (lives_with_mother==0 & lives_with_father==0) , a(grade year id_ie)
 			estimates store none_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & (lives_with_mother==0 & lives_with_father==0) , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & (lives_with_mother==0 & lives_with_father==0) , a(grade year id_ie)
 			estimates store none_`vlab'_2
-			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & (lives_with_mother==0 & lives_with_father==0) , a(grade id_ie)
+			reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & (lives_with_mother==0 & lives_with_father==0) , a(grade year id_ie)
 			estimates store none_`vlab'_3
-			if ${max_sibs} == 4 eststo none_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & (lives_with_mother==0 & lives_with_father==0)  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo none_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & (lives_with_mother==0 & lives_with_father==0)  , a(grade year id_ie)
 
 
 			
@@ -2832,7 +2855,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" /*"std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" "higher_ed_parent"*/ /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" /*"20-21"*/  {
+		foreach only_covid in "all" /*"20_21"*/  {
 			foreach level in "all" /*"elm" "sec"*/ {
 						
 			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -2850,7 +2873,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 			/*DID*/			treated post treated_post ///
 			/*EVENT*/		year_t_?? ///
-			/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+			/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 			/*A*/ 			min_socioec_index_ie_cat /*OTHER IN DEMOG*/ ///
 			/*B*/			/*GRADE AND MALE*/ ///
 			/*C*/			///closest_age_gap* ///
@@ -2919,7 +2942,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			drop if grade==0
 			
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021
+			if "`only_covid'" == "20_21" keep if year<=2021
 						
 			*- Divide sample based on expected cohort
 			bys id_per_umc: egen min_year 		= min(year)
@@ -2999,13 +3022,13 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 			* All students
 			/*
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & age_oldest==`age' , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & age_oldest==`age' , a(grade year id_ie)
 			estimates store all_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & age_oldest==`age' , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & age_oldest==`age' , a(grade year id_ie)
 			estimates store all_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & age_oldest==`age'  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & age_oldest==`age'  , a(grade year id_ie)
 			estimates store all_`vlab'_3
-			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & age_oldest==`age'  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & age_oldest==`age'  , a(grade year id_ie)
 			*/
 			
 			//assert 1==0
@@ -3043,14 +3066,14 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 								restore
 								continue
 							}							
-							//reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((age_oldest==`age' & fam_total_${fam_type}>1) | fam_total_${fam_type}==1)  , a(grade id_ie)
+							//reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((age_oldest==`age' & fam_total_${fam_type}>1) | fam_total_${fam_type}==1)  , a(grade year id_ie)
 							//estimates store age`age'_`vlab'
-							reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1  , a(grade id_ie)
+							reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1  , a(grade year id_ie)
 							estimates store g`g'_`lab_age'_`vlab'_2
-							reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1, a(grade id_ie)
+							reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1, a(grade year id_ie)
 							estimates store g`g'_`lab_age'_`vlab'_3
 							if ${max_sibs} == 4 {
-								reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1, a(grade id_ie)	
+								reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1, a(grade year id_ie)	
 								estimates store g`g'_`lab_age'_`vlab'_4
 							}
 						restore
@@ -3364,7 +3387,7 @@ args type
 	*- TWFE Estimates
 
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21" {
+		foreach only_covid in "all" "20_21" {
 			foreach level in "all" "elm" "sec" {
 			
 			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
@@ -3413,7 +3436,7 @@ args type
 			drop if grade==0
 			
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021
+			if "`only_covid'" == "20_21" keep if year<=2021
 			
 			
 			*- Divide sample based on grade in 2020
@@ -3495,23 +3518,23 @@ args type
 	
 			* All students
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 			estimates store all_`vlab'
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(grade year id_ie)
 			estimates store all_`vlab'_2
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
 			estimates store all_`vlab'_3
-			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade id_ie)
+			if ${max_sibs} == 4 eststo all_`vlab'_4: reghdfe `v' 		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
 				
 			if "`level'" == "all" {
 				forvalues g = 1(1)11 {
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'_3
-				if ${max_sibs} == 4 eststo g`g'_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & grade==`g'  , a(grade id_ie)	
+				if ${max_sibs} == 4 eststo g`g'_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & grade==`g'  , a(grade year id_ie)	
 				}
 				
 				if ${max_sibs}==4 local legend_child_${max_sibs} = "4 children"	
@@ -3723,7 +3746,7 @@ clear
 
 *- Event Study
 
-foreach only_covid in "all" "20-21" {
+foreach only_covid in "all" /*"20_21"*/ {
 	foreach level in "all" "elm" "sec" {
 		//foreach young in "" /*"0" "1"*/ {
 		//	foreach area in  "all" /*"urb" "rur"*/  { 
@@ -3747,7 +3770,7 @@ foreach only_covid in "all" "20-21" {
 							/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 							/*DID*/			treated post treated_post ///
 							/*EVENT*/		year_t_?? ///
-							/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+							/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 							/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
 							/*B*/			/*GRADE AND MALE*/ ///
 							/*C*/			///closest_age_gap* ///
@@ -3822,7 +3845,7 @@ foreach only_covid in "all" "20-21" {
 								}							
 							
 							*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-							if "`only_covid'" == "20-21" keep if year<=2021			
+							if "`only_covid'" == "20_21" keep if year<=2021			
 							
 							
 							if strmatch("`other_filters'","*rural*")==1 		keep if urban_siagie==0
@@ -3917,7 +3940,7 @@ foreach only_covid in "all" "20-21" {
 							local drop_vars = ""
 							if "`level'" == "elm" & strmatch("`other_filters'","*young*") local drop_vars = "year_t_b5 year_t_b4 year_t_b3"
 						
-							coefplot 	(event_`vlab', drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
+							coefplot 	(event_`vlab', drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0%20)) lcolor(gs0) cirecast(rarea)) ///
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
@@ -3931,10 +3954,17 @@ foreach only_covid in "all" "20-21" {
 										subtitle("`tlab'") ///
 										legend(pos(6) col(4))
 					
+						if "${covid_data}" == "_TEST" {
+							di "TEST"
+							capture qui graph export "$FIGURES_TEMP\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES_TEMP\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						}
+						if "${covid_data}" == "" {
+							di "REAL"
 							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
 							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
-							
-							coefplot 	(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") ciopts(bcolor("${ek_blue}")) lcolor("${ek_blue}")) ///
+						}						
+							coefplot 	(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") ciopts(bcolor("${ek_blue}%30")) lcolor("${ek_blue}") cirecast(rarea)) ///
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
@@ -3948,13 +3978,23 @@ foreach only_covid in "all" "20-21" {
 										subtitle("`tlab'") ///
 										legend(pos(6) col(4))
 					
+						if "${covid_data}" == "_TEST" {
+							di "TEST"
+							capture qui graph export "$FIGURES_TEMP\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES_TEMP\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace		
+						}
+						if "${covid_data}" == "" {
+							di "REAL"
 							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace								
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace		
+						}	
+						
+						
 							
 							coefplot 	///(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'1, drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
-										(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") 	ciopts(bcolor("${ek_blue}")) 	lcolor("${ek_blue}")) ///
-										(event_`vlab'_3, drop(year_t_b6 `drop_vars') mcolor("${ek_green}") 	ciopts(bcolor("${ek_green}")) 	lcolor("${ek_green}")) ///
-										(event_`vlab'_4, drop(year_t_b6 `drop_vars') mcolor("${ek_red}") 	ciopts(bcolor("${ek_red}")) 	lcolor("${ek_red}")) ///
+										(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") 	ciopts(bcolor("${ek_blue}%30")) 	lcolor("${ek_blue}") cirecast(rarea)) ///
+										(event_`vlab'_3, drop(year_t_b6 `drop_vars') mcolor("${ek_green}") 	ciopts(bcolor("${ek_green}%30")) 	lcolor("${ek_green}") cirecast(rarea)) ///
+										(event_`vlab'_4, drop(year_t_b6 `drop_vars') mcolor("${ek_red}") 	ciopts(bcolor("${ek_red}%30")) 	lcolor("${ek_red}") cirecast(rarea)) ///
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
@@ -3968,12 +4008,21 @@ foreach only_covid in "all" "20-21" {
 										///xline(2019.5 2021.5) ///
 										subtitle("`tlab'") ///
 										legend(pos(6) col(4))
-							
+					
+						if "${covid_data}" == "_TEST" {
+							di "TEST"
+							capture qui graph export "$FIGURES_TEMP\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES_TEMP\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace		
+						}
+						if "${covid_data}" == "" {
+							di "REAL"
 							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace							
-							}
+							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace			
+						}	
+
 					}
 			}
+	}
 		
 end
 
@@ -4632,7 +4681,7 @@ no education?
 
 	*- TWFE Estimates
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21" {
+		foreach only_covid in "all" "20_21" {
 			foreach level in "all" "elm" "sec" {
 			
 				if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
@@ -4654,7 +4703,7 @@ no education?
 				/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
 				/*DID*/			treated post treated_post ///
 				/*EVENT*/		year_t_?? ///
-				/*Demog*/		public_siagie urban_siagie male_siagie  ${x} ///
+				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
 				/*B*/			/*GRADE AND MALE*/ ///
 				/*C*/			///closest_age_gap* ///
@@ -4694,7 +4743,7 @@ no education?
 				drop if grade==0
 				
 				*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-				if "`only_covid'" == "20-21" keep if year<=2021
+				if "`only_covid'" == "20_21" keep if year<=2021
 				
 				*- Divide sample based on grade in 2020
 				//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
@@ -4765,7 +4814,7 @@ no education?
 		
 				* All students
 				di as result "*******" _n as text "All" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 				estimates store all_`vlab'
 
 				
@@ -4774,82 +4823,82 @@ no education?
 				*****			
 				*- Urban/Rural
 				di as result "*******" _n as text "Urban" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==1 , a(grade year id_ie)
 				estimates store urb_`vlab'
 
 
 				di as result "*******" _n as text "Rural" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & urban_siagie==0 , a(grade year id_ie)
 				estimates store rur_`vlab'
 
 				
 				*- Internet/No Internet
 				di as result "*******" _n as text "Internet in school" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & internet==1, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & internet==1, a(grade year id_ie)
 				estimates store int_`vlab'
 
 
 				di as result "*******" _n as text "No internet in school" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & internet==0 , a(grade year id_ie)
 				estimates store nin_`vlab'
 
 				/*
 				*- Public/Private
 				di as result "*******" _n as text "Public" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & public_siagie==1, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & public_siagie==1, a(grade year id_ie)
 				estimates store all_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==1 , a(grade year id_ie)
 				estimates store pub_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==1  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==1  , a(grade year id_ie)
 				estimates store pub_`vlab'_3
-				if ${max_sibs} == 4 eststo pub_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==1  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo pub_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==1  , a(grade year id_ie)
 
 				di as result "*******" _n as text "Private" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==0, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & public_siagie==0, a(grade year id_ie)
 				estimates store all_`vlab'
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==0 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & public_siagie==0 , a(grade year id_ie)
 				estimates store pri_`vlab'_2
-				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==0  , a(grade id_ie)
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & public_siagie==0  , a(grade year id_ie)
 				estimates store pri_`vlab'_3
-				if ${max_sibs} == 4 eststo pri_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==0  , a(grade id_ie)
+				if ${max_sibs} == 4 eststo pri_`vlab'_4: reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & public_siagie==0  , a(grade year id_ie)
 				*/
 				*- Low SES/High SES schools
 				di as result "*******" _n as text "Low SES IE" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==1 , a(grade year id_ie)
 				estimates store low_`vlab'
 
 
 				di as result "*******" _n as text "High SES IE" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==4, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & min_socioec_index_ie_cat==4, a(grade year id_ie)
 				estimates store hig_`vlab'
 
 
 				*- By age
 				di as result "*******" _n as text "Younger cohort" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==1 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==1 , a(grade year id_ie)
 				estimates store young_`vlab'
 
 				
 				di as result "*******" _n as text "Older cohort" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==0, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  & young==0, a(grade year id_ie)
 				estimates store old_`vlab'
 
 		
 				*- Birth Order
 				di as result "*******" _n as text "Oldest" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & inlist(fam_order_${fam_type},1)==1, a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & inlist(fam_order_${fam_type},1)==1, a(grade year id_ie)
 				estimates store first_`vlab'
 
 					
 				*- Mother's education
 				di as result "*******" _n as text "Some level of higher education" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==3 , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & educ_cat_mother==3 , a(grade year id_ie)
 				estimates store edu3_`vlab'
 
 				
 				*- Lives with parents
 				di as result "*******" _n as text "Only lives with one parent" _n as result "*******"
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)), a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1  &  ((lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1)), a(grade year id_ie)
 				estimates store one_`vlab'
 				
 
@@ -4961,7 +5010,7 @@ args type
 	*- TWFE Estimates
 
 	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" /*"approved" "approved_first"*/ {
-		foreach only_covid in "all" "20-21" {
+		foreach only_covid in "all" "20_21" {
 			foreach level in "all" "elm" "sec" {
 			
 			if ${covid_test} == 1 & inlist("`v'","std_gpa_m_adj","pass_math")==0 	continue
@@ -5010,7 +5059,7 @@ args type
 			drop if grade==0
 			
 			*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
-			if "`only_covid'" == "20-21" keep if year<=2021
+			if "`only_covid'" == "20_21" keep if year<=2021
 			
 			
 			*- Divide sample based on grade in 2020
@@ -5063,12 +5112,12 @@ args type
 	
 			* All students
 			di as result "*******" _n as text "All" _n as result "*******"
-			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade id_ie)
+			reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 , a(grade year id_ie)
 			estimates store all_`vlab'
 				
 			if "`level'" == "all" {
 				forvalues g = 1(1)11 {
-				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==`g' , a(grade id_ie)
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==`g' , a(grade year id_ie)
 				estimates store g`g'_`vlab'
 				}
 				
@@ -5154,6 +5203,842 @@ args type
 		}
 	}
 
+end
+
+
+*----------------
+*- TWFE: 2nd, 4th, 8th
+*----------------
+
+
+capture program drop twfe_2_4_6_8
+program define twfe_2_4_6_8
+
+
+args treatment_type subsample post_years      //treatment_type: treatment type (generally by # of siblings). 
+
+capture assert "`treatment_type'" != ""
+if _rc!=0 di "Need to select type: usual is -siblings-"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+capture assert inlist("`post_years'","all","20_21")==1
+if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"		 
+	clear
+
+	
+	local v = "std_gpa_m_adj"
+	local only_covid = "`post_years'"
+	local level = "all"
+	
+					
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+				if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+				if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
+
+				estimates clear
+				global x = "$x_all"
+				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
+				
+				use ///
+				/*OUTCOME*/		`v' std_gpa_m_adj std_gpa_c_adj ///
+				/*ID*/ 			id_ie id_per_umc year grade ///
+				/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
+				/*DID*/			treated post treated_post ///
+				/*EVENT*/		year_t_?? ///
+				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
+				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
+				/*B*/			/*GRADE AND MALE*/ ///
+				/*C*/			///closest_age_gap* ///
+				/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
+				/*Other*/		age_mother_1st_oldest_${fam_type} /**has_internet *has_comp *low_ses *quiet_room*/ ///
+				using "$TEMP\pre_reg_covid${covid_data}", clear
+				
+				*- School has internet
+				merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
+
+				
+				if "`treatment_type'"=="internet" {
+					drop treated treated_post
+					gen treated = internet==1
+					gen treated_post = treated*post
+					local lab_control = "No Internet"
+					local lab_treated = "Internet"
+				}	
+
+				if "`treatment_type'"=="parent_ed" {
+					drop treated treated_post
+					gen treated = (educ_cat_mother==3)
+					gen treated_post = treated*post
+					local lab_control = "Mother no higher ed."
+					local lab_treated = "Mother some higher ed."
+				}
+
+				if "`treatment_type'"=="both_parents" {
+					drop treated treated_post
+					gen treated = (lives_with_mother==1 & lives_with_father==1)
+					gen treated_post = treated*post
+					local lab_control = "Does not live with both"
+					local lab_treated = "Lives with both parents"
+				}	
+				
+				if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+				if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+				if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+				if "`subsample'" == "all" 		di "All siblings"
+					
+				*- Remove early grades and years
+				keep if year>=2014
+				drop if grade==0
+				
+				*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
+				if "`only_covid'" == "20_21" keep if year<=2021
+				
+				*- Divide sample based on grade in 2020
+				//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
+				
+				*- Divide sample based on expected cohort
+				bys id_per_umc: egen min_year 		= min(year)
+				bys id_per_umc: egen grade_min_year = min(cond(year==min_year,grade,.))
+				gen proxy_1st = min_year - grade_min_year  + 1
+								
+				
+				/*
+				*- Not enough pre-years
+							
+				drop if inlist(grade_2020,1,2)==1
+				drop if grade_2020==3 & year<=2017 //<=2017 Would only include those who repeated..
+				drop if grade_2020==4 & year<=2016 //<=2016 Would only include those who repeated..
+				keep if proxy_1st <= 2018
+				*/
+				
+				
+				/*
+				if "`area'" == "rur" keep if urban_siagie == 0
+				if "`area'" == "urb" keep if urban_siagie == 1
+
+				if "`hed_parent'" == "no" 	keep if higher_ed_parent == 0
+				if "`hed_parent'" == "yes" 	keep if higher_ed_parent == 1
+				*/
+				
+				if "`level'" == "all" {
+					keep if grade>=1 & grade<=11
+					//gen young = inlist(grade_2020,3,4,5,6)==1 if inlist(grade_2020,3,4,5,6,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2015,2016,2017,2018) if inlist(proxy_1st,2011,2012,2013,2014,2015,2016,2017,2018)==1
+					gen young = inlist(grade,1,2,3,4,5,6)==1 if inlist(grade,1,2,3,4,5,6,7,8,9,10,11)
+					local young_lab = "Primary" //Primary in 2020
+					local old_lab 	= "Secondary"
+					}
+				if "`level'" == "elm" {
+					keep if grade>=1 & grade<=6
+					//gen young = inlist(grade_2020,3,4)==1 if inlist(grade_2020,3,4,5,6)
+					//gen young = inlist(proxy_1st,2017,2018) if inlist(proxy_1st,2015,2016)==1
+					//local young_lab = "2017-2018 cohort" //3rd-4th grade in 2020
+					//local old_lab 	= "2015-2016 cohort" //5th-6th grade in 2020
+					gen young = inlist(grade,1,2,3)==1 if inlist(grade,1,2,3,4,5,6)
+					local young_lab = "1st-3rd grade"
+					local old_lab 	= "4th-6th grade"
+					}
+				if "`level'" == "sec" {
+					keep if grade>=7	
+					//gen young = inlist(grade_2020,7,8)==1 if inlist(grade_2020,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2014,2013) if inlist(proxy_1st,2011,2012)==1
+					//local young_lab = "2014-2013 cohort" //7th-8th grade in 2020
+					//local old_lab 	= "2011-2012 cohort" //9th-11th grade in 2020
+					gen young = inlist(grade,7,8)==1 if inlist(grade,7,8,9,10,11)
+					local young_lab = "7th-8th grade"
+					local old_lab 	= "9th-11th grade"
+					}
+
+				local vlab 		= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				local xtitle 	= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				if "`v'" == "std_gpa_m" 		{
+					local vlab = "gpa_m"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c" 		{
+					local vlab = "gpa_c"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "std_gpa_m_adj" 		{
+					local vlab = "gpa_m_adj"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c_adj" 		{
+					local vlab = "gpa_c_adj"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "pass_math" 		{
+					local vlab = "pass_m"
+					local xtitle = "% A's Mathematics"
+					}
+				if "`v'" == "pass_read" 		{
+					local vlab = "pass_c"
+					local xtitle = "% A's Reading"
+					}
+				if "`v'" == "approved" 		{
+					local vlab = "pass"
+					local xtitle = "Grade Promotion"
+					}
+				if "`v'" == "approved_first" 		{
+					local vlab = "passf"
+					local xtitle = "Grade Promotion without recovery"
+					}
+				if "`v'" == "higher_ed_parent" 		{
+					local vlab = "hed_parent"
+					local xtitle = "% Parent with higher education"
+					}
+		
+		
+				gen age_mom_cat = .
+				replace age_mom_cat = 1 if age_mother_1st_oldest_2<30 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 2 if age_mother_1st_oldest_2>=30 & age_mother_1st_oldest_2<50 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 3 if age_mother_1st_oldest_2>=50 & age_mother_1st_oldest_2!=.
+
+				
+								
+				*- Estimate Math & Reading: 2nd, 4th and 8th grade.
+
+				reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==2 , a(grade year id_ie)
+				estimates store m2
+				reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==2 , a(grade year id_ie)
+				estimates store c2
+				reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==4 , a(grade year id_ie)
+				estimates store m4
+				reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==4 , a(grade year id_ie)
+				estimates store c4
+				reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==6 , a(grade year id_ie)
+				estimates store m6
+				reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==6 , a(grade year id_ie)
+				estimates store c6				
+				reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==8 , a(grade year id_ie)
+				estimates store m8
+				reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==8 , a(grade year id_ie)
+				estimates store c8		
+							
+				coefplot 	(m2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+							(c2, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							, ///
+							bylabel("2nd grade") ///
+							|| ///
+							(m4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+							(c4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							, ///
+							bylabel("4th grade") ///
+							|| ///
+							(m6, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+							(c6, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							, ///
+							bylabel("6th grade") ///	
+							|| ///
+							(m8, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+							(c8, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							, ///
+							bylabel("8th grade") ///		
+							|| ///
+							, ///
+							vertical ///
+							recast(bar) barwidth(0.25) ///
+							ciopts(recast(rcap)) citop ///
+							xlabel(1 "2nd grade" 2 "4th grade" 3 "6th grade" 4 "8th grade") ///	
+							keep(treated_post) ///
+							legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
+							ytitle("Standardized GPA relative to Only Children", size(medsmall) height(5)) ///							
+							///xline(0, lcolor(gs12)) ///
+							ylabel(-0.06(0.01)0.01) ///
+							yline(0, lcolor(gs0) lpattern(dash)) ///
+							grid(none) ///
+							bycoefs 
+
+					
+					if "${covid_data}" == "_TEST" {
+						di "TEST"
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_2_4_6_8_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_2_4_6_8_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						}
+					if "${covid_data}" == "" {
+						di "REAL"
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_2_4_6_8_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_2_4_6_8_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						}								
+					
+end
+		
+
+
+
+
+
+*-----------------
+*-  TEST
+*-----------------
+
+
+capture program drop twfe_test
+program define twfe_test
+
+
+args treatment_type subsample       //treatment_type: treatment type (generally by # of siblings). 
+
+capture assert "`treatment_type'" != ""
+if _rc!=0 di "Need to select type: usual is -siblings-"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+
+	clear
+
+	
+	local v = "std_gpa_m_adj"
+	local only_covid = "all"
+	local level = "all"
+	
+					
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+				if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+				if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
+
+				estimates clear
+				global x = "$x_all"
+				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
+				
+				use ///
+				/*OUTCOME*/		`v' std_gpa_m_adj std_gpa_c_adj ///
+				/*ID*/ 			id_ie id_per_umc year grade ///
+				/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
+				/*DID*/			treated post treated_post ///
+				/*EVENT*/		year_t_?? ///
+				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
+				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
+				/*B*/			/*GRADE AND MALE*/ ///
+				/*C*/			///closest_age_gap* ///
+				/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
+				/*Other*/		age_mother_1st_oldest_${fam_type} /**has_internet *has_comp *low_ses *quiet_room*/ ///
+				using "$TEMP\pre_reg_covid${covid_data}", clear
+				
+				*- School has internet
+				merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
+
+				
+				if "`treatment_type'"=="internet" {
+					drop treated treated_post
+					gen treated = internet==1
+					gen treated_post = treated*post
+					local lab_control = "No Internet"
+					local lab_treated = "Internet"
+				}	
+
+				if "`treatment_type'"=="parent_ed" {
+					drop treated treated_post
+					gen treated = (educ_cat_mother==3)
+					gen treated_post = treated*post
+					local lab_control = "Mother no higher ed."
+					local lab_treated = "Mother some higher ed."
+				}
+
+				if "`treatment_type'"=="both_parents" {
+					drop treated treated_post
+					gen treated = (lives_with_mother==1 & lives_with_father==1)
+					gen treated_post = treated*post
+					local lab_control = "Does not live with both"
+					local lab_treated = "Lives with both parents"
+				}	
+				
+				if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+				if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+				if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+				if "`subsample'" == "all" 		di "All siblings"
+					
+				*- Remove early grades and years
+				keep if year>=2014
+				drop if grade==0
+				
+				*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
+				if "`only_covid'" == "20_21" keep if year<=2021
+				
+				*- Divide sample based on grade in 2020
+				//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
+				
+				*- Divide sample based on expected cohort
+				bys id_per_umc: egen min_year 		= min(year)
+				bys id_per_umc: egen grade_min_year = min(cond(year==min_year,grade,.))
+				gen proxy_1st = min_year - grade_min_year  + 1
+								
+				
+				/*
+				*- Not enough pre-years
+							
+				drop if inlist(grade_2020,1,2)==1
+				drop if grade_2020==3 & year<=2017 //<=2017 Would only include those who repeated..
+				drop if grade_2020==4 & year<=2016 //<=2016 Would only include those who repeated..
+				keep if proxy_1st <= 2018
+				*/
+				
+				
+				/*
+				if "`area'" == "rur" keep if urban_siagie == 0
+				if "`area'" == "urb" keep if urban_siagie == 1
+
+				if "`hed_parent'" == "no" 	keep if higher_ed_parent == 0
+				if "`hed_parent'" == "yes" 	keep if higher_ed_parent == 1
+				*/
+				
+				if "`level'" == "all" {
+					keep if grade>=1 & grade<=11
+					//gen young = inlist(grade_2020,3,4,5,6)==1 if inlist(grade_2020,3,4,5,6,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2015,2016,2017,2018) if inlist(proxy_1st,2011,2012,2013,2014,2015,2016,2017,2018)==1
+					gen young = inlist(grade,1,2,3,4,5,6)==1 if inlist(grade,1,2,3,4,5,6,7,8,9,10,11)
+					local young_lab = "Primary" //Primary in 2020
+					local old_lab 	= "Secondary"
+					}
+				if "`level'" == "elm" {
+					keep if grade>=1 & grade<=6
+					//gen young = inlist(grade_2020,3,4)==1 if inlist(grade_2020,3,4,5,6)
+					//gen young = inlist(proxy_1st,2017,2018) if inlist(proxy_1st,2015,2016)==1
+					//local young_lab = "2017-2018 cohort" //3rd-4th grade in 2020
+					//local old_lab 	= "2015-2016 cohort" //5th-6th grade in 2020
+					gen young = inlist(grade,1,2,3)==1 if inlist(grade,1,2,3,4,5,6)
+					local young_lab = "1st-3rd grade"
+					local old_lab 	= "4th-6th grade"
+					}
+				if "`level'" == "sec" {
+					keep if grade>=7	
+					//gen young = inlist(grade_2020,7,8)==1 if inlist(grade_2020,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2014,2013) if inlist(proxy_1st,2011,2012)==1
+					//local young_lab = "2014-2013 cohort" //7th-8th grade in 2020
+					//local old_lab 	= "2011-2012 cohort" //9th-11th grade in 2020
+					gen young = inlist(grade,7,8)==1 if inlist(grade,7,8,9,10,11)
+					local young_lab = "7th-8th grade"
+					local old_lab 	= "9th-11th grade"
+					}
+
+				local vlab 		= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				local xtitle 	= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				if "`v'" == "std_gpa_m" 		{
+					local vlab = "gpa_m"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c" 		{
+					local vlab = "gpa_c"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "std_gpa_m_adj" 		{
+					local vlab = "gpa_m_adj"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c_adj" 		{
+					local vlab = "gpa_c_adj"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "pass_math" 		{
+					local vlab = "pass_m"
+					local xtitle = "% A's Mathematics"
+					}
+				if "`v'" == "pass_read" 		{
+					local vlab = "pass_c"
+					local xtitle = "% A's Reading"
+					}
+				if "`v'" == "approved" 		{
+					local vlab = "pass"
+					local xtitle = "Grade Promotion"
+					}
+				if "`v'" == "approved_first" 		{
+					local vlab = "passf"
+					local xtitle = "Grade Promotion without recovery"
+					}
+				if "`v'" == "higher_ed_parent" 		{
+					local vlab = "hed_parent"
+					local xtitle = "% Parent with higher education"
+					}
+		
+		
+				gen age_mom_cat = .
+				replace age_mom_cat = 1 if age_mother_1st_oldest_2<30 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 2 if age_mother_1st_oldest_2>=30 & age_mother_1st_oldest_2<50 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 3 if age_mother_1st_oldest_2>=50 & age_mother_1st_oldest_2!=.
+assert 1==0
+
+
+				di as result "*******" _n as text "WITH CONTROLS" _n as result "*******"
+				local v = "std_gpa_m_adj"
+				reghdfe `v' 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1  , a(grade year id_ie)
+				estimates store reg0_controls
+
+				di as result "*******" _n as text "WITHOUT CONTROLS" _n as result "*******"
+				reghdfe `v' 	treated_post post treated  if inlist(fam_total_${fam_type},1,2,3,4)==1  , a(grade year id_ie)
+				estimates store reg0_nocontrols	
+				
+
+				di as result "*******" _n as text "WITHOUT YEAR FE" _n as result "*******"
+				reghdfe `v' 	treated_post post treated  if inlist(fam_total_${fam_type},1,2,3,4)==1  , a(grade id_ie)
+				estimates store reg0_nocontrols_noyfe				
+				
+				di as result "*******" _n as text "WITH CONTROLS" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2)==1  , a(grade year id_ie)
+				estimates store reg1_controls
+				reghdfe `v'		treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
+				estimates store reg2_controls
+				reghdfe `v'		treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
+				estimates store reg3_controls
+
+				di as result "*******" _n as text "WITHOUT CONTROLS" _n as result "*******"
+				reghdfe `v' 	treated_post post treated  if inlist(fam_total_${fam_type},1,2)==1  , a(grade year id_ie)
+				estimates store reg1_nocontrols
+				reghdfe `v'		treated_post post treated  if inlist(fam_total_${fam_type},1,3)==1  , a(grade year id_ie)
+				estimates store reg2_nocontrols
+				reghdfe `v'		treated_post post treated  if inlist(fam_total_${fam_type},1,4)==1  , a(grade year id_ie)
+				estimates store reg3_nocontrols				
+
+				di as result "*******" _n as text "WITHOUT YEAR FE" _n as result "*******"
+				reghdfe `v' 	treated_post post treated  if inlist(fam_total_${fam_type},1,2)==1  , a(grade  id_ie)
+				estimates store reg1_nocontrols_noyfe
+				reghdfe `v'		treated_post post treated  if inlist(fam_total_${fam_type},1,3)==1  , a(grade  id_ie)
+				estimates store reg2_nocontrols_noyfe
+				reghdfe `v'		treated_post post treated  if inlist(fam_total_${fam_type},1,4)==1  , a(grade  id_ie)
+				estimates store reg3_nocontrols_noyfe
+
+				*****
+				* Panel A: Confounders: Type of school
+				*****		
+				forvalues cat = 1(1)3 {
+				
+				di as result "*******" _n as text "Urban" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & age_mom_cat==`cat' , a(grade year id_ie)
+				estimates store age`cat'_`vlab'
+				reghdfe `v' 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2)==1 & age_mom_cat==`cat' , a(grade year id_ie)
+				estimates store age`cat'_`vlab'_2
+				reghdfe `v'		treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,3)==1 & age_mom_cat==`cat'  , a(grade year id_ie)
+				estimates store age`cat'_`vlab'_3
+				reghdfe `v'		treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,4)==1 & age_mom_cat==`cat'  , a(grade year id_ie)
+				estimates store age`cat'_`vlab'_4
+				}
+				
+				
+				
+*- Estimate Math & Reading: 2nd, 4th and 8th grade.
+bys id_per_umc: egen base_std_gpa_m_adj = max(cond(grade==2,std_gpa_m_adj,.))
+
+reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==2 , a(grade year id_ie)
+estimates store m2
+reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==2 , a(grade year id_ie)
+estimates store c2
+reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==4 , a(grade year id_ie)
+estimates store m4
+reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==4 , a(grade year id_ie)
+estimates store c4
+reghdfe std_gpa_m_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==8 , a(grade year id_ie)
+estimates store m8
+reghdfe std_gpa_c_adj 	treated_post post treated ${x_all} if inlist(fam_total_${fam_type},1,2,3,4)==1 & grade==8 , a(grade year id_ie)
+estimates store c8			
+			
+coefplot 	(m2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+			(c2, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(m4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(c4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("4th grade") ///	
+			|| ///
+			(m8, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(c8, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("8th grade") ///		
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade" 3 "8th grade") ///	
+			keep(treated_post) ///
+			legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
+			ytitle("`xtitle' relative to Only Children", size(medsmall) height(5)) ///							
+			xline(0, lcolor(gs12)) ///
+			grid(none) ///
+			bycoefs 				
+end
+		
+
+		
+
+********************************************************************************
+* Event Study - TEST
+********************************************************************************
+
+capture program drop event_test
+program define event_test
+	
+	
+
+
+args treatment_type subsample other_filters     //treatment_type: treatment type (generally by # of siblings). 
+
+capture assert "`treatment_type'" != ""
+if _rc!=0 di "Need to select type: usual is -siblings-"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+
+
+if ${max_sibs}==4 local legend_child_${max_sibs} = "4 children"	
+if ${max_sibs}==4 local legend_sib_${max_sibs} = "3 siblings"	
+
+*- GPA Overall 
+estimates clear
+
+clear
+
+*- Event Study
+
+local only_covid = "all"
+local level = "all"
+local v = "std_gpa_m_adj"
+
+								di "`v' - `treatment_type' - `subsample' - `other_filters'"
+							
+							if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+							if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+							if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
+
+							estimates clear
+							global x = "$x_all"
+							if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
+							
+							use ///
+							/*OUTCOME*/		`v'  ///
+							/*ID*/ 			id_ie id_per_umc year grade ///
+							/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
+							/*DID*/			treated post treated_post ///
+							/*EVENT*/		year_t_?? ///
+							/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
+							/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
+							/*B*/			/*GRADE AND MALE*/ ///
+							/*C*/			///closest_age_gap* ///
+							/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
+							/*Other*/		/**has_internet *has_comp *low_ses *quiet_room*/ ///
+							using "$TEMP\pre_reg_covid${covid_data}", clear
+							
+							*- School has internet
+							merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
+
+							
+							if "`treatment_type'"=="internet" {
+								drop treated treated_post
+								gen treated = internet==1
+								gen treated_post = treated*post
+								local lab_control = "No Internet"
+								local lab_treated = "Internet"
+							}	
+
+							if "`treatment_type'"=="parent_ed" {
+								drop treated treated_post
+								gen treated = (educ_cat_mother==3)
+								gen treated_post = treated*post
+								local lab_control = "Mother no higher ed."
+								local lab_treated = "Mother some higher ed."
+							}
+
+							if "`treatment_type'"=="both_parents" {
+								drop treated treated_post
+								gen treated = (lives_with_mother==1 & lives_with_father==1)
+								gen treated_post = treated*post
+								local lab_control = "Does not live with both"
+								local lab_treated = "Lives with both parents"
+							}	
+							
+							if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+							if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+							if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+							if "`subsample'" == "all" 		di "All siblings"
+		
+							*- Remove early grades and years
+							keep if year>=2016
+							drop if grade==0
+							
+							if "`level'" == "all" {
+								keep if grade>=1 & grade<=11
+								//gen young = inlist(grade_2020,3,4,5,6)==1 if inlist(grade_2020,3,4,5,6,7,8,9,10,11)
+								//gen young = inlist(proxy_1st,2015,2016,2017,2018) if inlist(proxy_1st,2011,2012,2013,2014,2015,2016,2017,2018)==1
+								gen young = inlist(grade,1,2,3,4,5,6)==1 if inlist(grade,1,2,3,4,5,6,7,8,9,10,11)
+								local young_lab = "Primary" //Primary in 2020
+								local old_lab 	= "Secondary"
+								}
+							if "`level'" == "elm" {
+								keep if grade>=1 & grade<=6
+								//gen young = inlist(grade_2020,3,4)==1 if inlist(grade_2020,3,4,5,6)
+								//gen young = inlist(proxy_1st,2017,2018) if inlist(proxy_1st,2015,2016)==1
+								//local young_lab = "2017-2018 cohort" //3rd-4th grade in 2020
+								//local old_lab 	= "2015-2016 cohort" //5th-6th grade in 2020
+								gen young = inlist(grade,1,2,3)==1 if inlist(grade,1,2,3,4,5,6)
+								local young_lab = "1st-3rd grade"
+								local old_lab 	= "4th-6th grade"
+								}
+							if "`level'" == "sec" {
+								keep if grade>=7	
+								//gen young = inlist(grade_2020,7,8)==1 if inlist(grade_2020,7,8,9,10,11)
+								//gen young = inlist(proxy_1st,2014,2013) if inlist(proxy_1st,2011,2012)==1
+								//local young_lab = "2014-2013 cohort" //7th-8th grade in 2020
+								//local old_lab 	= "2011-2012 cohort" //9th-11th grade in 2020
+								gen young = inlist(grade,7,8)==1 if inlist(grade,7,8,9,10,11)
+								local young_lab = "7th-8th grade"
+								local old_lab 	= "9th-11th grade"
+								}							
+							
+							*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
+							if "`only_covid'" == "20_21" keep if year<=2021			
+							
+							
+							if strmatch("`other_filters'","*rural*")==1 		keep if urban_siagie==0
+							if strmatch("`other_filters'","*urban*")==1 		keep if urban_siagie==1
+							
+							if strmatch("`other_filters'","*parent_nhed*")==1 	keep if higher_ed_parent == 0
+							if strmatch("`other_filters'","*parent_hed*")==1 	keep if higher_ed_parent == 1	
+							
+							if strmatch("`other_filters'","*both*")==1 			keep if lives_with_mother==1 & lives_with_father==1
+							if strmatch("`other_filters'","*notboth*")==1 		keep if (lives_with_mother==1 & lives_with_father==0) | (lives_with_mother==0 & lives_with_father==1) | (lives_with_mother==0 & lives_with_father==0)						
+							
+							if strmatch("`other_filters'","*young*")==1 		keep if young==1				
+							if strmatch("`other_filters'","*old*")==1 			keep if young==0						
+							
+									
+							/*		
+							if "`res'" == "all" 		keep if 1==1
+							if "`res'" == "alls" 		keep if has_internet!=.
+							if "`res'" == "nint" 		keep if has_internet==0
+							if "`res'" == "ncom" 		keep if has_comp==0
+							if "`res'" == "lses" 		keep if low_ses==1
+							if "`res'" == "nqui" 		keep if quiet_room==0
+							*/
+							
+							local vlab 		= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+							local xtitle 	= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+							if "`v'" == "std_gpa_m" 		{
+								local vlab = "gpa_m"
+								local xtitle = "Standardized Mathematics GPA"
+								}
+							if "`v'" == "std_gpa_c" 		{
+								local vlab = "gpa_c"
+								local xtitle = "Standardized Reading GPA"
+								}
+							if "`v'" == "std_gpa_m_adj" 		{
+								local vlab = "gpa_m_adj"
+								local xtitle = "Standardized Mathematics GPA"
+								}
+							if "`v'" == "std_gpa_c_adj" 		{
+								local vlab = "gpa_c_adj"
+								local xtitle = "Standardized Reading GPA"
+								}
+							if "`v'" == "pass_math" 		{
+								local vlab = "pass_m"
+								local xtitle = "% A's Mathematics"
+								}
+							if "`v'" == "pass_read" 		{
+								local vlab = "pass_c"
+								local xtitle = "% A's Reading"
+								}
+							if "`v'" == "approved" 		{
+								local vlab = "pass"
+								local xtitle = "Grade Promotion"
+								}
+							if "`v'" == "approved_first" 		{
+								local vlab = "passf"
+								local xtitle = "Grade Promotion without recovery"
+								}
+							if "`v'" == "higher_ed_parent" 		{
+								local vlab = "hed_parent"
+								local xtitle = "% Parent with higher education"
+								}	
+										
+						
+							/*
+							local res_lab = ""
+							if "`res'" == "alls" local res_lab = "s"
+							if "`res'" == "nint" local res_lab = "i"
+							if "`res'" == "ncom" local res_lab = "c"
+							if "`res'" == "lses" local res_lab = "l"
+							if "`res'" == "nqui" local res_lab = "q"
+							*/
+							
+							//merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(`v'_*) nogen
+							
+							*- Event Study
+							//OC vs size =2/3/4
+							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if fam_total_${fam_type}<=${max_sibs}, a(year grade id_ie)
+							estimates store event_`vlab'
+							
+							//OC vs size =2
+							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,2)==1 , a(year grade id_ie)
+							estimates store event_`vlab'_2
+							
+							//OC vs size =3
+							reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,3)==1 , a(year grade id_ie)
+							estimates store event_`vlab'_3
+							
+							if ${max_sibs} == 4 eststo event_`vlab'_4 :reghdfe `v' 			year_t_b? o.year_t_o1 year_t_a?  treated ${x} if inlist(fam_total_${fam_type},1,4)==1 , a(year grade id_ie)
+						
+							
+							local drop_vars = ""
+							if "`level'" == "elm" & strmatch("`other_filters'","*young*") local drop_vars = "year_t_b5 year_t_b4 year_t_b3"
+						
+							coefplot 	(event_`vlab', drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0%20)) lcolor(gs0) cirecast(rarea)) ///
+										, ///
+										omitted ///
+										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
+										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										yline(0,  lcolor(gs10))  ///
+										ytitle("`xtitle'") ///
+										ylab(-.1(.02).04) ///
+										///xline(2019.5 2021.5) ///
+										subtitle("`tlab'") ///
+										legend(pos(6) col(4))
+					
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+							
+							coefplot 	(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") ciopts(bcolor("${ek_blue}%30")) lcolor("${ek_blue}") cirecast(rarea)) ///
+										, ///
+										omitted ///
+										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
+										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										yline(0,  lcolor(gs10))  ///
+										ytitle("`xtitle'") ///
+										ylab(-.1(.02).04) ///
+										///xline(2019.5 2021.5) ///
+										subtitle("`tlab'") ///
+										legend(pos(6) col(4))
+					
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES\Event Study\covid_event_`level'_`only_covid'_`v'_T`treatment_type'_2_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace								
+							
+							coefplot 	///(e`vlab'_`area_lab'_`lives_lab'_`hed_lab'_`level_lab'`young'_`res_lab'1, drop(year_t_b6 `drop_vars') mcolor(gs0) ciopts(bcolor(gs0)) lcolor(gs0)) ///
+										(event_`vlab'_2, drop(year_t_b6 `drop_vars') mcolor("${ek_blue}") 	ciopts(bcolor("${ek_blue}%30")) 	lcolor("${ek_blue}") cirecast(rarea)) ///
+										(event_`vlab'_3, drop(year_t_b6 `drop_vars') mcolor("${ek_green}") 	ciopts(bcolor("${ek_green}%30")) 	lcolor("${ek_green}") cirecast(rarea)) ///
+										(event_`vlab'_4, drop(year_t_b6 `drop_vars') mcolor("${ek_red}") 	ciopts(bcolor("${ek_red}%30")) 	lcolor("${ek_red}") cirecast(rarea)) ///
+										, ///
+										omitted ///
+										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
+										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
+										leg(order(1 "1 sibling" 3 "2 siblings" 5 "`legend_sib_${max_sibs}'")) ///
+										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										yline(0,  lcolor(gs10))  ///
+										ytitle("`xtitle'") ///
+										ylab(-.1(.02).04) ///
+										///xline(2019.5 2021.5) ///
+										subtitle("`tlab'") ///
+										legend(pos(6) col(4))
+							
+							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+							capture qui graph export "$FIGURES\Event Study\covid_event_bysibs_`level'_`only_covid'_`v'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace							
+						
 end
 
 

@@ -98,13 +98,13 @@ program define clean_data
 
 	preserve
 			use "$TEMP\id_siblings", clear
-			keep id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st
+			keep id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st dob_mother dob_father
 			tempfile id_siblings_sample
 			save `id_siblings_sample', replace
 	restore
 
 	*- Match Family info
-	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st) 
+	merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st dob_mother dob_father) 
 	rename _m merge_siblings
 
 	*- Match ECE IDs
@@ -341,19 +341,12 @@ program define clean_data
 		
 		label var quart_`unit'_size "School by quartiles `unit' size (1=Q1, 4=Q4)"
 		}
-	/*
-	bys id_ie: egen min_grade = min(grade)
-	bys id_ie: egen max_grade = max(grade)
-	
-	tab min_grade max_grade
-	*/
 
-	
-	*- Census 2017 characteristics:
-	// Match INTERNET/ELECTRICITY Penetration
-	
-
-	//rename quiet_room_4p quiet_room
+		
+	*- Other control variables:
+	gen age_mother = year - year(dob_mother) if year(dob_mother)>1901 & year(dob_mother)<2015 
+	gen age_father = year - year(dob_father) if year(dob_father)>1901 & year(dob_father)<2025 
+	drop dob_mother dob_father
 	
 	drop if grade==0	
 
@@ -391,7 +384,7 @@ program define clean_data
 		male_siagie public_siagie urban_siagie min_socioec_index_ie_cat educ_mother educ_father lives_with_mother lives_with_father ///
 		quart_* grade_size* class_size* closest_age_gap*${fam_type} ///
 		base* ///
-		age_mother_1st age_mother_1st_oldest_${fam_type} ///
+		age_mother_1st age_mother_1st_oldest_${fam_type} age_mother age_father ///
 		covid_preg_sib covid_0_2_sib covid_2_4_sib t_born*  ///
 		year_entry_1st ///
 		year_2p year_4p year_2s peso*  socioec* /**has_internet *has_comp *low_ses *quiet_room*/ ///
