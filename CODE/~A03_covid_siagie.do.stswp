@@ -3976,7 +3976,7 @@ foreach only_covid in "all" /*"20_21"*/ {
 										ylab(-.1(.02).04) ///
 										///xline(2019.5 2021.5) ///
 										subtitle("`tlab'") ///
-										legend(off)
+										legend(pos(6) col(4))
 					
 						if "${covid_data}" == "_TEST" {
 							di "TEST"

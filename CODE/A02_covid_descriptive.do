@@ -328,6 +328,7 @@ program define parental_investment
 clear
 append using "$TEMP\ece_family_2p"
 gen grade=2
+merge 1:1 id_estudiante_2p year using "$TEMP\ece_2p"
 append using "$TEMP\ece_family_4p"
 replace grade=4 if grade==.
 append using "$TEMP\ece_family_6p"
@@ -341,16 +342,33 @@ VarStandardiz index_parent_educ_inv, by(year grade) newvar(std_index)
 
 		foreach g in "2p" "4p" "6p" "2s" {
 			foreach adult in "mother" {
-				gen base_educ_cat_`adult'_`g' = 1 if inlist(base_edu_`adult'_`g',1,2,3,4)==1
-				replace base_educ_cat_`adult'_`g' = 2 if inlist(base_edu_`adult'_`g',5)==1
-				replace base_educ_cat_`adult'_`g' = 3 if inlist(base_edu_`adult'_`g',6,7,8,9,10,11,12)==1 //in 2S only matters until 10. There is no 11 or 12.
+				gen educ_cat_`adult'_`g' = 1 if inlist(edu_`adult'_`g',1,2,3,4)==1
+				replace educ_cat_`adult'_`g' = 2 if inlist(edu_`adult'_`g',5)==1
+				replace educ_cat_`adult'_`g' = 3 if inlist(edu_`adult'_`g',6,7,8,9,10,11,12)==1 //in 2S only matters until 10. There is no 11 or 12.
 			}
 		}
 		
 
-gen edu_cat
 
-graph bar std_index if year==2015, over(edu_mother_2p)
+		
+graph bar std_index if year==2015, over(educ_cat_mother_2p) 
+
+
+graph bar std_index if year==2015, ///
+    over(socioec_index_cat, ///
+        relabel(1 "Low SES (Q1)" 2 "Q2" 3 "Q3" 4 "High SES (Q4)") ///
+        label(angle(0)) ///
+        gap(20)) ///
+    bar(1, fcolor(gs8) lcolor(gs0)) ///
+	ytitle("Index of Parental Investment") ///
+    yline(0, lcolor(gs0) lpattern(dash))
+capture qui graph export "$FIGURES\Descriptive\parental_investment_ses.png", replace			
+capture qui graph export "$FIGURES\Descriptive\parental_investment_ses.pdf", replace		
+
+
+	
+graph bar std_index if year==2015, over(educ_cat_mother_2p)
+graph bar std_index if year==2015, over(educ_cat_mother_2p)
 
 		
 end
