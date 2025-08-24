@@ -29,6 +29,7 @@
            child anchor=north,align=center,inner sep=0pt}}}
 
 
+
 % Custom block colors for better appearance
 \setbeamercolor{block title}{bg=blue!20,fg=black}
 \setbeamercolor{block body}{bg=blue!10,fg=black}
@@ -43,11 +44,15 @@
 \tikzstyle{activity} =[align=center,outer sep=1pt]
 
 %% Change the bg color to adjust your transition slide background color!
+\definecolor{sagegreen}{RGB}{185,205,190} 
 \newenvironment{transitionframe}{
-  \setbeamercolor{background canvas}{bg=White}
+  \setbeamercolor{background canvas}{bg=sagegreen}
   \begin{frame}}{
     \end{frame}
 }
+
+
+
 
 %%%%%%%%%%%%%% COMMANDS %%%%%%%%%%%%%%%%%%%%%
 \newcommand{\progressbar}{%
@@ -225,9 +230,13 @@ Do children with siblings experience larger learning losses when households face
     
 \end{frame}
 
+
+
+
+
 %Just enough of your methodology so results don't feel like magic
 %Not so much that you crowd out the ndings
-\begin{frame}
+\begin{transitionframe}
     \label{frame:thispaper}
     \frametitle{This Paper}
     \begin{enumerate}
@@ -238,7 +247,7 @@ Do children with siblings experience larger learning losses when households face
     \item Mechanisms
     \item External validity
     \end{enumerate}
-\end{frame}
+\end{transitionframe}
 
 \begin{frame}
     \label{frame:contribution}
@@ -271,9 +280,7 @@ Do children with siblings experience larger learning losses when households face
     \end{enumerate}
 \end{frame}
 
-
-
-\begin{frame}
+\begin{transitionframe}
     \label{frame:background}
     \frametitle{Background and Context}
     \begin{enumerate}
@@ -283,8 +290,7 @@ Do children with siblings experience larger learning losses when households face
        \item How much more were parents involved?
        \item What happened to performance?
     \end{enumerate}
-\end{frame}
-
+\end{transitionframe}
 
 % ========================================
 % DATA
@@ -353,6 +359,8 @@ Do children with siblings experience larger learning losses when households face
     \end{itemize}
 
 \end{frame}
+
+
 % ========================================
 % EMPIRICAL STRATEGY
 % ========================================
@@ -439,7 +447,7 @@ Do children with siblings experience larger learning losses when households face
     \label{frame:eventstudy_bysibs}
     \frametitle{More siblings came with larger losses}
         {\resizebox{0.9\textwidth}{!}{
-       \includegraphics{./FIGURES/Event Study/covid_event_bysibs_all_all_std_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/Event Study/covid_event_bysibs_all_all_std_gpa_m_adj_Tsiblings_Sall_4.pdf}
       }
     }
 \end{frame}
@@ -479,8 +487,9 @@ Do children with siblings experience larger learning losses when households face
     \label{frame:birthorder}
     \frametitle{Birth Order}
        \begin{itemize}
-           \item Effects of school closures may be different for 1st, 2nd, 3rd... children. 
-           \item We consider only first-born children.
+           \item Effects of school closures may be different for 1st, 2nd, 3rd... children.
+           \item This is different from family size effects.
+           \item In order to separate both, we only consider first-born children.
        \end{itemize}
 \end{frame}
 
@@ -507,7 +516,7 @@ Do children with siblings experience larger learning losses when households face
 \end{frame}
 
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:pcinternet}
     \frametitle{Scarce material resources: PC and Internet}
        \centering
@@ -549,22 +558,23 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 \end{tabular}
 }
 
-\end{frame}
+\end{transitionframe}
 
 
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:siblingdisruption}
     \frametitle{Sibling disruption}
         {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_20_21_Tsiblings_Soldest_4.pdf}
       }
     }
 
-\end{frame}
+\end{transitionframe}
 
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:parentaldilution_intro}
     \frametitle{Material Resources}
        \begin{itemize}
@@ -572,34 +582,44 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
            \item Without pre-k or children in school, they need to take up on childcare.
            \item Additionally, they may need to provide help with schoolwork.
        \end{itemize}
-\end{frame}
+\end{transitionframe}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:parentaldilution}
     \frametitle{Parental dilution}
         {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}%\includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+\end{transitionframe}
+
+\begin{frame}
+    \label{frame:parental_investments_vs_ses}
+    \frametitle{Parental time Investment increases with SES}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/Descriptive/parental_investment_ses.pdf}
       }
     }
 
 \end{frame}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:childcare}
     \frametitle{Parental dilution - Increased childcare}
        \begin{itemize}
             \item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
             \item Mixed results in literature (US and Denmark) although not until younger starts school.
         \end{itemize}
-\end{frame}      
+\end{transitionframe}      
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:delayedentry}
     \frametitle{Effects of delaying younger School Entry (GPA of older)}
     \input{./TABLES/rd_summ_1_m_a_365.tex}
-\end{frame}
+\end{transitionframe}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:delayedentryscores}
     \frametitle{Effects of delaying younger School Entry (Scores and investment)}
 \makeatletter
@@ -630,16 +650,21 @@ Bandwidth           &         365   &         365   &         365   &         36
 }
 
 
-\end{frame}
+\end{transitionframe}
 
 \begin{frame}
     \label{frame:incomeshocks}
     \frametitle{Income Shocks}
      
-    \input{./TABLES/MANUAL/twfe_ece_ses.tex}
+    %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
+
+     {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/twfe_ses_2_4_8_Tsiblings_Soldest_4.pdf}
+      }
+    }
 \end{frame}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:otherstrategies}
     \frametitle{Other potential strategies}
         \begin{itemize}
@@ -658,10 +683,10 @@ Bandwidth           &         365   &         365   &         365   &         36
         \end{itemize}
      
 
-\end{frame}
+\end{transitionframe}
 
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:iv_intro}
     \frametitle{Effect of family size on GPA: Using Same Sex and Twin IV}
     \begin{itemize}
@@ -669,34 +694,33 @@ Bandwidth           &         365   &         365   &         365   &         36
         \item Having same sex children (BB or GG) makes families more likely to have a third child. Twin births is also used as a potential exogenous variation in family size.
     \end{itemize}    
    
-\end{frame}
+\end{transitionframe}
 
-\begin{frame}
+\begin{transitionframe}[t]
     \label{frame:iv_results}
     \frametitle{Effect of family size on GPA: Using same sex and twin births IV}
     \input{./TABLES/MANUAL/twfe_twins.tex}
    
-    
     \only<2->{
-    \highlightboxflex{0.3}{-0.9}{0.8}{0.7}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    \highlightboxflex{0.3}{-0.25}{0.8}{0.7}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
     
     % Highlight box for Covid same sex coefficient  
-    \highlightboxflex{3.55}{-0.9}{0.8}{0.7}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    \highlightboxflex{3.55}{-0.25}{0.8}{0.7}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
     
     \begin{tikzpicture}[overlay, remember picture]
         % Single text label at the bottom
         \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Reduction in family size effect!};
         
         % Arrow to Pre-Covid coefficient (pointing to the left box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(0.3,-0.9)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(0.3,-0.25)}]current page.center);
         
         % Arrow to Covid coefficient (pointing to the right box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.55,-0.9)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.55,-0.25)}]current page.center);
     \end{tikzpicture}
     }
-\end{frame}
+\end{transitionframe}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:iv_conclusion}
     \frametitle{Effect of family size on GPA: Using Same Sex and Twin IV}
  \begin{itemize}
@@ -705,7 +729,7 @@ Bandwidth           &         365   &         365   &         365   &         36
         %\item One reason why we don't find results could be that to some this captures more the effect of monetary cost but in terms of time, twins might not be twice as costly than two separate children
         \item We are estimating here the differential effect from \#2 to \#3.
     \end{itemize}
-\end{frame}
+\end{transitionframe}
 
 % ========================================
 % BEYOND PERFORMANCE
@@ -715,8 +739,23 @@ Bandwidth           &         365   &         365   &         365   &         36
     \begin{frame}
             \label{frame:expectations}
             \frametitle{Reduction in educational expectations}
-    \input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+      {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/twfe_expectation_bysibs_2_4_8_Tsiblings_Soldest_4.pdf}
+      }
+    }   %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
     \end{frame}
+
+    \begin{frame}
+            \label{frame:grade_progression}
+            \frametitle{Grade progression}
+    %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+    \end{frame}   
+
+    \begin{frame}
+            \label{frame:college_app}
+            \frametitle{College Applications}
+    %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+    \end{frame}      
 
 % ========================================
 % EXTERNAL VALIDITY
@@ -725,12 +764,13 @@ Bandwidth           &         365   &         365   &         365   &         36
 
     \begin{frame}
             \label{frame:pisadata}
-            \frametitle{Looking at PISA data}
+            \frametitle{Is this only about Peru?}
         \begin{itemize}
             \item International examination to 15 year olds
             \item 81 countries (37 OECD and 44 non-OECD).
             \item In 2009, 2012 and 2022, I am able to identify only-child and sibling sample.
-            \item I estimate the gap in achievement between both for each of these years.
+            \item In most countries, children with siblings also exhibit larger learning losses
+            \item Longer school closures where associated with larger gaps.
         \end{itemize}
     \end{frame}
 
@@ -754,7 +794,7 @@ Bandwidth           &         365   &         365   &         365   &         36
     \begin{figure}
         \centering
         \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_raw_DID_PV4MATH_not_fully_open.pdf}
-        \caption{Change in learning gaps by duration of school closure for OECD and Non-OECD countries}
+        \caption{Similar pattern in rest of the world}
         \label{fig:1b}
     \end{figure}
     
@@ -781,13 +821,6 @@ Bandwidth           &         365   &         365   &         365   &         36
 
 \end{frame}
 
-% ========================================
-% EXAMPLE SLIDES
-% ========================================
-\section{Example Slides}
-
-
-
 
 \begin{frame}
     \hypersetup{citecolor=blue}
@@ -806,7 +839,16 @@ Bandwidth           &         365   &         365   &         365   &         36
     %\href{mailto:fpardo@utexas.edu}{fpardo@utexas.edu} \\
     \href{https://francisco-pardo-pajuelo.github.io/}{Website}
   \end{flushleft}
+
 \end{frame}
+
+% ========================================
+% EXAMPLE SLIDES
+% ========================================
+\section{Example Slides}
+
+
+
 
 
 \begin{frame}[allowframebreaks]
@@ -899,7 +941,16 @@ Bandwidth           &         365   &         365   &         365   &         36
 \end{frame}
 
 
-
+\begin{frame}
+    \label{frame:research_feedback}
+    \frametitle{Threats to identification \textcolor{red}{(for feedback)}}
+        Any other thoughts on potential time varying shocks?
+        \begin{itemize}
+            \item Parent's work
+            \item 
+            \item There is a shift from private to public enrollment during COVID. If this was more common on siblings... would be composition?
+        \end{itemize}
+\end{frame}
 
 
 \begin{frame}
