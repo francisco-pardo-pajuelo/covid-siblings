@@ -1,0 +1,232 @@
+*- Censo
+
+
+*-------
+*- Censo 2020
+*-------
+
+import dbase using "$IN\CENSO_ESCOLAR\2020\C3AP_Lineal.dbf", clear
+
+
+
+
+*-------
+*- Censo 2021
+*-------
+
+*- Primaria
+
+*-- Servicio: presencial/semi-presencial/remoto
+import dbase using "$IN\CENSO_ESCOLAR\2021\C3AP_Lineal_1.dbf", clear
+tab P102 
+
+ds P155_Q // Durante el año 2020, ¿Se realizó el informe del progreso de los estudiantes a los padres de familia? ¿Cuántas veces?
+
+label var P155_Q "Durante el año 2020, ¿Se realizó el informe del progreso de los estudiantes a los padres de familia? ¿Cuántas veces?"
+
+gen id_ie = COD_MOD + ANEXO
+keep id_ie P102 P155_Q
+destring P102 P155_Q, replace
+
+tempfile modality_prim_1
+save `modality_prim_1', replace
+
+*-- Servicios y activitades
+import dbase using "$IN\CENSO_ESCOLAR\2021\C3AP_Lineal_2.dbf", clear
+ds P801_ACT P802 P804_CAST P806 P808 P808_2 P809 P809_2 P809_E P811_6 P812
+
+gen id_ie = COD_MOD + ANEXO
+
+keep id_ie P801_ACT P802 P804_CAST P806 P808 P808_2 P809 P809_2 P809_E P811_6 P812
+
+label var P801_ACT 	"Las actividades propuestas en la web, ¿Son desarrolladas por los estudiantes de la I.E.?"
+label var P802 		""
+label var P804_CAST "Señor(a) director(a), ¿Se encuentra usted satisfecho con el contenido de Aprendo en Casa ?, ya sea en castellano"
+label var P806 		"Durante el año 2020, este servicio/nivel educativo ¿Ha coordinado o articulado alguna acción con el gobierno local (distrital o provincial) para incrementar el acceso a la estrategia aprendo en casa?"
+label var P808 		"La mayoría de los docentes de este servicio/nivel educativo, ¿Realizan la retroalimentación a los estudiantes?" //
+label var P808_2 	"Retroalimentación - 1: Elemental 2: Descriptiva 3: Reflexiva por descubrimiento" //
+label var P809 		"La mayoría de los docentes de este servicio/nivel educativo, ¿Han establecido el medio de comunicación, para la coordinación y acompañamiento del trabajo remoto con los PPFF y/o estudiantes?"
+label var P809_2 	"1: WhatsApp 2: Facebook 3: Correo electrónico 4: Llamada telefónica 5: Otros"
+label var P809_E 	"Especificar"
+label var P811_6 	"En un escenario de educación remota, ¿Cuál es el medio de comunicación pertinente, que según las condiciones de la zona, permiten la comunicación y aprendizaje de los estudiantes? 6: Visitas domiciliarias"
+label var P812		""
+
+
+tempfile modality_prim_2
+save `modality_prim_2', replace
+
+*- Talleres
+import dbase using "$IN\CENSO_ESCOLAR\2021\Mat2021_EBR.dbf", clear
+keep if PREG=="P113"
+keep if NROCED=="3AP"
+keep if NUMERO=="01"
+
+gen id_ie = COD_MOD + ANEXO
+keep id_ie D01
+rename D01 talleres_ppff //Durante el año 2020 ¿Se realizaron talleres dirigidos a los padres de familia o apoderados en el servicio/nivel educativo?
+label var talleres_ppff "Durante el año 2020 ¿Se realizaron talleres dirigidos a los padres de familia o apoderados en el servicio/nivel educativo?"
+tempfile mat_ebr_prim
+save `mat_ebr_prim', replace
+
+
+use `modality_prim_1', clear
+merge 1:1 id_ie using `modality_prim_2', keep(master match) nogen
+merge 1:1 id_ie using `mat_ebr_prim', keep(master match) nogen
+capture tab _m
+capture drop _m
+
+tempfile modality_prim
+save `modality_prim', replace
+
+*- Secundaria
+import dbase using "$IN\CENSO_ESCOLAR\2021\C3AS_Lineal_1.dbf", clear
+tab P102
+
+gen id_ie = COD_MOD + ANEXO
+keep id_ie P102
+destring P102, replace
+
+tempfile modality_sec_1
+save `modality_sec_1', replace
+
+*- Talleres
+import dbase using "$IN\CENSO_ESCOLAR\2021\Mat2021_EBR.dbf", clear
+keep if PREG=="P113"
+keep if NROCED=="3AS"
+keep if NUMERO=="01"
+
+gen id_ie = COD_MOD + ANEXO
+keep id_ie D01
+rename D01 talleres_ppff
+tempfile mat_ebr_sec
+save `mat_ebr_sec', replace
+
+
+use `modality_sec_1', clear
+//merge 1:1 id_ie using `modality_sec_2', keep(master match) nogen
+merge 1:1 id_ie using `mat_ebr_sec', keep(master match) nogen
+capture tab _m
+capture drop _m
+
+tempfile modality_sec
+save `modality_sec', replace
+
+append using `modality_prim'
+tempfile modality
+save `modality', replace
+
+
+*- Match with coefficients
+use "$TEMP\coef_twfe_ie.dta", clear
+
+merge 1:1 id_ie using `modality', keep(master match)
+tab P102 
+tab _m
+drop _m
+
+merge 1:1 id_ie using  "$OUT/schools_20241018", keep(master match)
+
+gen dep = substr(codcp_inei,1,2)
+
+
+table P102 D_GESTION if P102<=3, stat(mean b)
+
+
+
+binsreg b talleres_ppff if talleres_ppff<=4
+binsreg b P155_Q if P155_Q<=4
+
+
+assert 1==0
+
+
+
+
+*-------
+*- ENDO 2020
+*-------
+use "$IN\ENDO\2020\BD.ENDO REMOTO 2020.dta", clear
+
+ds P1_26_? P1_27_? FACTOR_EXPANSION
+/*
+	26. Durante el año 2020, con relación a su desempeño como docente, en la escala del 1 al 4, donde 1 es "Muy
+	difícil" y 4 "Muy fácil", ¿qué tan fácil o difícil es llevar a cabo las siguientes actividades? 
+	a. ¿Planificación de la enseñanza de forma individual y colegiada?
+	b. ¿Sistematizar su práctica pedagógica?
+	c. ¿Reflexionar sobre los resultados de su práctica pedagógica?
+	d. ¿Participar en la gestión de la IE?
+	e. ¿Participar en procesos de aprendizaje (formación continua)?
+
+
+
+	27. Durante el año 2020, en la escala del 1 al 4, donde 1 es "Muy difícil" y 4 "Muy fácil", ¿qué tan fácil o difícil
+	es realizar las siguientes actividades vinculadas al quehacer docente?
+	a. ¿Comunicarse y retroalimentar y motivar a las y los estudiantes?
+	b. ¿Atender los problemas socioemocionales de las y los estudiantes?
+	c. ¿Virtualizar la enseñanza, adaptando y/o complementando las sesiones de "Aprendo en
+	casa", según necesidades de las y los estudiantes?
+	d. ¿Coordinar y responder a la demanda de los padres y madres de familia?
+	e. ¿Planificar actividades bajo el enfoque por competencias del Currículo Nacional de la
+	Educación Básica?
+
+*/
+
+
+
+
+*-------
+*- ENDO 2021
+*-------
+use "$IN\ENDO\2021\BD.ENDO REMOTA 2021.dta", clear
+
+ds P5_1_? P5_2_? FACTOR_EXPANSION
+
+/*
+1. En una semana regular, ¿cuánto tiempo le dedica a las siguientes actividades FUERA del horario laboral?
+a. ¿A Preparar las clases y labores administrativas?
+b. ¿A Retroalimentar y evaluar a los estudiantes?
+c. ¿A Atender a padres y madres de familia?
+d. ¿A Trabajar en equipo y de forma colegiada con sus colegas?
+e. ¿Al Entretenimiento, cultura y esparcimiento?
+f. ¿A Realizar deporte y actividad física?
+
+¿Menos de 1 hora? .......... 1
+¿Entre 1 a 3 horas? .......... 2
+¿Más de 3 horas?............. 3
+No lo realiza ..................... 4
+
+
+2. Durante el año 2021, en relación a su desempeño como docente, ¿qué tan fácil o difícil es llevar a cabo las
+siguientes actividades?
+
+a. ¿Planificar la enseñanza de forma individual o colegiada?
+b. ¿Planificar actividades bajo el enfoque por competencias del Currículo
+Nacional?
+c. ¿Realizar la evaluación diagnóstica y formativa?
+d. ¿Virtualizar la enseñanza, adaptando y/o complementando las
+sesiones de "Aprendo en casa"?
+e. ¿Atender los problemas socioemocionales de sus estudiantes?
+f. ¿Coordinar y responder a la demanda de padres y madres de familia?
+g. ¿Proponer e implementar innovaciones o buenas prácticas
+pedagógicas?
+
+
+¿Fácil? ............. 1
+¿Difícil?............ 2
+
+*/
+
+
+*-------
+*- ENDI 2020
+*-------
+
+
+
+*-------
+*- ENDI 2021
+*-------
+
+
+
+

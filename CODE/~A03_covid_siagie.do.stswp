@@ -6,13 +6,20 @@ program define main
 	setup_COVID_A03
 	
 	
-	*------ Final Runs
-	//twfe_final
-	//event_final
+	*------ Final Runs 
 	twfe_2_4_6_8 siblings oldest 20_21
 	twfe_2_4_6_8 siblings all	 20_21
 	twfe_2_4_6_8 siblings oldest all
 	twfe_2_4_6_8 siblings all	 all
+	
+	twfe_age_gap 	siblings oldest 20_21
+	twfe_dual 		siblings oldest 20_21 "lives_with_mother"
+	twfe_dual 		siblings oldest 20_21 "mom_sec_complete"
+
+	twfe_age_gap 	siblings all 20_21
+	twfe_dual 		siblings all 20_21 "lives_with_mother"
+	twfe_dual 		siblings all 20_21 "mom_sec_complete"
+
 	
 	event_gpa		siblings oldest 						// other_filters "e.g. rural_young_hed_both"
 	event_gpa		siblings all 						// other_filters "e.g. rural_young_hed_both"
@@ -3976,7 +3983,7 @@ foreach only_covid in "all" /*"20_21"*/ {
 										ylab(-.1(.02).04) ///
 										///xline(2019.5 2021.5) ///
 										subtitle("`tlab'") ///
-										legend(pos(6) col(4))
+										legend(off)
 					
 						if "${covid_data}" == "_TEST" {
 							di "TEST"
@@ -5468,18 +5475,16 @@ end
 
 
 
+*----------------
+*- TWFE: Age Gap
+*----------------
 
 
-*-----------------
-*-  TEST
-*-----------------
+capture program drop twfe_age_gap
+program define twfe_age_gap
 
 
-capture program drop twfe_test
-program define twfe_test
-
-
-args treatment_type subsample       //treatment_type: treatment type (generally by # of siblings). 
+args treatment_type subsample post_years      //treatment_type: treatment type (generally by # of siblings). 
 
 capture assert "`treatment_type'" != ""
 if _rc!=0 di "Need to select type: usual is -siblings-"
@@ -5487,12 +5492,13 @@ if _rc!=0 di "Need to select type: usual is -siblings-"
 capture assert "`subsample'" != ""
 if _rc!=0 di "Need to select subsample: can be -all-"		
 
-
+capture assert inlist("`post_years'","all","20_21")==1
+if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"		 
 	clear
 
 	
 	local v = "std_gpa_m_adj"
-	local only_covid = "all"
+	local only_covid = "`post_years'"
 	local level = "all"
 	
 					
@@ -5513,7 +5519,7 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
 				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
 				/*B*/			/*GRADE AND MALE*/ ///
-				/*C*/			///closest_age_gap* ///
+				/*C*/			closest_age_gap* ///
 				/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
 				/*Other*/		age_mother_1st_oldest_${fam_type} /**has_internet *has_comp *low_ses *quiet_room*/ ///
 				using "$TEMP\pre_reg_covid${covid_data}", clear
@@ -5658,7 +5664,649 @@ if _rc!=0 di "Need to select subsample: can be -all-"
 				replace age_mom_cat = 1 if age_mother_1st_oldest_2<30 & age_mother_1st_oldest_2!=.
 				replace age_mom_cat = 2 if age_mother_1st_oldest_2>=30 & age_mother_1st_oldest_2<50 & age_mother_1st_oldest_2!=.
 				replace age_mom_cat = 3 if age_mother_1st_oldest_2>=50 & age_mother_1st_oldest_2!=.
-assert 1==0
+
+				
+				
+			
+				*- Gap <=2
+				di as result "*******" _n as text "Close Age sibling (<=2 year difference)" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
+				estimates store g02_`vlab'
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
+				estimates store g02_`vlab'_2
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
+				estimates store g02_`vlab'_3
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2<=2 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
+				estimates store g02_`vlab'_4
+				
+				
+				*- Gap 3-5
+				di as result "*******" _n as text "Close Age sibling (3-5 year difference)" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
+				estimates store g35_`vlab'
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
+				estimates store g35_`vlab'_2
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
+				estimates store g35_`vlab'_3
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2>=3 & closest_age_gap_2<=5 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
+				estimates store g35_`vlab'_4
+				
+
+				*- Gap 6+
+				di as result "*******" _n as text "Close Age sibling (>=6 year difference)" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
+				estimates store g6m_`vlab'
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1)), a(grade year id_ie)
+				estimates store g6m_`vlab'_2
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
+				estimates store g6m_`vlab'_3
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & ((closest_age_gap_2>=6 & fam_total_${fam_type}>1) | (fam_total_${fam_type}==1))  , a(grade year id_ie)
+				estimates store g6m_`vlab'_4						
+				
+				coefplot 	(g02_gpa_m_adj, mcolor(gs0) 	fcolor(gs0%50)	lcolor(gs0%50)	ciopts(color(gs0))) ///
+							, ///
+							bylabel("Sibling within 0-2 age gap") ///
+							|| ///
+							(g35_gpa_m_adj, mcolor(gs0) 	fcolor(gs0%50)	lcolor(gs0%50)	ciopts(color(gs0))) ///
+							, ///
+							bylabel("Sibling within 3-5 age gap") ///
+							|| ///
+							(g6m_gpa_m_adj, mcolor(gs0) 	fcolor(gs0%50)	lcolor(gs0%50)	ciopts(color(gs0))) ///
+							, ///
+							bylabel("Sibling beyond 6+ age gap") ///
+							|| ///
+							, ///
+							vertical ///
+							recast(bar) barwidth(0.25) ///
+							ciopts(recast(rcap)) citop ///
+							xlabel(1 "Sibling within 0-2 age gap" 2 "Sibling within 3-5 age gap" 3 "Sibling beyond 6+ age gap") ///	
+							keep(treated_post) ///
+							///legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+							legend(off) ///
+							ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+							///xline(0, lcolor(gs12)) ///
+							ylabel(-0.06(0.01)0.01) ///
+							yline(0, lcolor(gs0) lpattern(dash)) ///
+							grid(none) ///
+							bycoefs 
+
+					
+					if "${covid_data}" == "_TEST" {
+						di "TEST"
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						}
+					if "${covid_data}" == "" {
+						di "REAL"
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						}
+						
+							
+				coefplot 	(g02_gpa_m_adj_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+							(g02_gpa_m_adj_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							(g02_gpa_m_adj_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+							, ///
+							bylabel("Sibling within 0-2 age gap") ///
+							|| ///
+							(g35_gpa_m_adj_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+							(g35_gpa_m_adj_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							(g35_gpa_m_adj_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+							, ///
+							bylabel("Sibling within 3-5 age gap") ///
+							|| ///
+							(g6m_gpa_m_adj_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+							(g6m_gpa_m_adj_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							(g6m_gpa_m_adj_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+							, ///
+							bylabel("Sibling beyond 6+ age gap") ///
+							|| ///
+							, ///
+							vertical ///
+							recast(bar) barwidth(0.25) ///
+							ciopts(recast(rcap)) citop ///
+							xlabel(1 "Sibling within 0-2 age gap" 2 "Sibling within 3-5 age gap" 3 "Sibling beyond 6+ age gap") ///	
+							keep(treated_post) ///
+							legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+							ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+							///xline(0, lcolor(gs12)) ///
+							ylabel(-0.06(0.01)0.01) ///
+							yline(0, lcolor(gs0) lpattern(dash)) ///
+							grid(none) ///
+							bycoefs 
+
+					
+					if "${covid_data}" == "_TEST" {
+						di "TEST"
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						}
+					if "${covid_data}" == "" {
+						di "REAL"
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						}								
+					
+end
+		
+
+
+
+
+*----------------
+*- TWFE: Age Gap
+*----------------
+
+
+capture program drop twfe_dual
+program define twfe_dual
+
+
+args treatment_type subsample post_years category     //treatment_type: treatment type (generally by # of siblings). 
+
+capture assert "`treatment_type'" != ""
+if _rc!=0 di "Need to select type: usual is -siblings-"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+capture assert inlist("`post_years'","all","20_21")==1
+if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"		 
+	
+capture assert inlist("`category'","lives_with_mother","mother_sec_complete")==1	
+if _rc!=0 di "Need to select category: can be -lives_with_mother- or -mother_sec_complete-"
+	
+	
+	clear
+
+	
+	local v = "std_gpa_m_adj"
+	local only_covid = "`post_years'"
+	local level = "all"
+	
+					
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+				if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+				if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
+
+				estimates clear
+				global x = "$x_all"
+				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
+				
+				use ///
+				/*OUTCOME*/		`v' std_gpa_m_adj std_gpa_c_adj ///
+				/*ID*/ 			id_ie id_per_umc year grade ///
+				/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
+				/*DID*/			treated post treated_post ///
+				/*EVENT*/		year_t_?? ///
+				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
+				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
+				/*B*/			/*GRADE AND MALE*/ ///
+				/*C*/			closest_age_gap* ///
+				/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
+				/*Other*/		age_mother_1st_oldest_${fam_type} /**has_internet *has_comp *low_ses *quiet_room*/ ///
+				using "$TEMP\pre_reg_covid${covid_data}", clear
+				
+				*- School has internet
+				merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
+
+				
+				if "`treatment_type'"=="internet" {
+					drop treated treated_post
+					gen treated = internet==1
+					gen treated_post = treated*post
+					local lab_control = "No Internet"
+					local lab_treated = "Internet"
+				}	
+
+				if "`treatment_type'"=="parent_ed" {
+					drop treated treated_post
+					gen treated = (educ_cat_mother==3)
+					gen treated_post = treated*post
+					local lab_control = "Mother no higher ed."
+					local lab_treated = "Mother some higher ed."
+				}
+
+				if "`treatment_type'"=="both_parents" {
+					drop treated treated_post
+					gen treated = (lives_with_mother==1 & lives_with_father==1)
+					gen treated_post = treated*post
+					local lab_control = "Does not live with both"
+					local lab_treated = "Lives with both parents"
+				}	
+				
+				if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+				if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+				if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+				if "`subsample'" == "all" 		di "All siblings"
+					
+				*- Remove early grades and years
+				keep if year>=2014
+				drop if grade==0
+				
+				*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
+				if "`only_covid'" == "20_21" keep if year<=2021
+				
+				*- Divide sample based on grade in 2020
+				//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
+				
+				*- Divide sample based on expected cohort
+				bys id_per_umc: egen min_year 		= min(year)
+				bys id_per_umc: egen grade_min_year = min(cond(year==min_year,grade,.))
+				gen proxy_1st = min_year - grade_min_year  + 1
+								
+				
+				/*
+				*- Not enough pre-years
+							
+				drop if inlist(grade_2020,1,2)==1
+				drop if grade_2020==3 & year<=2017 //<=2017 Would only include those who repeated..
+				drop if grade_2020==4 & year<=2016 //<=2016 Would only include those who repeated..
+				keep if proxy_1st <= 2018
+				*/
+				
+				
+				/*
+				if "`area'" == "rur" keep if urban_siagie == 0
+				if "`area'" == "urb" keep if urban_siagie == 1
+
+				if "`hed_parent'" == "no" 	keep if higher_ed_parent == 0
+				if "`hed_parent'" == "yes" 	keep if higher_ed_parent == 1
+				*/
+				
+				if "`level'" == "all" {
+					keep if grade>=1 & grade<=11
+					//gen young = inlist(grade_2020,3,4,5,6)==1 if inlist(grade_2020,3,4,5,6,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2015,2016,2017,2018) if inlist(proxy_1st,2011,2012,2013,2014,2015,2016,2017,2018)==1
+					gen young = inlist(grade,1,2,3,4,5,6)==1 if inlist(grade,1,2,3,4,5,6,7,8,9,10,11)
+					local young_lab = "Primary" //Primary in 2020
+					local old_lab 	= "Secondary"
+					}
+				if "`level'" == "elm" {
+					keep if grade>=1 & grade<=6
+					//gen young = inlist(grade_2020,3,4)==1 if inlist(grade_2020,3,4,5,6)
+					//gen young = inlist(proxy_1st,2017,2018) if inlist(proxy_1st,2015,2016)==1
+					//local young_lab = "2017-2018 cohort" //3rd-4th grade in 2020
+					//local old_lab 	= "2015-2016 cohort" //5th-6th grade in 2020
+					gen young = inlist(grade,1,2,3)==1 if inlist(grade,1,2,3,4,5,6)
+					local young_lab = "1st-3rd grade"
+					local old_lab 	= "4th-6th grade"
+					}
+				if "`level'" == "sec" {
+					keep if grade>=7	
+					//gen young = inlist(grade_2020,7,8)==1 if inlist(grade_2020,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2014,2013) if inlist(proxy_1st,2011,2012)==1
+					//local young_lab = "2014-2013 cohort" //7th-8th grade in 2020
+					//local old_lab 	= "2011-2012 cohort" //9th-11th grade in 2020
+					gen young = inlist(grade,7,8)==1 if inlist(grade,7,8,9,10,11)
+					local young_lab = "7th-8th grade"
+					local old_lab 	= "9th-11th grade"
+					}
+
+				local vlab 		= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				local xtitle 	= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				if "`v'" == "std_gpa_m" 		{
+					local vlab = "gpa_m"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c" 		{
+					local vlab = "gpa_c"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "std_gpa_m_adj" 		{
+					local vlab = "gpa_m_adj"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c_adj" 		{
+					local vlab = "gpa_c_adj"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "pass_math" 		{
+					local vlab = "pass_m"
+					local xtitle = "% A's Mathematics"
+					}
+				if "`v'" == "pass_read" 		{
+					local vlab = "pass_c"
+					local xtitle = "% A's Reading"
+					}
+				if "`v'" == "approved" 		{
+					local vlab = "pass"
+					local xtitle = "Grade Promotion"
+					}
+				if "`v'" == "approved_first" 		{
+					local vlab = "passf"
+					local xtitle = "Grade Promotion without recovery"
+					}
+				if "`v'" == "higher_ed_parent" 		{
+					local vlab = "hed_parent"
+					local xtitle = "% Parent with higher education"
+					}
+		
+		
+				gen age_mom_cat = .
+				replace age_mom_cat = 1 if age_mother_1st_oldest_2<30 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 2 if age_mother_1st_oldest_2>=30 & age_mother_1st_oldest_2<50 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 3 if age_mother_1st_oldest_2>=50 & age_mother_1st_oldest_2!=.
+
+				gen mom_sec_complete = (inlist(educ_cat_mother,2,3)==1) if educ_cat_mother!=.
+				
+				if "`category'" == "lives_with_mother" 	{
+					local cat0_lab = "Does not live with mother"
+					local cat1_lab = "Lives with mother"
+				}
+				if "`category'" == "mom_sec_complete" 	{
+					local cat0_lab = "Mother did not complete secondary"
+					local cat1_lab = "Mother completed secondary"
+				}
+				
+				*- Does not live with mom
+				di as result "*******" _n as text "Does not live with mother" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & `category'==0, a(grade year id_ie)
+				estimates store cat0_`vlab'
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & `category'==0, a(grade year id_ie)
+				estimates store cat0_`vlab'_2
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & `category'==0  , a(grade year id_ie)
+				estimates store cat0_`vlab'_3
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & `category'==0  , a(grade year id_ie)
+				estimates store cat0_`vlab'_4
+				
+				*- Does not live with mom
+				di as result "*******" _n as text "Lives with mother" _n as result "*******"
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2,3,4)==1 & `category'==1, a(grade year id_ie)
+				estimates store cat1_`vlab'
+				reghdfe `v' 	treated_post post treated ${x} if inlist(fam_total_${fam_type},1,2)==1 & `category'==1, a(grade year id_ie)
+				estimates store cat1_`vlab'_2
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,3)==1 & `category'==1  , a(grade year id_ie)
+				estimates store cat1_`vlab'_3
+				reghdfe `v'		treated_post post treated ${x} if inlist(fam_total_${fam_type},1,4)==1 & `category'==1  , a(grade year id_ie)
+				estimates store cat1_`vlab'_4						
+				
+				coefplot 	(cat0_gpa_m_adj, mcolor(gs0) 	fcolor(gs0%50)	lcolor(gs0%50)	ciopts(color(gs0))) ///
+							, ///
+							bylabel("`cat0_lab'") ///
+							|| ///
+							(cat1_gpa_m_adj, mcolor(gs0) 	fcolor(gs0%50)	lcolor(gs0%50)	ciopts(color(gs0))) ///
+							, ///
+							bylabel("`cat1_lab'") ///
+							|| ///
+							, ///
+							vertical ///
+							recast(bar) barwidth(0.25) ///
+							ciopts(recast(rcap)) citop ///
+							xlabel(1 "`cat0_lab'" 2 "`cat1_lab'") ///	
+							keep(treated_post) ///
+							///legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+							legend(off) ///
+							ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+							///xline(0, lcolor(gs12)) ///
+							ylabel(-0.06(0.01)0.01) ///
+							yline(0, lcolor(gs0) lpattern(dash)) ///
+							grid(none) ///
+							bycoefs 
+
+					
+					if "${covid_data}" == "_TEST" {
+						di "TEST"
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						}
+					if "${covid_data}" == "" {
+						di "REAL"
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						}
+						
+							
+				coefplot 	(cat0_gpa_m_adj_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+							(cat0_gpa_m_adj_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							(cat0_gpa_m_adj_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+							, ///
+							bylabel("`cat0_lab'") ///
+							|| ///
+							(cat1_gpa_m_adj_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+							(cat1_gpa_m_adj_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+							(cat1_gpa_m_adj_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+							, ///
+							bylabel("`cat1_lab'") ///
+							|| ///
+							, ///
+							vertical ///
+							recast(bar) barwidth(0.25) ///
+							ciopts(recast(rcap)) citop ///
+							xlabel(1 "`cat0_lab'" 2 "`cat1_lab'") ///	
+							keep(treated_post) ///
+							legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+							ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+							///xline(0, lcolor(gs12)) ///
+							ylabel(-0.06(0.01)0.01) ///
+							yline(0, lcolor(gs0) lpattern(dash)) ///
+							grid(none) ///
+							bycoefs 
+
+					
+					if "${covid_data}" == "_TEST" {
+						di "TEST"
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						}
+					if "${covid_data}" == "" {
+						di "REAL"
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						}								
+					
+end
+		
+
+
+*-----------------
+*-  TEST
+*-----------------
+
+
+capture program drop twfe_test
+program define twfe_test
+
+
+args treatment_type subsample       //treatment_type: treatment type (generally by # of siblings). 
+
+capture assert "`treatment_type'" != ""
+if _rc!=0 di "Need to select type: usual is -siblings-"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+
+	clear
+
+	
+	local v = "std_gpa_m_adj"
+	local only_covid = "all"
+	local level = "all"
+	
+					
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+				if ${main_loop} 	== 1 & inlist("`level'","${main_loop_level}")!=1 										continue	
+				if ${main_loop} 	== 1 & inlist("`only_covid'","${main_loop_only_covid}")!=1 								continue
+
+				estimates clear
+				global x = "$x_all"
+				if "`v'" == "higher_ed_parent" global x = "$x_nohigher_ed"	
+				
+				use ///
+				/*OUTCOME*/		`v' std_gpa_m_adj std_gpa_c_adj ///
+				/*ID*/ 			id_ie id_per_umc year grade ///
+				/*FAMILY*/		fam_order_${fam_type} fam_total_${fam_type} ///
+				/*DID*/			treated post treated_post ///
+				/*EVENT*/		year_t_?? ///
+				/*Demog*/		public_siagie urban_siagie male_siagie age_mother_1st_oldest_2 age_mother age_father educ_cat_mother educ_cat_father ${x_all_vars} ///
+				/*A*/ 			min_socioec_index_ie_cat quart_class_size quart_grade_size /*OTHER IN DEMOG*/ ///
+				/*B*/			/*GRADE AND MALE*/ ///
+				/*C*/			///closest_age_gap* ///
+				/*D*/			educ_cat_mother /*higher_ed_parent*/ lives_with_mother lives_with_father ///
+				/*Other*/		age_mother_1st_oldest_${fam_type} /**has_internet *has_comp *low_ses *quiet_room*/ ///
+				using "$TEMP\pre_reg_covid${covid_data}", clear
+				
+				*- School has internet
+				merge m:1 id_ie using "$TEMP\school_internet", keepusing(codlocal internet) keep(master match)
+		
+				
+				if "`treatment_type'"=="internet" {
+					drop treated treated_post
+					gen treated = internet==1
+					gen treated_post = treated*post
+					local lab_control = "No Internet"
+					local lab_treated = "Internet"
+				}	
+
+				if "`treatment_type'"=="parent_ed" {
+					drop treated treated_post
+					gen treated = (educ_cat_mother==3)
+					gen treated_post = treated*post
+					local lab_control = "Mother no higher ed."
+					local lab_treated = "Mother some higher ed."
+				}
+
+				if "`treatment_type'"=="both_parents" {
+					drop treated treated_post
+					gen treated = (lives_with_mother==1 & lives_with_father==1)
+					gen treated_post = treated*post
+					local lab_control = "Does not live with both"
+					local lab_treated = "Lives with both parents"
+				}	
+				
+				if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+				if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+				if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+				if "`subsample'" == "all" 		di "All siblings"
+					
+				*- Remove early grades and years
+				keep if year>=2014
+				drop if grade==0
+				
+			*- Age of oldest (proxy)
+					preserve
+						use "$TEMP\id_siblings", clear
+						//bys id_fam_${fam_type}: egen exp_entry_year_oldest = max(cond(fam_order_${fam_type}==1,exp_entry_year,.))
+						//bys id_fam_${fam_type}: egen exp_entry_year_youngest = max(cond(fam_order_${fam_type}==fam_total_${fam_type},exp_entry_year,.))
+						keep id_fam_${fam_type} id_per_umc exp_entry_year //exp_entry_year_oldest exp_entry_year_youngest
+						tempfile exp_entry_year_siblings
+						save `exp_entry_year_siblings', replace
+					restore
+					
+					merge m:1 id_per_umc using `exp_entry_year_siblings', keepusing(id_fam_${fam_type} exp_entry_year /*exp_entry_year_oldest exp_entry_year_youngest*/) keep(master match) nogen				
+				
+				*- Keep only 2020-2021 (exclude 2022,2023,2024) from the TWFE estimates
+				if "`only_covid'" == "20_21" keep if year<=2021
+				
+				*- Divide sample based on grade in 2020
+				//bys id_per_umc: egen grade_2020	= min(cond(year==2020,grade,.))
+				
+				*- Divide sample based on expected cohort
+				bys id_per_umc: egen min_year 		= min(year)
+				bys id_per_umc: egen grade_min_year = min(cond(year==min_year,grade,.))
+				gen proxy_1st = min_year - grade_min_year  + 1
+								
+				
+				/*
+				*- Not enough pre-years
+							
+				drop if inlist(grade_2020,1,2)==1
+				drop if grade_2020==3 & year<=2017 //<=2017 Would only include those who repeated..
+				drop if grade_2020==4 & year<=2016 //<=2016 Would only include those who repeated..
+				keep if proxy_1st <= 2018
+				*/
+				
+				
+				/*
+				if "`area'" == "rur" keep if urban_siagie == 0
+				if "`area'" == "urb" keep if urban_siagie == 1
+
+				if "`hed_parent'" == "no" 	keep if higher_ed_parent == 0
+				if "`hed_parent'" == "yes" 	keep if higher_ed_parent == 1
+				*/
+				
+				if "`level'" == "all" {
+					keep if grade>=1 & grade<=11
+					//gen young = inlist(grade_2020,3,4,5,6)==1 if inlist(grade_2020,3,4,5,6,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2015,2016,2017,2018) if inlist(proxy_1st,2011,2012,2013,2014,2015,2016,2017,2018)==1
+					gen young = inlist(grade,1,2,3,4,5,6)==1 if inlist(grade,1,2,3,4,5,6,7,8,9,10,11)
+					local young_lab = "Primary" //Primary in 2020
+					local old_lab 	= "Secondary"
+					}
+				if "`level'" == "elm" {
+					keep if grade>=1 & grade<=6
+					//gen young = inlist(grade_2020,3,4)==1 if inlist(grade_2020,3,4,5,6)
+					//gen young = inlist(proxy_1st,2017,2018) if inlist(proxy_1st,2015,2016)==1
+					//local young_lab = "2017-2018 cohort" //3rd-4th grade in 2020
+					//local old_lab 	= "2015-2016 cohort" //5th-6th grade in 2020
+					gen young = inlist(grade,1,2,3)==1 if inlist(grade,1,2,3,4,5,6)
+					local young_lab = "1st-3rd grade"
+					local old_lab 	= "4th-6th grade"
+					}
+				if "`level'" == "sec" {
+					keep if grade>=7	
+					//gen young = inlist(grade_2020,7,8)==1 if inlist(grade_2020,7,8,9,10,11)
+					//gen young = inlist(proxy_1st,2014,2013) if inlist(proxy_1st,2011,2012)==1
+					//local young_lab = "2014-2013 cohort" //7th-8th grade in 2020
+					//local old_lab 	= "2011-2012 cohort" //9th-11th grade in 2020
+					gen young = inlist(grade,7,8)==1 if inlist(grade,7,8,9,10,11)
+					local young_lab = "7th-8th grade"
+					local old_lab 	= "9th-11th grade"
+					}
+
+				local vlab 		= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				local xtitle 	= "-999-" //to reset value and make sure we are assigning one. This because I had an issue by looping through new outcoms without adding the vlab and replacing wrong files.
+				if "`v'" == "std_gpa_m" 		{
+					local vlab = "gpa_m"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c" 		{
+					local vlab = "gpa_c"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "std_gpa_m_adj" 		{
+					local vlab = "gpa_m_adj"
+					local xtitle = "Standardized Mathematics GPA"
+					}
+				if "`v'" == "std_gpa_c_adj" 		{
+					local vlab = "gpa_c_adj"
+					local xtitle = "Standardized Reading GPA"
+					}
+				if "`v'" == "pass_math" 		{
+					local vlab = "pass_m"
+					local xtitle = "% A's Mathematics"
+					}
+				if "`v'" == "pass_read" 		{
+					local vlab = "pass_c"
+					local xtitle = "% A's Reading"
+					}
+				if "`v'" == "approved" 		{
+					local vlab = "pass"
+					local xtitle = "Grade Promotion"
+					}
+				if "`v'" == "approved_first" 		{
+					local vlab = "passf"
+					local xtitle = "Grade Promotion without recovery"
+					}
+				if "`v'" == "higher_ed_parent" 		{
+					local vlab = "hed_parent"
+					local xtitle = "% Parent with higher education"
+					}
+		
+		
+				gen age_mom_cat = .
+				replace age_mom_cat = 1 if age_mother_1st_oldest_2<30 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 2 if age_mother_1st_oldest_2>=30 & age_mother_1st_oldest_2<50 & age_mother_1st_oldest_2!=.
+				replace age_mom_cat = 3 if age_mother_1st_oldest_2>=50 & age_mother_1st_oldest_2!=.
+
+drop _m
+
+merge m:1 id_per_umc using "$TEMP\applied_students", keep(master match)
+
+				
+				assert 1==0
+
 
 
 				di as result "*******" _n as text "WITH CONTROLS" _n as result "*******"
