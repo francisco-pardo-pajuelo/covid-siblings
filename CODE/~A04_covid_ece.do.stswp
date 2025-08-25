@@ -10,7 +10,11 @@ program define main
 	twfe_ece siblings oldest
 	twfe_ece siblings all
 	
-	twfe_gpa_baseline_survey_common	
+	twfe_gpa_baseline_survey_common	siblings oldest
+	twfe_gpa_baseline_survey_common	siblings all
+	
+	
+	
 	twfe_gpa_baseline_survey_unique
 	
 	//twfe_survey	
@@ -43,7 +47,7 @@ program define setup_COVID_A04
 	global main_outcomes=1
 	global main_outcome_1 = "std_gpa_m_adj"
 	global main_outcome_2 = "" //pass_math
-	global main_outcome_3 = "higher_ed_parent" //higher_ed_parent
+	global main_outcome_3 = "" //higher_ed_parent
 	
 	global main_loop = 0
 	global main_loop_level	= "all"
@@ -52,7 +56,12 @@ program define setup_COVID_A04
 	*- Global variables
 	global fam_type=2
 	global max_sibs = 4
-	global x_all = "male_siagie age_mother age_mother_1st_oldest_${fam_type} i.educ_cat_mother"
+	global x_all 			= "male_siagie age_mother age_mother_1st_oldest_${fam_type} i.educ_cat_mother"
+	global x_all_vars 		= "male_siagie age_mother age_mother_1st_oldest_${fam_type} educ_cat_mother"
+
+	global x_score 	= "base_score_math base_score_com"
+	global x_ses 	= "base_socioec_index"	
+
 	global x_nohigher_ed = "male_siagie urban_siagie public_siagie"
 	
 	global baseline_score_2p = "base_com_std_2p base_math_std_2p" //spanish
@@ -967,6 +976,9 @@ end
 capture program drop twfe_gpa_baseline_survey_common
 program define twfe_gpa_baseline_survey_common
 
+
+args treatment_type subsample
+
 	*------------
 	*- Table X: TWFE on GPA controlling for baseline scores
 	*------------
@@ -1003,6 +1015,7 @@ program define twfe_gpa_baseline_survey_common
 			keep if pair_`i' == 1
 			keep 	id_per_umc id_ie year grade fam_total_${fam_type} fam_order_${fam_type} ///
 					score* std* ///
+					${x_all_vars} ///
 					treated_post treated post ///
 					base_score* base_socioec* base_internet* base_pc* base_radio* base_aspiration* 				
 			gen pair = `i'
@@ -1016,9 +1029,40 @@ program define twfe_gpa_baseline_survey_common
 	append using `pair_2'
 	append using `pair_3'
 	append using `pair_4'
+	
+	*- Treatment type
+	if "`treatment_type'"=="internet" {
+		drop treated treated_post
+		gen treated = internet==1
+		gen treated_post = treated*post
+		local lab_control = "No Internet"
+		local lab_treated = "Internet"
+	}	
 
+	if "`treatment_type'"=="parent_ed" {
+		drop treated treated_post
+		gen treated = (educ_cat_mother==3)
+		gen treated_post = treated*post
+		local lab_control = "Mother no higher ed."
+		local lab_treated = "Mother some higher ed."
+	}
+
+	if "`treatment_type'"=="both_parents" {
+		drop treated treated_post
+		gen treated = (lives_with_mother==1 & lives_with_father==1)
+		gen treated_post = treated*post
+		local lab_control = "Does not live with both"
+		local lab_treated = "Lives with both parents"
+	}	
+				
+	*- Subsample
+	if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+	if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+	if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+	if "`subsample'" == "all" 		di "All siblings"	
+
+	
 	*- In each case, we take the most recent ECE survey results (when there is more than 1 available year)
-
 	foreach v in "score_math" "score_com" "socioec_index" "socioec_index_cat" "internet" "pc" "radio" "aspiration" {
 		gen base_`v' 		= base_`v'_2p if pair==1
 		replace base_`v' 	= base_`v'_4p if pair==2
@@ -1054,10 +1098,10 @@ program define twfe_gpa_baseline_survey_common
 	compress
 
 
-	global x_score 	= "base_score_math base_score_com"
-	global x_ses 	= "base_socioec_index"
 				
-	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" /*"std_gpa_c_adj"*/ /*"pass_math" "pass_read" "prim_on_time" "higher_ed_parent"*/ /*"approved" "approved_first"*/ {
+	foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" /*"pass_math" "pass_read" "prim_on_time" "higher_ed_parent"*/ /*"approved" "approved_first"*/ {
+		
+		if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
 		
 		foreach pair in "all" "1" "2" "3" "4" {
 
@@ -1088,28 +1132,31 @@ program define twfe_gpa_baseline_survey_common
 					
 				
 				//local subj = "m"
-					eststo `v'_all_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses}, a(id_ie grade year pair)
+					eststo `v'_all0_`size'	: reghdfe `v' treated_post treated post, a(id_ie grade year pair)
+					eststo `v'_all1_`size'	: reghdfe `v' treated_post treated post ${x_all}, a(id_ie grade year pair)
+					eststo `v'_all2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score}, a(id_ie grade year pair)
+					eststo `v'_all3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses}, a(id_ie grade year pair)
 					
 					//Effect by SES
-					eststo `v'_ses1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==1, a(id_ie grade year pair)
-					//eststo `v'_ses2_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==2, a(id_ie grade year pair)
-					//eststo `v'_ses3_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==3, a(id_ie grade year pair)
-					eststo `v'_ses4_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_socioec_index_cat==4, a(id_ie grade year pair)
+					eststo `v'_ses1_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==1, a(id_ie grade year pair)
+					//eststo `v'_ses2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==2, a(id_ie grade year pair)
+					//eststo `v'_ses3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==3, a(id_ie grade year pair)
+					eststo `v'_ses4_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==4, a(id_ie grade year pair)
 					
 					//Effect by Resources
-					eststo `v'_pc_int0_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_internet==0 & base_pc==0, a(id_ie grade year pair)
-					eststo `v'_pc_int1_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_internet==1 & base_pc==1, a(id_ie grade year pair)
+					eststo `v'_pc_int0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==0 & base_pc==0, a(id_ie grade year pair)
+					eststo `v'_pc_int1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==1 & base_pc==1, a(id_ie grade year pair)
 			
 					//Effect by Academic achievement
-					eststo `v'_acad1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==1, a(id_ie grade year pair)
-					//eststo `v'_acad2_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==2, a(id_ie grade year pair)
-					//eststo `v'_acad3_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==3, a(id_ie grade year pair)
-					eststo `v'_acad4_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_score_acad_Q==4, a(id_ie grade year pair)
+					eststo `v'_acad1_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==1, a(id_ie grade year pair)
+					//eststo `v'_acad2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==2, a(id_ie grade year pair)
+					//eststo `v'_acad3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==3, a(id_ie grade year pair)
+					eststo `v'_acad4_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==4, a(id_ie grade year pair)
 			
 					//Effect by Expectations
-					eststo `v'_asp_low_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_aspiration,1,2)==1, a(id_ie grade year pair)
-					//eststo `v'_asp_med_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, a(id_ie grade year pair)
-					eststo `v'_asp_hig_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_aspiration,4,5)==1, a(id_ie grade year pair)
+					eststo `v'_asp_low_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,1,2)==1, a(id_ie grade year pair)
+					//eststo `v'_asp_med_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, a(id_ie grade year pair)
+					eststo `v'_asp_hig_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,4,5)==1, a(id_ie grade year pair)
 				
 			restore
 			}
@@ -1125,45 +1172,37 @@ program define twfe_gpa_baseline_survey_common
 			if "`v'" == "approved" 			local xtitle = "Grade Promotion"
 			if "`v'" == "approved_first" 	local xtitle = "Grade Promotion without recovery"
 			if "`v'" == "higher_ed_parent" 	local xtitle = "% Parent with higher education"
-			
-			
-			
-			foreach sample_split in  "ses" "pc_int" "acad" "asp" {
-				
-				if "`sample_split'" ¿¿ 
-				
-				
-				
-			}
+	
+	local v = "std_gpa_m_adj"
+			*- For Reviewing how adding controls affects the estimates
 			coefplot ///
-			(`v'_pc_int0_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
-			(`v'_pc_int0_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
-			(`v'_pc_int0_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			(`v'_all0_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
 			, ///
-			bylabel("2nd grade") ///
+			bylabel("No controls") ///
 			|| ///
-			(`v'_pc_int1_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
-			(`v'_pc_int1_2, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
-			(`v'_pc_int1_2, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			(`v'_all1_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
 			, ///
-			bylabel("4th grade") ///
+			bylabel("Demographic") ///
 			|| ///
-			(asp_c4_2s_x_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
-			(asp_c4_2s_x_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
-			(asp_c4_2s_x_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			(`v'_all2_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
 			, ///
-			bylabel("8th grade") ///		
+			bylabel("Demog + Academic") ///
+			|| ///
+			(`v'_all3_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
+			, ///
+			bylabel("Demog + Academic + SES") ///
 			|| ///
 			, ///
 			vertical ///
 			recast(bar) barwidth(0.25) ///
 			ciopts(recast(rcap)) citop ///
-			xlabel(1 "2nd grade" 2 "4th grade" 3 "8th grade") ///	
+			xlabel(1 "No controls" 2 "Demographic" 3 "Demog + Academic" 4 "Demog + Academic + SES") ///	
 			keep(treated_post) ///
-			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
-			ytitle("Expectation of not achieving 4+ year college" "relative to Only Children (%)", size(medsmall) height(5)) ///							
+			///legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+			legend(off) ///
+			ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
 			///xline(0, lcolor(gs12)) ///
-			ylabel(-0.04 "-4%" -0.02 "-2%" 0 "0%" 0.02 "2%") ///
+			ylabel(-0.06(0.01)0.01) ///
 			yline(0, lcolor(gs0) lpattern(dash)) ///
 			grid(none) ///
 			bycoefs 
@@ -1171,93 +1210,250 @@ program define twfe_gpa_baseline_survey_common
 		
 		if "${covid_data}" == "_TEST" {
 			di "TEST"
-			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_expectation_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_expectation_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_bycontrols`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_bycontrols`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 			}
 		if "${covid_data}" == "" {
 			di "REAL"
-			capture qui graph export "$FIGURES\TWFE\twfe_expectation_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-			capture qui graph export "$FIGURES\TWFE\twfe_expectation_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
-			}	
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_bycontrols`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_bycontrols`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}				
 			
-			
-			
-			
-			
-	
-				coefplot 	(`v'_all_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_all_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_all_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("All Students") ///
-							||  ///
-							(`v'_ses1_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_ses1_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_ses1_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("Low SES Households (Q1)") ///
-							||  ///
-							(`v'_ses4_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_ses4_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_ses4_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("High SES Households (Q4)") ///
-							||  ///
-							(`v'_pc_int0_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_pc_int0_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_pc_int0_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("Households with neither PC nor Internet") ///
-							||  ///
-							(`v'_pc_int1_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_pc_int1_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_pc_int1_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("Households with both PC and Internet") ///
-							||  ///
-							(`v'_acad1_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_acad1_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_acad1_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("Low achievement students (Q1)") ///
-							||  ///
-							(`v'_acad4_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_acad4_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_acad4_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("High achievement students (Q4)") ///
-							||  ///
-							(`v'_asp_low_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_asp_low_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_asp_low_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("Expectations: Below 4-year college") ///
-							||  ///
-							(`v'_asp_hig_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
-							(`v'_asp_hig_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
-							(`v'_asp_hig_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
-							, ///
-							bylabel("Expectations: 4-year college and beyond") ///
-							||  ///
-							, ///
-							keep(treated_post) ///
-							legend(order(1 "1 sibling" 3 "2 siblings" 5 "`legend_sib_${max_sibs}'") col(3) pos(6)) ///
-							xtitle("`xtitle' relative to Only Children", size(medsmall) height(5)) ///
-							///xlabel(`xmin'(0.02)0.02) ///
-							xlabel(#5) ///								
-							xline(0, lcolor(gs12)) ///
-							///xline(`xlines', lcolor(gs15))  ///
-							grid(none) ///
-							bycoefs	
+			coefplot ///
+			(`v'_all0_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(`v'_all0_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(`v'_all0_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("No controls") ///
+			|| ///
+			(`v'_all1_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(`v'_all1_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(`v'_all1_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("Demographic") ///
+			|| ///
+			(`v'_all2_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(`v'_all2_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(`v'_all2_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("Demog + Academic") ///
+			|| ///
+			(`v'_all3_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(`v'_all3_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(`v'_all3_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("Demog + Academic + SES") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "No controls" 2 "Demographic" 3 "Demog + Academic" 4 "Demog + Academic + SES") ///	
+			keep(treated_post) ///
+			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+			ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.04(0.02)0.02) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
 
-				if "${covid_data}" == "_TEST" {
-					capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_baseline_survey_pair`pair'_${max_sibs}${covid_data}.png", replace	
-					capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_baseline_survey_pair`pair'_${max_sibs}${covid_data}.pdf", replace	
-					}
-				if "${covid_data}" == "" {
-					capture qui graph export "$FIGURES\TWFE\twfe_`v'_baseline_survey_pair`pair'_${max_sibs}${covid_data}.png", replace	
-					capture qui graph export "$FIGURES\TWFE\twfe_`v'_baseline_survey_pair`pair'_${max_sibs}${covid_data}.pdf", replace	
-					}	
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_bycontrols_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_bycontrols_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_bycontrols_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_bycontrols_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}
+	
+			
+			*- For heterogeneity with different sample splits
+			foreach sample_split in  "ses" "pc_int" "acad" "asp" {
+	
+				if "`sample_split'" == "ses" {
+					local coef0 = "ses1"
+					local coef1 = "ses4"
+					local coef0_lab = "Low SES Households (Q1)"
+					local coef1_lab = "High SES Households (Q4)"
+				} 	
+	
+	
+				if "`sample_split'" == "pc_int" {
+					local coef0 = "pc_int0"
+					local coef1 = "pc_int1"
+					local coef0_lab = "Households with neither PC nor Internet"
+					local coef1_lab = "Households with both PC and Internet"
+				} 
+				
+				if "`sample_split'" == "acad" {
+					local coef0 = "acad1"
+					local coef1 = "acad4"
+					local coef0_lab = "Low achievement students (Q1)"
+					local coef1_lab = "High achievement students (Q4)"
+				} 
+				
+				if "`sample_split'" == "asp" {
+					local coef0 = "asp_low"
+					local coef1 = "asp_hig"
+					local coef0_lab = "Expectations: Below 4-year college"
+					local coef1_lab = "Expectations: 4-year college and beyond"
+				} 				
+	
+			
+
+			coefplot ///
+			(`v'_`coef0'_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
+			, ///
+			bylabel("`coef0_lab'") ///
+			|| ///
+			(`v'_`coef1'_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
+			, ///
+			bylabel("`coef1_lab'") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "`coef0_lab'" 2 "`coef1_lab'") ///	
+			keep(treated_post) ///
+			///legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+			legend(off) ///
+			ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.06(0.01)0.01) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_by`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_by`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_by`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_by`sample_split'_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}				
+			
+			coefplot ///
+			(`v'_`coef0'_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(`v'_`coef0'_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(`v'_`coef0'_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("`coef0_lab'") ///
+			|| ///
+			(`v'_`coef1'_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(`v'_`coef1'_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(`v'_`coef1'_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("`coef1_lab'") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "`coef0_lab'" 2 "`coef1_lab'") ///	
+			keep(treated_post) ///
+			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+			ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.04(0.02)0.02) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_by`sample_split'_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_by`sample_split'_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_by`sample_split'_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_by`sample_split'_bysibs_T`treatment_type'_S`subsample'_pair`pair'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}
+		} /// Sample Split
+
+		coefplot 	(`v'_all3_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_all3_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_all3_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("All Students") ///
+					||  ///
+					(`v'_ses1_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_ses1_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_ses1_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("Low SES Households (Q1)") ///
+					||  ///
+					(`v'_ses4_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_ses4_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_ses4_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("High SES Households (Q4)") ///
+					||  ///
+					(`v'_pc_int0_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_pc_int0_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_pc_int0_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("Households with neither PC nor Internet") ///
+					||  ///
+					(`v'_pc_int1_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_pc_int1_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_pc_int1_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("Households with both PC and Internet") ///
+					||  ///
+					(`v'_acad1_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_acad1_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_acad1_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("Low achievement students (Q1)") ///
+					||  ///
+					(`v'_acad4_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_acad4_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_acad4_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("High achievement students (Q4)") ///
+					||  ///
+					(`v'_asp_low_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_asp_low_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_asp_low_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("Expectations: Below 4-year college") ///
+					||  ///
+					(`v'_asp_hig_2, mcolor("${ek_blue}") 		ciopts(color("${ek_blue}"))) ///
+					(`v'_asp_hig_3, mcolor("${ek_green}") 	ciopts(color("${ek_green}"))) ///
+					(`v'_asp_hig_4, mcolor("${ek_red}") 		ciopts(color("${ek_red}"))) ///
+					, ///
+					bylabel("Expectations: 4-year college and beyond") ///
+					||  ///
+					, ///
+					keep(treated_post) ///
+					legend(order(1 "1 sibling" 3 "2 siblings" 5 "`legend_sib_${max_sibs}'") col(3) pos(6)) ///
+					xtitle("`xtitle' relative to Only Children", size(medsmall) height(5)) ///
+					///xlabel(`xmin'(0.02)0.02) ///
+					xlabel(#5) ///								
+					xline(0, lcolor(gs12)) ///
+					///xline(`xlines', lcolor(gs15))  ///
+					grid(none) ///
+					bycoefs	
+
+		if "${covid_data}" == "_TEST" {
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_baseline_survey_T`treatment_type'_S`subsample'_pair`pair'_${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_`v'_baseline_survey_T`treatment_type'_S`subsample'_pair`pair'_${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_baseline_survey_T`treatment_type'_S`subsample'_pair`pair'_${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_`v'_baseline_survey_T`treatment_type'_S`subsample'_pair`pair'_${max_sibs}${covid_data}.pdf", replace	
+			}	
 	
 
 	****
@@ -1280,11 +1476,12 @@ program define twfe_gpa_baseline_survey_common
 			if "`v'" == "approved_first" 	local xlabel = "Grade Promotion without recovery"
 			if "`v'" == "higher_ed_parent" 	local xlabel = "% Parent with higher education"	
 	
-		capture erase "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex"
+		capture erase "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_1_pair`pair'${covid_data}.tex"
+		capture erase "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_1_pair`pair'${covid_data}.tex"
 		
 		****** TABLE HEADER
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", replace write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", replace write
 		file write table_tex	/// HEADER OPTIONS OF TABLE
 							"\makeatletter" _n ///
 							"\@ifclassloaded{beamer}{%" _n ///
@@ -1294,14 +1491,14 @@ program define twfe_gpa_baseline_survey_common
 							"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 							"	\centering" _n ///
 							"	\caption{`title_t1_pair_`pair''}" _n ///
-							"	\label{tab:twfe_`v'_baseline_survey_1_pair`pair'}" _n ///
+							"	\label{tab:twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'}" _n ///
 							"	\resizebox{0.65\textwidth}{!}%" _n ///
 							"}" _n ///
 							"{" _n ///
 							"\makeatother"	 _n 
 		file close table_tex
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex	/// HEADER OPTIONS OF TABLE
 						"\begin{tabular}{lccc}" _n ///
 						/// HEADER OF TABLE
@@ -1319,15 +1516,15 @@ program define twfe_gpa_baseline_survey_common
 		******* TABLE CONTENT	
 		
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex ///	
 						"&  &  &   \\" _n  ///
 						"\multicolumn{4}{l}{\textit{Panel A: All students}} \\" _n
 		file close table_tex	
 		
 
-		estout   `v'_all_2 `v'_all_3 `v'_all_4  ///
-		using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", ///
+		estout   `v'_all3_2 `v'_all3_3 `v'_all3_4  ///
+		using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 		append style(tex) ///
 		cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 		keep(treated_post) ///
@@ -1337,14 +1534,14 @@ program define twfe_gpa_baseline_survey_common
 		mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 		
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex ///	
 						"&  &  &   \\" _n  ///
 						"\multicolumn{4}{l}{\textit{Panel B: Low SES Households (Q1)}} \\" _n
 		file close table_tex		
 		
 		estout   `v'_ses1_2 `v'_ses1_3 `v'_ses1_4  ///
-		using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", ///
+		using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 		append style(tex) ///
 		cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 		keep(treated_post) ///
@@ -1354,14 +1551,14 @@ program define twfe_gpa_baseline_survey_common
 		mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 		
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex ///	
 						"&  &  &   \\" _n  ///
 						"\multicolumn{4}{l}{\textit{Panel C: High SES Households (Q4)}} \\" _n
 		file close table_tex	
 
 		estout   `v'_ses4_2 `v'_ses4_3 `v'_ses4_4  ///
-		using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", ///
+		using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 		append style(tex) ///
 		cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 		keep(treated_post) ///
@@ -1370,14 +1567,14 @@ program define twfe_gpa_baseline_survey_common
 		stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "\hspace{3mm}Observations")) ///
 		mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
 
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex ///	
 						"&  &  &   \\" _n  ///
 						"\multicolumn{4}{l}{\textit{Panel D: Households with neither PC nor Internet}} \\" _n
 		file close table_tex
 		
 		estout   `v'_pc_int0_2 `v'_pc_int0_3 `v'_pc_int0_4  ///
-		using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", ///
+		using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 		append style(tex) ///
 		cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 		keep(treated_post) ///
@@ -1386,14 +1583,14 @@ program define twfe_gpa_baseline_survey_common
 		stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "\hspace{3mm}Observations")) ///
 		mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex ///	
 						"&  &  &   \\" _n  ///
 						"\multicolumn{4}{l}{\textit{Panel E: Households with both PC and Internet}} \\" _n
 		file close table_tex		
 		
 		estout   `v'_pc_int1_2 `v'_pc_int1_3 `v'_pc_int1_4  ///
-		using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", ///
+		using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 		append style(tex) ///
 		cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 		keep(treated_post) ///
@@ -1405,7 +1602,7 @@ program define twfe_gpa_baseline_survey_common
 
 		********* END TABLE
 		
-		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_pair`pair'.tex", append write
+		file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_1_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 		file write table_tex	/// HEADER OPTIONS OF TABLE							
 		_n "\bottomrule" _n ///
 			"\end{tabular}" _n ///
@@ -1428,11 +1625,11 @@ program define twfe_gpa_baseline_survey_common
 ****
 
 
-	capture erase "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex"
+	capture erase "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex"
 	
 	****** TABLE HEADER
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", replace write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", replace write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
 						"\makeatletter" _n ///
 						"\@ifclassloaded{beamer}{%" _n ///
@@ -1442,14 +1639,14 @@ program define twfe_gpa_baseline_survey_common
 						"	\begin{table}[!tbp]\centering\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}" _n ///
 						"	\centering" _n ///
 						"	\caption{`title_t2_pair_`pair''}" _n ///
-						"	\label{tab:twfe_`v'_baseline_survey_2_pair`pair'}" _n ///
+						"	\label{tab:twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'}" _n ///
 						"	\resizebox{0.65\textwidth}{!}%" _n ///
 						"}" _n ///
 						"{" _n ///
 						"\makeatother"	 _n 
 	file close table_tex
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex	/// HEADER OPTIONS OF TABLE
 					"\begin{tabular}{lccc}" _n ///
 					/// HEADER OF TABLE
@@ -1467,14 +1664,14 @@ program define twfe_gpa_baseline_survey_common
 	******* TABLE CONTENT	
 	
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel A: All students}} \\" _n
 	file close table_tex	
 	
-	estout   `v'_all_2 `v'_all_3 `v'_all_4  ///
-	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", ///
+	estout   `v'_all3_2 `v'_all3_3 `v'_all3_4  ///
+	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(treated_post) ///
@@ -1483,14 +1680,14 @@ program define twfe_gpa_baseline_survey_common
 	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "\hspace{3mm}Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel B: Low achievement students (Q1)}} \\" _n
 	file close table_tex		
 	
 	estout   `v'_acad1_2 `v'_acad1_3 `v'_acad1_4  ///
-	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", ///
+	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(treated_post) ///
@@ -1499,14 +1696,14 @@ program define twfe_gpa_baseline_survey_common
 	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "\hspace{3mm}Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel C: High achievement students (Q4)}} \\" _n
 	file close table_tex		
 	
 	estout   `v'_acad4_2 `v'_acad4_3 `v'_acad4_4  ///
-	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", ///
+	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(treated_post) ///
@@ -1515,14 +1712,14 @@ program define twfe_gpa_baseline_survey_common
 	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "\hspace{3mm}Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)	
 
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel D: Low Education Expectations: Below 4-year college}} \\" _n
 	file close table_tex	
 	
 	estout   `v'_asp_low_2 `v'_asp_low_3 `v'_asp_low_4  ///
-	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", ///
+	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(treated_post) ///
@@ -1531,14 +1728,14 @@ program define twfe_gpa_baseline_survey_common
 	stats(blank_line N   , fmt(%9.0fc %9.0fc ) labels(" " "\hspace{3mm}Observations")) ///
 	mlabels(, none) collabels(, none) note(" ") label starlevels(* 0.10 ** 0.05 *** 0.01)
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex ///	
 					"&  &  &   \\" _n  ///
 					"\multicolumn{4}{l}{\textit{Panel E: High Education Expectations: 4-year college and beyond}} \\" _n
 	file close table_tex		
 	
 	estout   `v'_asp_hig_2 `v'_asp_hig_3 `v'_asp_hig_4  ///
-	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", ///
+	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", ///
 	append style(tex) ///
 	cells(b(star fmt(%9.3f)) se(par fmt(%9.3f))) ///
 	keep(treated_post) ///
@@ -1552,7 +1749,7 @@ program define twfe_gpa_baseline_survey_common
 
 	********* END TABLE
 	
-	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_pair`pair'.tex", append write
+	file open  table_tex	using "$TABLES\twfe_`v'_baseline_survey_2_T`treatment_type'_S`subsample'_pair`pair'${covid_data}.tex", append write
 	file write table_tex	/// HEADER OPTIONS OF TABLE							
 	_n "\bottomrule" _n ///
 		"\end{tabular}" _n ///
@@ -2333,6 +2530,14 @@ program define twfe_gpa_baseline_survey_unique
 
 end
 
+************************************************************************************
+************************************************************************************
+************************************************************************************
+************************************************************************************
+************************************************************************************
+************************************************************************************
+************************************************************************************
+************************************************************************************
 ************************************************************************************
 
 

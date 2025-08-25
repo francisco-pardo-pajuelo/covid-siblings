@@ -12,9 +12,13 @@ program define main
 	twfe_2_4_6_8 siblings oldest all
 	twfe_2_4_6_8 siblings all	 all
 	
-	twfe_age_gap 	siblings oldest 20_21
-	twfe_dual 		siblings oldest 20_21 "lives_with_mother"
-	twfe_dual 		siblings oldest 20_21 "mom_sec_complete"
+	twfe_age_gap 	siblings oldest 20_21 all
+	twfe_dual 		siblings oldest 20_21 all "lives_with_mother"
+	twfe_dual 		siblings oldest 20_21 all "mom_sec_complete"
+	
+	twfe_age_gap 	siblings oldest 20_21 elm
+	twfe_dual 		siblings oldest 20_21 elm "lives_with_mother"
+	twfe_dual 		siblings oldest 20_21 elm "mom_sec_complete"	
 
 	twfe_age_gap 	siblings all 20_21
 	twfe_dual 		siblings all 20_21 "lives_with_mother"
@@ -5222,7 +5226,7 @@ capture program drop twfe_2_4_6_8
 program define twfe_2_4_6_8
 
 
-args treatment_type subsample post_years      //treatment_type: treatment type (generally by # of siblings). 
+args treatment_type subsample only_covid level      //treatment_type: treatment type (generally by # of siblings). 
 
 capture assert "`treatment_type'" != ""
 if _rc!=0 di "Need to select type: usual is -siblings-"
@@ -5230,13 +5234,13 @@ if _rc!=0 di "Need to select type: usual is -siblings-"
 capture assert "`subsample'" != ""
 if _rc!=0 di "Need to select subsample: can be -all-"		
 
-capture assert inlist("`post_years'","all","20_21")==1
+capture assert inlist("`only_covid'","all","20_21")==1
 if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"		 
 	clear
 
 	
 	local v = "std_gpa_m_adj"
-	local only_covid = "`post_years'"
+	//local only_covid = "`post_years'"
 	local level = "all"
 	
 					
@@ -5484,7 +5488,7 @@ capture program drop twfe_age_gap
 program define twfe_age_gap
 
 
-args treatment_type subsample post_years      //treatment_type: treatment type (generally by # of siblings). 
+args treatment_type subsample only_covid level      //treatment_type: treatment type (generally by # of siblings). 
 
 capture assert "`treatment_type'" != ""
 if _rc!=0 di "Need to select type: usual is -siblings-"
@@ -5492,14 +5496,14 @@ if _rc!=0 di "Need to select type: usual is -siblings-"
 capture assert "`subsample'" != ""
 if _rc!=0 di "Need to select subsample: can be -all-"		
 
-capture assert inlist("`post_years'","all","20_21")==1
+capture assert inlist("`only_covid'","all","20_21")==1
 if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"		 
 	clear
 
 	
 	local v = "std_gpa_m_adj"
-	local only_covid = "`post_years'"
-	local level = "all"
+	//local only_covid = "`post_years'"
+	//local level = "all"
 	
 					
 				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -5733,13 +5737,13 @@ if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"
 					
 					if "${covid_data}" == "_TEST" {
 						di "TEST"
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 						}
 					if "${covid_data}" == "" {
 						di "REAL"
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 						}
 						
 							
@@ -5778,13 +5782,13 @@ if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"
 					
 					if "${covid_data}" == "_TEST" {
 						di "TEST"
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_age_gap_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 						}
 					if "${covid_data}" == "" {
 						di "REAL"
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_age_gap_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 						}								
 					
 end
@@ -5802,7 +5806,7 @@ capture program drop twfe_dual
 program define twfe_dual
 
 
-args treatment_type subsample post_years category     //treatment_type: treatment type (generally by # of siblings). 
+args treatment_type subsample only_covid level category     //treatment_type: treatment type (generally by # of siblings). 
 
 capture assert "`treatment_type'" != ""
 if _rc!=0 di "Need to select type: usual is -siblings-"
@@ -5810,7 +5814,7 @@ if _rc!=0 di "Need to select type: usual is -siblings-"
 capture assert "`subsample'" != ""
 if _rc!=0 di "Need to select subsample: can be -all-"		
 
-capture assert inlist("`post_years'","all","20_21")==1
+capture assert inlist("`only_covid'","all","20_21")==1
 if _rc!=0 di "Need to select post_year: can be -all- or -20_21-"		 
 	
 capture assert inlist("`category'","lives_with_mother","mother_sec_complete")==1	
@@ -5821,8 +5825,8 @@ if _rc!=0 di "Need to select category: can be -lives_with_mother- or -mother_sec
 
 	
 	local v = "std_gpa_m_adj"
-	local only_covid = "`post_years'"
-	local level = "all"
+	//local only_covid = "`post_years'"
+	//local level = "all"
 	
 					
 				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
@@ -6047,13 +6051,13 @@ if _rc!=0 di "Need to select category: can be -lives_with_mother- or -mother_sec
 					
 					if "${covid_data}" == "_TEST" {
 						di "TEST"
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 						}
 					if "${covid_data}" == "" {
 						di "REAL"
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 						}
 						
 							
@@ -6086,13 +6090,13 @@ if _rc!=0 di "Need to select category: can be -lives_with_mother- or -mother_sec
 					
 					if "${covid_data}" == "_TEST" {
 						di "TEST"
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES_TEMP\TWFE\twfe_gpa_`category'_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 						}
 					if "${covid_data}" == "" {
 						di "REAL"
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_bysibs_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+						capture qui graph export "$FIGURES\TWFE\twfe_gpa_`category'_bysibs_`level'_`only_covid'_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 						}								
 					
 end
@@ -6102,6 +6106,7 @@ end
 *-----------------
 *-  TEST
 *-----------------
+
 
 
 capture program drop twfe_test
@@ -6408,6 +6413,7 @@ coefplot 	(m2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50"
 			grid(none) ///
 			bycoefs 				
 end
+		
 		
 
 		
