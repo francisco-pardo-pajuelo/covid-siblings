@@ -13,12 +13,12 @@ program define main
 	parent_investment
 	
 	*- Main Raw trend
-	raw_gpa_trends_main siblings oldest //with shade
 	raw_gpa_trends_main siblings all //with shade
+	raw_gpa_trends_main siblings oldest //with shade
 	
 	*- Raw trends
-	raw_gpa_trends siblings oldest
 	raw_gpa_trends siblings all
+	raw_gpa_trends siblings oldest
 	
 	*- Other placebo raw trends
 	raw_gpa_trends parent_ed	oldest
@@ -693,23 +693,21 @@ args treatment_type subsample
 				
 				foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" {
 					if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
-					//if inlist("`type'","siblings","parent_ed","both_parents","t_born","t_born_Q2")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
+					//if inlist("`treatment_type'","siblings","parent_ed","both_parents","t_born","t_born_Q2")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
 					sum `v' 
 					gen miny = r(min)
 					gen maxy = r(max)
 					
 					twoway 		///(rarea miny maxy areax if inrange(areax, 2019.5, 2021.5), color(gs15)) ///
-								(line `v' year if treated==0 & year<=2019, lcolor("gs0%50") lpattern(dash)) /// 
-								(line `v' year if treated==0 & year>=2020, lcolor("gs0%50") lpattern(dash)) /// 
-								(line `v' year if treated==1 & year<=2019, lcolor("${trend_color}")) ///
-								(line `v' year if treated==1 & year>=2020, lcolor("${trend_color}")) ///
+								(line `v' year if treated==0 & year>=2016, lcolor("${ek_red}")) /// 
+								(line `v' year if treated==1 & year>=2016, lcolor("${ek_blue}")) ///
 								, ///
 								xline(2019.5 2021.5, lcolor(gs8)) ///
-								xlabel(2014 "14" 2015 "15" 2016 "16" 2017 "17" 2018 "18" 2019 "19" 2020 "20" 2021 "21" 2022 "22" 2023 "23" 2024 "24")  ///
+								xlabel(2016(1)2024)  ///
 								ytitle("`ytitle_`v''", size(small)) ///
 								xtitle("Year") ///
 								///legend(off) ///
-								legend(order(2 "`lab_control'" 4 "`lab_treated'") col(3) pos(6)) ///
+								legend(order(1 "`lab_control'" 2 "`lab_treated'") col(3) pos(6)) ///
 								name(total_`v', replace)	
 								
 							if "${covid_data}" != "_TEST" {								
@@ -717,8 +715,8 @@ args treatment_type subsample
 								capture qui graph export "$FIGURES\Descriptive\raw_total_`level'_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
 							}
 							if "${covid_data}" == "_TEST" {		
-								capture qui graph export "$FIGURES_TEMP\Descriptive\raw_total_`level'_`v'_`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
-								capture qui graph export "$FIGURES_TEMP\Descriptive\raw_total_`level'_`v'_`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
+								capture qui graph export "$FIGURES_TEMP\Descriptive\raw_total_`level'_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
+								capture qui graph export "$FIGURES_TEMP\Descriptive\raw_total_`level'_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
 							}
 								
 					drop miny maxy
@@ -742,18 +740,17 @@ args treatment_type subsample
 		
 		forvalues g = 1(1)11 {
 			foreach v in "std_gpa_m" "std_gpa_c" "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" {
-				//if inlist("`type'","siblings","parent_ed","both_parents")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
+				if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+				if inlist("`treatment_type'","siblings")==0 continue
 				sum `v' if grade>=1 & grade<=11 & `v'!=. & year>=2014 & year<=2024
 				gen miny = r(min)
 				gen maxy = r(max)
 				twoway 	///(rarea miny maxy areax if inrange(areax, 2019.5, 2021.5), color(gs15)) ///
-						(line `v' year if grade == `g' & treated==0 & year<=2019, lcolor("gs0%50") lpattern(dash)) /// 
-						(line `v' year if grade == `g' & treated==0 & year>=2020, lcolor("gs0%50") lpattern(dash)) /// 
-						(line `v' year if grade == `g' & treated==1 & year<=2019, lcolor("${trend_color}")) ///
-						(line `v' year if grade == `g' & treated==1 & year>=2020, lcolor("${trend_color}")) ///
+								(line `v' year if grade==`g' & treated==0 & year>=2016, lcolor("${ek_red}")) /// 
+								(line `v' year if grade==`g' & treated==1 & year>=2016, lcolor("${ek_blue}")) ///
 						, ///
 						xline(2019.5 2021.5, lcolor(gs8)) ///
-						xlabel(2014 "14" 2015 "15" 2016 "16" 2017 "17" 2018 "18" 2019 "19" 2020 "20" 2021 "21" 2022 "22" 2023 "23" 2024 "24")  ///
+						xlabel(2016 "16" 2017 "17" 2018 "18" 2019 "19" 2020 "20" 2021 "21" 2022 "22" 2023 "23" 2024 "24")  ///
 						ytitle("`ytitle_`v''", size(small)) ///
 						xtitle("Year") ///
 						subtitle("`g`g'' grade") ///
@@ -764,31 +761,56 @@ args treatment_type subsample
 					}
 				}
 		
+		
+		*- Elementary School
 		foreach v in "std_gpa_m" "std_gpa_c" "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" {
-			if inlist("`type'","siblings","parent_ed","both_parents")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
-			graph combine   `v'_1 	///
-							`v'_2 `v'_3 	///
-							`v'_4 `v'_5 	///
-							`v'_6 `v'_7 	///
-							`v'_8 `v'_9 	///
-							`v'_10 `v'_11 	///
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+			if inlist("`treatment_type'","siblings")==0 continue
+			graph combine   `v'_1  `v'_2 	///
+							`v'_3  `v'_4 	///
+							`v'_5  `v'_6 	/// 
 							, 				///
 							col(3) ///
-							xsize(40) ///
+							xsize(60) ///
 							ysize(40) 
 							
 				///graph save "$FIGURES\raw_m.gph" , replace	
 				///capture qui graph export "$FIGURES\raw_m.eps", replace	
 				if "${covid_data}" != "_TEST" {	
-					capture qui graph export "$FIGURES\Descriptive\raw_grades_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
-					capture qui graph export "$FIGURES\Descriptive\raw_grades_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
+					capture qui graph export "$FIGURES\Descriptive\raw_grades_elm_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\raw_grades_elm_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
 					}
 					
 				if "${covid_data}" == "_TEST" {	
-					capture qui graph export "$FIGURES_TEMP\Descriptive\raw_grades_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
-					capture qui graph export "$FIGURES_TEMP\Descriptive\raw_grades_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
+					capture qui graph export "$FIGURES_TEMP\Descriptive\raw_grades_elm_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
+					capture qui graph export "$FIGURES_TEMP\Descriptive\raw_grades_elm_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
 					}				
 			}
+			
+		*- Secondary School	
+		foreach v in "std_gpa_m" "std_gpa_c" "std_gpa_m_adj" "std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time" {
+			if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
+			if inlist("`treatment_type'","siblings")==0 continue
+			graph combine   `v'_7  `v'_8 	///
+							`v'_9  `v'_10 	///
+							`v'_11  		/// 
+							, 				///
+							col(3) ///
+							xsize(60) ///
+							ysize(40) 
+							
+				///graph save "$FIGURES\raw_m.gph" , replace	
+				///capture qui graph export "$FIGURES\raw_m.eps", replace	
+				if "${covid_data}" != "_TEST" {	
+					capture qui graph export "$FIGURES\Descriptive\raw_grades_sec_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
+					capture qui graph export "$FIGURES\Descriptive\raw_grades_sec_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
+					}
+					
+				if "${covid_data}" == "_TEST" {	
+					capture qui graph export "$FIGURES_TEMP\Descriptive\raw_grades_sec_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.png", replace			
+					capture qui graph export "$FIGURES_TEMP\Descriptive\raw_grades_sec_`v'_T`treatment_type'_S`subsample'_Size`size'${covid_data}.pdf", replace	
+					}				
+			}			
 			
 	restore
 	}
@@ -927,11 +949,11 @@ args treatment_type subsample
 				gen areax = 2019.5 if mod(_n,2)==0
 				replace areax = 2021.5 if mod(_n,2)==1
 				
-				//foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" /*"std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time"*/ {
+				foreach v in /*"std_gpa_m" "std_gpa_c"*/ "std_gpa_m_adj" /*"std_gpa_c_adj" "pass_math" "pass_read" "prim_on_time"*/ {
 					if ${main_outcomes} == 1 & inlist("`v'","${main_outcome_1}","${main_outcome_2}","${main_outcome_3}")!=1		continue
-					//if inlist("`type'","siblings","parent_ed","both_parents","t_born","t_born_Q2")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
+					//if inlist("`treatment_type'","siblings","parent_ed","both_parents","t_born","t_born_Q2")==0 & inlist("`v'","std_gpa_m","std_gpa_c","std_gpa_m_adj","std_gpa_c_adj")==1 continue
 					
-					local v = "std_gpa_m_adj"
+					//local v = "std_gpa_m_adj"
 					sum `v' 
 					gen miny = r(min)
 					gen maxy = r(max)
@@ -982,7 +1004,7 @@ args treatment_type subsample
 								
 					drop miny maxy
 					drop shade_*
-						//}	
+				}	
 			//restore
 		//}
 

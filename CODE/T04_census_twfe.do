@@ -52,6 +52,20 @@ label var P811_6 	"En un escenario de educación remota, ¿Cuál es el medio de 
 label var P812		"¿Los estudiantes de este servicio/nivel educativo han recibido Tablet?"
 
 
+
+foreach v of var P801_ACT P806 P808 P809 P812 {
+	replace `v' = "1" if `v'=="SI"
+	replace `v' = "0" if `v'=="NO"
+	destring `v', replace
+}
+
+	replace P811_6 = "1" if P811_6=="X"
+	replace P811_6 = "0" if P811_6==""
+	destring P811_6, replace
+
+destring P802 P804_CAST P808_2 P809_2, replace
+	
+	
 tempfile modality_prim_2
 save `modality_prim_2', replace
 
@@ -136,6 +150,26 @@ table P102 D_GESTION if P102<=3, stat(mean b)
 binsreg b talleres_ppff if talleres_ppff<=4
 binsreg b P155_Q if P155_Q<=4
 
+tabstat b if b!=0 & pv<0.1, by(P102)
+
+twoway 	(kdensity b if P102==2 & abs(b)<.5 & b!=0) ///
+		(kdensity b if P102==3 & abs(b)<.5 & b!=0) ///
+		, ///
+		legend(order(1 "Semi-remote" 2 "Remote") pos(6) col(2))
+		
+
+
+pwcorr b P102 if inlist(P102,2,3)==1
+pwcorr b P801_ACT 	
+pwcorr b P802 		
+pwcorr b P804_CAST 
+pwcorr b P806 		
+pwcorr b P808 		
+pwcorr b P808_2 	
+pwcorr b P809 		
+pwcorr b P809_2 	
+pwcorr b P811_6 	
+pwcorr b P812		
 
 assert 1==0
 
