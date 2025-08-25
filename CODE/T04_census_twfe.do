@@ -33,11 +33,11 @@ save `modality_prim_1', replace
 
 *-- Servicios y activitades
 import dbase using "$IN\CENSO_ESCOLAR\2021\C3AP_Lineal_2.dbf", clear
-ds P801_ACT P802 P804_CAST P806 P808 P808_2 P809 P809_2 P809_E P811_6 P812
+ds P801_ACT P802 P804_CAST P806 P808 P808_2 P809 P809_? P809_E P811_6 P812
 
 gen id_ie = COD_MOD + ANEXO
 
-keep id_ie P801_ACT P802 P804_CAST P806 P808 P808_2 P809 P809_2 P809_E P811_6 P812
+keep id_ie P801_ACT P802 P804_CAST P806 P808 P808_2 P809 P809_? P809_E P811_6 P812
 
 label var P801_ACT 	"Las actividades propuestas en la web, ¿Son desarrolladas por los estudiantes de la I.E.?"
 label var P802 		""

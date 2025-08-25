@@ -24,6 +24,9 @@ program define main
 	raw_gpa_trends both_parents	oldest
 	raw_gpa_trends t_born		oldest
 	raw_gpa_trends t_born_Q2	oldest
+	
+	*- ECE trends
+	raw_ece_trends
 
 	
 
@@ -390,7 +393,17 @@ use "$TEMP\pre_reg_covid${covid_data}", clear
 	global g2tit = "2nd grade" 
 	global g4tit = "4th grade" 
 	global g6tit = "6th grade" 
-	global g8tit = "8th grade" 	
+	global g8tit = "8th grade" 
+	
+	global subj_title_math = "Mathematics "
+	global subj_title_com = "Reading "
+	
+	local xming2 = 2014
+	local xmaxg2 = 2023
+	local xming4 = 2016
+	local xmaxg4 = 2024
+	local xming8 = 2015
+	local xmaxg8 = 2023
 	
 	
 	
@@ -441,20 +454,20 @@ use "$TEMP\pre_reg_covid${covid_data}", clear
 			
 			keep if score_`subj'_${g${g}lab}!=.
 			keep if year!=2020
-			gen score_${g${g}lab} = (score_`subj'_${g${g}lab}-500)/100
+			//gen score_${g${g}lab} = (score_`subj'_${g${g}lab}-500)/100
 
 			gen pop = 1 
 			gen sibs = (fam_total_${fam_type}>=2)
-			collapse (sum) pop (mean) score_${g${g}lab} [iw=peso_m_${g${g}lab}], by(year sibs) 
-			twoway 	(line score_${g${g}lab} year if sibs==0 & year<=2019, lcolor("${red_1}")) 	///
-					(line score_${g${g}lab} year if sibs==1 & year<=2019, lcolor("${blue_1}"))	///
-					(line score_${g${g}lab} year if sibs==0 & year>=2020, lcolor("${red_1}")) 	///
-					(line score_${g${g}lab} year if sibs==1 & year>=2020, lcolor("${blue_1}"))	///
+			collapse (sum) pop (mean) score_`subj'_${g${g}lab} [iw=peso_m_${g${g}lab}], by(year sibs) 
+			twoway 	(line score_`subj'_${g${g}lab} year if sibs==0 & year<=2019, lcolor("${red_1}")) 	///
+					(line score_`subj'_${g${g}lab} year if sibs==1 & year<=2019, lcolor("${blue_1}"))	///
+					(line score_`subj'_${g${g}lab} year if sibs==0 & year>=2020, lcolor("${red_1}")) 	///
+					(line score_`subj'_${g${g}lab} year if sibs==1 & year>=2020, lcolor("${blue_1}"))	///
 					, ///
-					xlabel(2014(1)2024) ///
+					xlabel(`xming`g''(1)`xmaxg`g'') ///
 					xtitle("Year") ///
-					ytitle("${g${g}tit} standardize exam score") ///
-					legend(order(1 "Only Childs" 2 "Children with Siblings") pos(6) col(2))
+					ytitle("${g${g}tit} ${subj_title_`subj'}standardize exam score") ///
+					legend(order(1 "Only Children" 2 "Children with Siblings") pos(6) col(2))
 
 			capture qui graph export "$FIGURES\Descriptive\raw_ece_`subj'_`g'${covid_data}.png", replace			
 			capture qui graph export "$FIGURES\Descriptive\raw_ece_`subj'_`g'${covid_data}.pdf", replace		
@@ -464,14 +477,14 @@ use "$TEMP\pre_reg_covid${covid_data}", clear
 					(line pop year if sibs==0 & year>=2020, lcolor("${red_1}")) 	///
 					(line pop year if sibs==1 & year>=2020, lcolor("${blue_1}"))	///
 					, ///
-					xlabel(2014(1)2024) ///
+					xlabel(`xming`g''(1)`xmaxg`g'') ///
 					xtitle("Year") ///
-					ytitle("${g${g}tit} standardize exam population") /// 
-					legend(order(1 "Only Childs" 2 "Children with Siblings") pos(6) col(2))				
+					ytitle("${g${g}tit} ${subj_title_`subj'}standardize exam population") /// 
+					legend(order(1 "Only Children" 2 "Children with Siblings") pos(6) col(2))				
 					
 			capture qui graph export "$FIGURES\Descriptive\raw_ece_pop_`subj'_`g'${covid_data}.png", replace			
 			capture qui graph export "$FIGURES\Descriptive\raw_ece_pop_`subj'_`g'${covid_data}.pdf", replace				
-
+			/*
 			bys year (sibs): gen score = score_${g${g}lab} - score_${g${g}lab}[1]		
 			twoway 	(line score year if sibs==0 & year<=2019, lcolor("${red_1}")) 	///
 					(line score year if sibs==1 & year<=2019, lcolor("${blue_1}"))	///
@@ -484,6 +497,7 @@ use "$TEMP\pre_reg_covid${covid_data}", clear
 					legend(order(1 "Only Childs" 2 "Children with Siblings") pos(6) col(2))
 			capture qui graph export "$FIGURES\Descriptive\raw_ece_rel_`subj'_`g'${covid_data}.png", replace			
 			capture qui graph export "$FIGURES\Descriptive\raw_ece_rel_`subj'_`g'${covid_data}.pdf", replace		
+			*/
 		restore
 		}
 	}
