@@ -20,6 +20,7 @@
 \usepackage[round,authoryear]{natbib}
 \usepackage[absolute,overlay]{textpos}
 \usepackage{array} %To hide columns
+\usepackage{stix} % For arrows
 \usepackage{forest}
 
 \usepackage{array} % To hide columns
@@ -463,6 +464,35 @@ Do children with siblings experience larger learning losses when households face
 \end{frame}
 
 
+\begin{frame}
+    \label{frame:birthorder}
+    \frametitle{TWFE estimates for 2020-2021}
+       \begin{itemize}
+           \item Using the administrative data we can control for sex, mother's age, mother's age at first birth, mother's education and school, year and grade FE.
+           %\item In some cases, I can use survey data for a more rich set of controls.
+           \item For students in 6th, 7th and 9th grade, I can match baseline characteristics from 2nd, 4th and 8th grade.
+           \item Similar results with standardized exams and socioeconomic index controls.
+
+
+%    - 1. 2° (2015,2016) 					→ 6° (2019,2020)
+%	- 2. 2° (2014,2016) + 4° (2016,2018) 	→ 6° (2018,2020)
+%	- 3. 2° (2014,2016) + 4° (2016,2018) 	→ 7° (2019,2021)
+%	- 4. 2° (2012,2013) + 8° (2018,2019) 	→ 9° (2019,2020)              
+       \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls}
+    \frametitle{Results do not change when controlling for scores and socio-economic status}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       %\includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Sall_4.pdf}
+      }
+    }
+\end{frame}
+
+
 % ========================================
 % MECHANISMS
 % ========================================
@@ -516,49 +546,35 @@ Do children with siblings experience larger learning losses when households face
 \end{frame}
 
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:pcinternet}
-    \frametitle{Scarce material resources: PC and Internet}
-       \centering
-       \resizebox{0.7\textwidth}{!}{
-\makeatother
-\begin{tabular}{lcccc}
-\toprule
-\cmidrule(lr){2-5}
-& \multicolumn{4}{c}{TWFE} \\
-\cmidrule(lr){2-5}
-& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\
-\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
-& (1) & (2) & (3) & (4) \\
-\bottomrule
-&  &  & &  \\
-\multicolumn{5}{l}{Panel D: Households with no PC or Internet} \\
-Mathematics         &      -0.037***&      -0.024***&      -0.067***&      -0.089***\\
-                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.010)   \\
- 
-&  &  & &  \\
-Reading             &      -0.036***&      -0.025***&      -0.063***&      -0.083***\\
-                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.010)   \\
-                    &               &               &               &               \\
-Observations        &     766,875   &     566,628   &     447,252   &     356,075   \\
- 
-&  &  & &  \\
-\multicolumn{5}{l}{Panel E: Households with both PC and Internet} \\
-Mathematics         &      -0.043***&      -0.024***&      -0.051***&      -0.080***\\
-                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.008)   \\
- 
-&  &  & &  \\
-Reading             &      -0.035***&      -0.018***&      -0.049***&      -0.054***\\
-                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.008)   \\
-                    &               &               &               &               \\
-Observations        &     793,797   &     552,557   &     452,886   &     360,214   \\
- 
+    \frametitle{PC and internet}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        %\includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
 
-\bottomrule
-\end{tabular}
-}
+    \begin{flushleft}
+        \hyperlink{frame:pcinternet_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
 
-\end{transitionframe}
+\end{frame}
+
+\begin{frame}
+    \label{frame:pcinternet_siblings}
+    \frametitle{PC and internet}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        %\includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:pcinternet}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+
+\end{frame}
 
 
 
@@ -571,10 +587,14 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
       }
     }
 
+    \begin{flushleft}
+        \hyperlink{frame:siblingdisruption_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
 \end{frame}
 
 \begin{frame}
-    \label{frame:siblingdisruption}
+    \label{frame:siblingdisruption_siblings}
     \frametitle{Sibling disruption}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
@@ -582,27 +602,25 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
       }
     }
 
+    \begin{flushleft}
+        \hyperlink{frame:siblingdisruption}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
 \end{frame}
+
+
+
 
 
 \begin{transitionframe}
     \label{frame:parentaldilution_intro}
-    \frametitle{Material Resources}
+    \frametitle{Parental Resources}
        \begin{itemize}
            \item Parent's loose childcare and school support.
            \item Without pre-k or children in school, they need to take up on childcare.
            \item Additionally, they may need to provide help with schoolwork.
+           \item ``Parents who before the pandemic invested time and resources in their children use official education resources the most... because of the employment  disruptions of the pandemic, they \textbf{[low SES]} spent  even less time during the lockdowns.'' \cite{naslund-hadley_education_2021}
        \end{itemize}
-\end{transitionframe}
-
-\begin{transitionframe}
-    \label{frame:parentaldilution}
-    \frametitle{Parental dilution}
-        {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}%\includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-      }
-    }
-
 \end{transitionframe}
 
 \begin{frame}
@@ -615,6 +633,72 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 
 \end{frame}
 
+
+
+\begin{frame}
+    \label{frame:mothereduc}
+    \frametitle{Mother's Education}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_mom_sec_complete_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:mothereduc_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:mothereduc_siblings}
+    \frametitle{Mother's Education}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_mom_sec_complete_bysibs_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:mothereduc}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:livesmother}
+    \frametitle{Lives with mother}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_lives_with_mother_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:livesmother_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:livesmother_siblings}
+    \frametitle{Lives with mother}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_lives_with_mother_bysibs_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:livesmother}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
+\end{frame}
+
+
+
+
+
 \begin{transitionframe}
     \label{frame:childcare}
     \frametitle{Parental dilution - Increased childcare}
@@ -624,13 +708,32 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
         \end{itemize}
 \end{transitionframe}      
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:delayedentry}
     \frametitle{Effects of delaying younger School Entry (GPA of older)}
     \input{./TABLES/rd_summ_1_m_a_365.tex}
-\end{transitionframe}
 
-\begin{transitionframe}
+      
+    \only<2->{
+    \highlightboxflex{-0.6}{-0.2}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    
+    % Highlight box for Covid same sex coefficient  
+    \highlightboxflex{1.85}{-0.2}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    
+    \begin{tikzpicture}[overlay, remember picture]
+        % Single text label at the bottom
+        \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Negative spillover of having a younger sibling stay at home};
+        
+        % Arrow to Pre-Covid coefficient (pointing to the left box)
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(-0.6,-0.25)}]current page.center);
+        
+        % Arrow to Covid coefficient (pointing to the right box)
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(1.85,-0.25)}]current page.center);
+    \end{tikzpicture}
+    }
+\end{frame}
+
+\begin{frame}
     \label{frame:delayedentryscores}
     \frametitle{Effects of delaying younger School Entry (Scores and investment)}
 \makeatletter
@@ -643,7 +746,7 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 & \multicolumn{2}{c}{Pre-Covid}  & \multicolumn{3}{c}{Post-Covid} \\
 & \multicolumn{2}{c}{2018-2019}  & \multicolumn{3}{c}{2022-2024}  \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-6}
-& Mathematics & Reading & Mathematics & Reading & Parental Investment  \\
+& Mathematics & Reading & Mathematics & Reading & Parental Time Investment  \\
 & (1) & (2) & (3) & (4) & (5) \\
 \bottomrule
 &  &  &  & &  \\
@@ -660,8 +763,23 @@ Bandwidth           &         365   &         365   &         365   &         36
 \end{tabular}
 }
 
+    \only<2->{
 
-\end{transitionframe}
+    % Highlight box for Covid same sex coefficient  
+    \highlightboxflex{3.20}{-0.77}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    
+    \begin{tikzpicture}[overlay, remember picture]
+        % Single text label at the bottom
+        \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Reduce parental time investment when younger sibling stays at home};
+
+  
+        
+        % Arrow to Covid coefficient (pointing to the right box)
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.20,-0.77)}]current page.center);
+    \end{tikzpicture}
+    }
+
+\end{frame}
 
 \begin{frame}
     \label{frame:incomeshocks}
@@ -675,29 +793,9 @@ Bandwidth           &         365   &         365   &         365   &         36
     }
 \end{frame}
 
-\begin{transitionframe}
-    \label{frame:otherstrategies}
-    \frametitle{Other potential strategies}
-        \begin{itemize}
-            \item Twin births: exogenous change in family size.
-            \begin{itemize}
-                \item Results are not significant
-                \item $\approx$ 1,000 observations per grade-year of first-born with twin siblings
-                \item This measures the effect of 3rd relative to 2nd child, not the effect of 2nd relative to 1st.
-            \end{itemize}
-            \item Same sex as instrument
-            \begin{itemize}
-                \item Has more power
-                \item `expected change' in family size but couple with our shock may become `unexpected'
-            \end{itemize}
-            
-        \end{itemize}
-     
-
-\end{transitionframe}
 
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:iv_intro}
     \frametitle{Effect of family size on GPA: Using Same Sex and Twin IV}
     \begin{itemize}
@@ -705,9 +803,9 @@ Bandwidth           &         365   &         365   &         365   &         36
         \item Having same sex children (BB or GG) makes families more likely to have a third child. Twin births is also used as a potential exogenous variation in family size.
     \end{itemize}    
    
-\end{transitionframe}
+\end{frame}
 
-\begin{transitionframe}[t]
+\begin{frame}[t]
     \label{frame:iv_results}
     \frametitle{Effect of family size on GPA: Using same sex and twin births IV}
     \input{./TABLES/MANUAL/twfe_twins.tex}
@@ -729,9 +827,9 @@ Bandwidth           &         365   &         365   &         365   &         36
         \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.55,-0.25)}]current page.center);
     \end{tikzpicture}
     }
-\end{transitionframe}
+\end{frame}
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:iv_conclusion}
     \frametitle{Effect of family size on GPA: Using Same Sex and Twin IV}
  \begin{itemize}
@@ -740,7 +838,7 @@ Bandwidth           &         365   &         365   &         365   &         36
         %\item One reason why we don't find results could be that to some this captures more the effect of monetary cost but in terms of time, twins might not be twice as costly than two separate children
         \item We are estimating here the differential effect from \#2 to \#3.
     \end{itemize}
-\end{transitionframe}
+\end{frame}
 
 % ========================================
 % BEYOND PERFORMANCE
@@ -1067,6 +1165,85 @@ Observations        &     385,616   &     318,633   &     230,174   &     186,29
 }
 
 \end{frame}
+
+
+
+\begin{transitionframe}
+    \label{frame:parentaldilution}
+    \frametitle{Parental dilution}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}%\includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+\end{transitionframe}
+
+
+\begin{transitionframe}
+    \label{frame:pcinternet_table}
+    \frametitle{Scarce material resources: PC and Internet}
+       \centering
+       \resizebox{0.7\textwidth}{!}{
+\makeatother
+\begin{tabular}{lcccc}
+\toprule
+\cmidrule(lr){2-5}
+& \multicolumn{4}{c}{TWFE} \\
+\cmidrule(lr){2-5}
+& 1-3 siblings & 1 sibling & 2 siblings & 3 siblings  \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5}
+& (1) & (2) & (3) & (4) \\
+\bottomrule
+&  &  & &  \\
+\multicolumn{5}{l}{Panel D: Households with no PC or Internet} \\
+Mathematics         &      -0.037***&      -0.024***&      -0.067***&      -0.089***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.010)   \\
+ 
+&  &  & &  \\
+Reading             &      -0.036***&      -0.025***&      -0.063***&      -0.083***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.010)   \\
+                    &               &               &               &               \\
+Observations        &     766,875   &     566,628   &     447,252   &     356,075   \\
+ 
+&  &  & &  \\
+\multicolumn{5}{l}{Panel E: Households with both PC and Internet} \\
+Mathematics         &      -0.043***&      -0.024***&      -0.051***&      -0.080***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.008)   \\
+ 
+&  &  & &  \\
+Reading             &      -0.035***&      -0.018***&      -0.049***&      -0.054***\\
+                    &     (0.005)   &     (0.005)   &     (0.006)   &     (0.008)   \\
+                    &               &               &               &               \\
+Observations        &     793,797   &     552,557   &     452,886   &     360,214   \\
+ 
+
+\bottomrule
+\end{tabular}
+}
+
+\end{transitionframe}
+
+\begin{transitionframe}
+    \label{frame:otherstrategies}
+    \frametitle{Other potential strategies}
+        \begin{itemize}
+            \item Twin births: exogenous change in family size.
+            \begin{itemize}
+                \item Results are not significant
+                \item $\approx$ 1,000 observations per grade-year of first-born with twin siblings
+                \item This measures the effect of 3rd relative to 2nd child, not the effect of 2nd relative to 1st.
+            \end{itemize}
+            \item Same sex as instrument
+            \begin{itemize}
+                \item Has more power
+                \item `expected change' in family size but couple with our shock may become `unexpected'
+            \end{itemize}
+            
+        \end{itemize}
+     
+
+\end{transitionframe}
+
 
 
 \end{document}
