@@ -320,7 +320,7 @@ Do children with siblings experience larger learning losses when households face
 % ========================================
 % DATA
 % ========================================
-\begin{frame}
+\begin{transitionframe}
     \label{frame:trends}
     \frametitle{Trends in data}
     \begin{columns}[T]
@@ -339,7 +339,7 @@ Do children with siblings experience larger learning losses when households face
     \end{columns}
     
     
-\end{frame}
+\end{transitionframe}
 
 % ========================================
 % RESEARCH
@@ -458,7 +458,17 @@ Do children with siblings experience larger learning losses when households face
     \frametitle{Differential learning losses are larger in earlier grades}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       \includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Sall_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_2_4_6_8}
+    \frametitle{Losses in Standardized exams 2022-2024}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_ece_2_4_8_Tsiblings_Soldest_4.pdf}
       }
     }
 \end{frame}
@@ -487,9 +497,89 @@ Do children with siblings experience larger learning losses when households face
     \frametitle{Results do not change when controlling for scores and socio-economic status}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       %\includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Sall_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
+
+      \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls_siblings}{\beamergotobutton{Results by siblings}}
+        \hyperlink{frame:twfe_gpa_controls_1}{\beamergotobutton{6th-2nd grade}}
+        \hyperlink{frame:twfe_gpa_controls_2}{\beamergotobutton{6th-4th grade}}
+         \hyperlink{frame:twfe_gpa_controls_3}{\beamergotobutton{7th-4th grade}}
+        \hyperlink{frame:twfe_gpa_controls_4}{\beamergotobutton{9th-8th grade}}  
+    \end{flushleft}   
+    
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_siblings}
+    \frametitle{Results do not change when controlling for scores and socio-economic status}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_1}
+    \frametitle{6th graders with 2nd grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair1_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_2}
+    \frametitle{6th graders with 4th grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair2_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_3}
+    \frametitle{7th graders with 4th grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair3_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_4}
+    \frametitle{9th graders with 8th grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair4_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
 \end{frame}
 
 
@@ -551,7 +641,7 @@ Do children with siblings experience larger learning losses when households face
     \frametitle{PC and internet}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        %\includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_20_21_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
 
@@ -566,7 +656,7 @@ Do children with siblings experience larger learning losses when households face
     \frametitle{PC and internet}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        %\includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_20_21_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_bysibs_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
 
@@ -612,7 +702,7 @@ Do children with siblings experience larger learning losses when households face
 
 
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:parentaldilution_intro}
     \frametitle{Parental Resources}
        \begin{itemize}
@@ -621,7 +711,7 @@ Do children with siblings experience larger learning losses when households face
            \item Additionally, they may need to provide help with schoolwork.
            \item ``Parents who before the pandemic invested time and resources in their children use official education resources the most... because of the employment  disruptions of the pandemic, they \textbf{[low SES]} spent  even less time during the lockdowns.'' \cite{naslund-hadley_education_2021}
        \end{itemize}
-\end{transitionframe}
+\end{frame}
 
 \begin{frame}
     \label{frame:parental_investments_vs_ses}
@@ -630,6 +720,37 @@ Do children with siblings experience larger learning losses when households face
         \includegraphics{./FIGURES/Descriptive/parental_investment_ses.pdf}
       }
     }
+
+\end{frame}
+
+
+\begin{frame}
+    \label{frame:byses}
+    \frametitle{Socio-Economic Status}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byses_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:byses_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:byses_siblings}
+    \frametitle{Socio-Economic Status}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byses_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:byses}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
 
 \end{frame}
 
@@ -665,6 +786,7 @@ Do children with siblings experience larger learning losses when households face
 
 \end{frame}
 
+\begin{comment}
 \begin{frame}
     \label{frame:livesmother}
     \frametitle{Lives with mother}
@@ -694,19 +816,19 @@ Do children with siblings experience larger learning losses when households face
     \end{flushleft}        
 
 \end{frame}
+\end{comment}
 
 
 
 
-
-\begin{transitionframe}
+\begin{frame}
     \label{frame:childcare}
     \frametitle{Parental dilution - Increased childcare}
        \begin{itemize}
             \item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
             \item Mixed results in literature (US and Denmark) although not until younger starts school.
         \end{itemize}
-\end{transitionframe}      
+\end{frame}      
 
 \begin{frame}
     \label{frame:delayedentry}
@@ -1244,6 +1366,68 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 
 \end{transitionframe}
 
+
+
+\begin{frame}
+    \label{frame:byacad}
+    \frametitle{By Academic achievement}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byacad_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:byacad_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:byacad_siblings}
+    \frametitle{By Academic achievement}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byacad_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:byacad}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
+\end{frame}
+
+
+\begin{frame}
+    \label{frame:byasp}
+    \frametitle{By Education Expectations}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byasp_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:byasp_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:byasp_siblings}
+    \frametitle{By Education Expectations}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byasp_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:byasp}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
+\end{frame}
 
 
 \end{document}
