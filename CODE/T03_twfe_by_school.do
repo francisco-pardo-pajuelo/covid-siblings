@@ -300,6 +300,9 @@ assert 1==0
 				timer clear 2
 				timer on 2
 				
+				use "$TEMP\temp_reg", clear
+				local v = "std_gpa_m_adj"
+				
 				levelsof id_ie if N_avg>800 				& grade>=7 & inlist(year,2016,2017,2018,2019,2020,2021), local(list_ie_1)
 				levelsof id_ie if N_avg>600 & N_avg<=800 	& grade>=7 & inlist(year,2016,2017,2018,2019,2020,2021), local(list_ie_2)
 				levelsof id_ie if N_avg>400 & N_avg<=600 	& grade>=7 & inlist(year,2016,2017,2018,2019,2020,2021), local(list_ie_3)
