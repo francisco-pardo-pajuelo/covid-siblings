@@ -301,8 +301,14 @@ Do children with siblings experience larger learning losses when households face
     \frametitle{Data}
 
     \begin{itemize}
-        \item School progression (approval and GPA per grade-year)
-        \item Standardized test scores in 2nd, 4th, 6th, 8th grade in some years.
+        \item School progression (approval and GPA per grade-year). 
+        \begin{itemize}
+            \item Teachers decide whether to promote a student to the next grade based on their assessments of competencies.
+        \end{itemize}
+        \item Standardized test scores in 2nd, 4th, 6th, 8th grade in some years. 
+        \begin{itemize}
+            \item Low stakes, not used by teachers. Comparable across schools and time.
+        \end{itemize}
         \item Family, student, teachers and principals surveys:
         \begin{itemize}
             \item Parental involvement in children's education
@@ -314,19 +320,35 @@ Do children with siblings experience larger learning losses when households face
             %\item Specifically related to siblings: ``Read out loud to my siblings''.
         \end{itemize}
         \item Identify siblings through parent's anonymized ID.
+        %\item In both primary and secondary schools, teachers decide whether to promote a student to the next grade based on their assessments of competencies in the national curriculum (MINEDU, 2005). The national standardized examinations are not used by teachers in the decision to promote students to the next grade since the results from these examinations are only available to teachers in the following academic year by which time the promotion decision has already been made.
     \end{itemize}
 \end{frame}
 
 % ========================================
 % DATA
 % ========================================
-\begin{transitionframe}
-    \label{frame:trends}
-    \frametitle{Trends in data}
+\begin{frame}
+    \label{frame:ece_trends}
+    \frametitle{Learning losses for both, but larger for children with siblings}
                \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_ece_math_4.pdf}    
     
-\end{transitionframe}
+\end{frame}
 
+\begin{frame}
+    \label{frame:gpa_trends}
+    \frametitle{Trends in data}
+               \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_shade_total_elm_std_gpa_m_adj_Tsiblings_Sall_Size2_4.pdf}    
+    
+\end{frame}
+
+\begin{frame}
+    \label{frame:gpa_trends_grades}
+    \frametitle{Trends in data}
+               \includegraphics[width=0.8\textwidth]{./FIGURES/Descriptive/raw_grades_std_gpa_m_adj_siblings.pdf}    
+    
+\end{frame}
+
+\begin{comment}
 \begin{transitionframe}
     \label{frame:trends}
     \frametitle{Trends in data}
@@ -347,7 +369,7 @@ Do children with siblings experience larger learning losses when households face
     
     
 \end{transitionframe}
-
+\end{comment}
 % ========================================
 % RESEARCH
 % ========================================
@@ -365,7 +387,11 @@ Do children with siblings experience larger learning losses when households face
          \item<3-> \textbf{No unobserved time varying shocks:} For example, if one parent doesn't work they may choose to have more children but also have more time for homeschooling (\textcolor{blue}{+}) or may need children to work (\textcolor{red}{-}). \\
          $\Rightarrow$ Strategy controls for any unobserved time invariant shock. However, will provide some evidence with IV estimates.
     \end{itemize}
-
+    \only<3->{
+    \begin{flushleft}
+        \hyperlink{frame:research_feedback}{\beamergotobutton{Threats}}
+    \end{flushleft}   
+    }
 \end{frame}
 
 
@@ -533,61 +559,6 @@ Do children with siblings experience larger learning losses when households face
 
 \end{frame}
 
-\begin{frame}
-    \label{frame:twfe_gpa_controls_1}
-    \frametitle{6th graders with 2nd grade baseline}
-        {\resizebox{0.9\textwidth}{!}{
-       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair1_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}       
-\end{frame}
-
-\begin{frame}
-    \label{frame:twfe_gpa_controls_2}
-    \frametitle{6th graders with 4th grade baseline}
-        {\resizebox{0.9\textwidth}{!}{
-       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair2_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}       
-\end{frame}
-
-\begin{frame}
-    \label{frame:twfe_gpa_controls_3}
-    \frametitle{7th graders with 4th grade baseline}
-        {\resizebox{0.9\textwidth}{!}{
-       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair3_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}       
-\end{frame}
-
-\begin{frame}
-    \label{frame:twfe_gpa_controls_4}
-    \frametitle{9th graders with 8th grade baseline}
-        {\resizebox{0.9\textwidth}{!}{
-       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair4_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}       
-\end{frame}
 
 
 % ========================================
@@ -920,6 +891,30 @@ Bandwidth           &         365   &         365   &         365   &         36
         \includegraphics{./FIGURES/TWFE/twfe_ses_2_4_8_Tsiblings_Soldest_4.pdf}
       }
     }
+
+    \begin{flushleft}
+        \hyperlink{frame:incomeshocks_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}  
+
+   
+\end{frame}
+
+\begin{frame}
+    \label{frame:incomeshocks_siblings}
+    \frametitle{Income Shocks}
+     
+    %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
+
+     {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/twfe_ses_bysibs_2_4_8_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+ \begin{flushleft}
+        \hyperlink{frame:incomeshocks}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}   
+    
+    
 \end{frame}
 
 
@@ -986,12 +981,14 @@ Bandwidth           &         365   &         365   &         365   &         36
     \begin{frame}
             \label{frame:grade_progression}
             \frametitle{Grade progression}
+   \textcolor{green}{Pending}
     %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
     \end{frame}   
 
     \begin{frame}
             \label{frame:college_app}
             \frametitle{College Applications}
+   \textcolor{green}{Pending}
     %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
     \end{frame}      
 
@@ -1080,10 +1077,32 @@ Bandwidth           &         365   &         365   &         365   &         36
 
 \end{frame}
 
+
+
+% ========================================
+% Some thoughts
+% ========================================
+
+\section{Thoughts}
+
+\begin{frame}
+    \label{frame:thoughts}
+    \frametitle{Thoughts}
+    \begin{itemize}
+        \item How to think about heterogeneity? We should expect more effects not where there lacks parental suppport but where there is $\rightarrow$ more possibilities of substitution from teachers to parents. But not too much because otherwise they could do it all?
+        \item Have school level estimates. Idea was to do heterogeneity. Needed or our excercise is enough?
+    \end{itemize}
+
+
+\end{frame}
+
+
+
+
 % ========================================
 % EXAMPLE SLIDES
 % ========================================
-\section{Example Slides}
+\section{Resources}
 
 
 
@@ -1178,6 +1197,9 @@ Bandwidth           &         365   &         365   &         365   &         36
     \end{tikzpicture}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Threats to identification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
     \label{frame:research_feedback}
@@ -1188,9 +1210,16 @@ Bandwidth           &         365   &         365   &         365   &         36
             \item 
             \item There is a shift from private to public enrollment during COVID. If this was more common on siblings... would be composition?
         \end{itemize}
+
+ 
+    \begin{flushleft}
+        \hyperlink{frame:research}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}
+    
 \end{frame}
 
 
+\begin{comment}
 \begin{frame}
     \label{frame:twfe}
     \frametitle{TWFE results}
@@ -1200,7 +1229,6 @@ Bandwidth           &         365   &         365   &         365   &         36
       }
     }
 \end{frame}
-
 
 \begin{frame}
 \label{frame:twfeexams}
@@ -1351,8 +1379,13 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 }
 
 \end{transitionframe}
+\end{comment}
 
-\begin{transitionframe}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Describing IV}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
     \label{frame:otherstrategies}
     \frametitle{Other potential strategies}
         \begin{itemize}
@@ -1371,7 +1404,12 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
         \end{itemize}
      
 
-\end{transitionframe}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Additional Heterogeneity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
@@ -1434,6 +1472,67 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
         \hyperlink{frame:byasp}{\beamergotobutton{Go Back $\carriagereturn$}}
     \end{flushleft}        
 
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{GPA with baseline controls by grade}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_1}
+    \frametitle{6th graders with 2nd grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair1_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_2}
+    \frametitle{6th graders with 4th grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair2_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_3}
+    \frametitle{7th graders with 4th grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair3_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_controls_4}
+    \frametitle{9th graders with 8th grade baseline}
+        {\resizebox{0.9\textwidth}{!}{
+       %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_Tsiblings_Soldest_pair4_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
 \end{frame}
 
 
