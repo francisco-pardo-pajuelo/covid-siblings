@@ -204,7 +204,7 @@
 \frame{\titlepage}
 
 
-\begin{frame}
+\begin{frame}[t]
     \label{frame:motivation}
     \frametitle{Motivation}
 
@@ -224,7 +224,7 @@
 %Test of an important theoretical prediction:
 \only<2->{
         \begin{block}{Research Question}
-Do children with siblings experience larger learning losses when households face an unexpected shock/school closures/increased childcare needs?
+Do children with siblings experience larger learning losses when households face an unexpected \textcolor{red}{shock/school closures/increased childcare needs}?
 \end{block}
 }
     \end{enumerate}
@@ -296,7 +296,8 @@ Do children with siblings experience larger learning losses when households face
 % ========================================
 % DATA
 % ========================================
-\begin{frame}
+\begin{transitionframe}
+    
     \label{frame:data}
     \frametitle{Data}
 
@@ -322,7 +323,7 @@ Do children with siblings experience larger learning losses when households face
         \item Identify siblings through parent's anonymized ID.
         %\item In both primary and secondary schools, teachers decide whether to promote a student to the next grade based on their assessments of competencies in the national curriculum (MINEDU, 2005). The national standardized examinations are not used by teachers in the decision to promote students to the next grade since the results from these examinations are only available to teachers in the following academic year by which time the promotion decision has already been made.
     \end{itemize}
-\end{frame}
+\end{transitionframe}
 
 % ========================================
 % DATA
@@ -336,17 +337,14 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:gpa_trends}
-    \frametitle{Trends in data}
+    \frametitle{Gap in GPA also becomes larger}
                \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_shade_total_elm_std_gpa_m_adj_Tsiblings_Sall_Size2_4.pdf}    
-    
+            \hyperlink{frame:gpa_trends_grades_elm}{\beamergotobutton{GPA trends by grade}}
+  
 \end{frame}
 
-\begin{frame}
-    \label{frame:gpa_trends_grades}
-    \frametitle{Trends in data}
-               \includegraphics[width=0.8\textwidth]{./FIGURES/Descriptive/raw_grades_std_gpa_m_adj_siblings.pdf}    
-    
-\end{frame}
+
+
 
 \begin{comment}
 \begin{transitionframe}
@@ -470,7 +468,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:eventstudy}
-    \frametitle{Children with siblings do compared to only children during school closures}
+    \frametitle{A 0.04 standard deviation decline in GPA compared to only children}
         {\resizebox{0.9\textwidth}{!}{
        \includegraphics{./FIGURES/Event Study/covid_event_all_all_std_gpa_m_adj_Tsiblings_Sall_4.pdf}
       }
@@ -479,7 +477,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:eventstudy_bysibs}
-    \frametitle{More siblings came with larger losses}
+    \frametitle{Effect is larger (and persistent) when there are more siblings}
         {\resizebox{0.9\textwidth}{!}{
        \includegraphics{./FIGURES/Event Study/covid_event_bysibs_all_all_std_gpa_m_adj_Tsiblings_Sall_4.pdf}
       }
@@ -488,7 +486,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:twfe_gpa_2_4_6_8}
-    \frametitle{Differential learning losses are larger in earlier grades}
+    \frametitle{The gap in learning losses is larger in earlier grades}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
        \includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Soldest_4.pdf}
@@ -497,8 +495,22 @@ Do children with siblings experience larger learning losses when households face
 \end{frame}
 
 \begin{frame}
-    \label{frame:twfe_gpa_2_4_6_8}
-    \frametitle{Losses in Standardized exams 2022-2024}
+    \label{frame:recap1}
+    \frametitle{What about standardized exams?}
+    \begin{itemize}
+       \item So far we have seen that children with siblings do worse in terms of GPA.
+        \begin{itemize}
+            \item Worse when there are more siblings
+            \item Worse when they are younger
+            \item Effects can be persistent
+        \end{itemize}
+        \item What about actual performance in standardized exams years afters school reopen?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{frame:twfe_gpa_2_4_8}
+    \frametitle{Similar pattern in elementary school even 3 years after schools open (2022-2024)}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
        \includegraphics{./FIGURES/TWFE/twfe_ece_2_4_8_Tsiblings_Soldest_4.pdf}
@@ -508,7 +520,7 @@ Do children with siblings experience larger learning losses when households face
 
 
 \begin{frame}
-    \label{frame:birthorder}
+    \label{frame:twfe_gpa_controls_intro}
     \frametitle{TWFE estimates for 2020-2021}
        \begin{itemize}
            \item Using the administrative data we can control for sex, mother's age, mother's age at first birth, mother's education and school, year and grade FE.
@@ -540,8 +552,7 @@ Do children with siblings experience larger learning losses when households face
         \hyperlink{frame:twfe_gpa_controls_2}{\beamergotobutton{6th-4th grade}}
          \hyperlink{frame:twfe_gpa_controls_3}{\beamergotobutton{7th-4th grade}}
         \hyperlink{frame:twfe_gpa_controls_4}{\beamergotobutton{9th-8th grade}}  
-    \end{flushleft}   
-    
+    \end{flushleft}     
 \end{frame}
 
 \begin{frame}
@@ -1135,7 +1146,7 @@ Bandwidth           &         365   &         365   &         365   &         36
             \hyperlink{frame:contribution}{\beamergotobutton{Literature}}\\[2pt]
             \hyperlink{frame:background}{\beamergotobutton{Background}}\\[2pt]
             \hyperlink{frame:data}{\beamergotobutton{Data}}\\[2pt]
-            \hyperlink{frame:trends}{\beamergotobutton{Data Trends}}
+            \hyperlink{frame:ece_trends}{\beamergotobutton{Data Trends}}
             
             \vspace{0.2cm}
             \textbf{Mechanisms}
@@ -1143,10 +1154,13 @@ Bandwidth           &         365   &         365   &         365   &         36
             
             \hyperlink{frame:mechanisms}{\beamergotobutton{Potential Mechanisms}}\\[2pt]
             \hyperlink{frame:birthorder}{\beamergotobutton{Birth Order}}\\[2pt]
-            \hyperlink{frame:ses}{\beamergotobutton{SES Analysis}}\\[2pt]
             \hyperlink{frame:pcinternet}{\beamergotobutton{PC \& Internet}}\\[2pt]
             \hyperlink{frame:siblingdisruption}{\beamergotobutton{Sibling Disruption}}\\[2pt]
-            \hyperlink{frame:parentaldilution}{\beamergotobutton{Parental Dilution}}
+            \hyperlink{frame:parentaldilution_intro}{\beamergotobutton{Parental Dilution}} \\[2pt]
+            \hyperlink{frame:byses}{\beamergotobutton{SES Analysis}}\\[2pt]
+            \hyperlink{frame:childcare}{\beamergotobutton{Childcare Effects}}\\[2pt]
+            \hyperlink{frame:delayedentry}{\beamergotobutton{Delayed Entry}}\\[2pt]
+            \hyperlink{frame:incomeshocks}{\beamergotobutton{Income Shocks}}          
         \end{column}
         
         \begin{column}{0.45\textwidth}
@@ -1157,32 +1171,33 @@ Bandwidth           &         365   &         365   &         365   &         36
             \hyperlink{frame:research}{\beamergotobutton{Research Design}}\\[2pt]
             \hyperlink{frame:empirical}{\beamergotobutton{Empirical Strategy}}\\[2pt]
             \hyperlink{frame:eventstudy}{\beamergotobutton{Event Study}}\\[2pt]
-            \hyperlink{frame:twfe}{\beamergotobutton{TWFE Results}}\\[2pt]
-            \hyperlink{frame:twfeexams}{\beamergotobutton{Standardized Exams}}
+            \hyperlink{frame:twfe_gpa_2_4_6_8}{\beamergotobutton{TWFE Results}}\\[2pt]
+            \hyperlink{frame:twfe_gpa_2_4_8}{\beamergotobutton{Standardized Exams}}
+            \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{TWFE with controls}}
+
+            
             
             \vspace{0.2cm}
             \textbf{Additional Analysis}
             \vspace{0.1cm}
-            
-            \hyperlink{frame:childcare}{\beamergotobutton{Childcare Effects}}\\[2pt]
-            \hyperlink{frame:delayedentry}{\beamergotobutton{Delayed Entry}}\\[2pt]
-            \hyperlink{frame:incomeshocks}{\beamergotobutton{Income Shocks}}\\[2pt]
+        
             \hyperlink{frame:otherstrategies}{\beamergotobutton{Other Strategies}}\\[2pt]
-            \hyperlink{frame:twiniv}{\beamergotobutton{Twin IV}} \\[2pt]
+            \hyperlink{frame:iv_intro}{\beamergotobutton{Twin IV}} \\[2pt]
             \hyperlink{frame:expectations}{\beamergotobutton{Expectations}}
+
+            \vspace{0.2cm}
+            \textbf{External Validity \& Conclusions}
+            \vspace{0.1cm}
+            
+            \hyperlink{frame:pisadata}{\beamergotobutton{PISA Data}} \\[2pt]
+            \hyperlink{frame:pisagaps}{\beamergotobutton{Learning Gaps}} \\[2pt]
+            \hyperlink{frame:pisaclosure}{\beamergotobutton{School Closure}} \\[2pt]
+            \hyperlink{frame:conclusions}{\beamergotobutton{Conclusions}}
             
         \end{column}
     \end{columns}
     
-    \vspace{0.2cm}
-    
-    \begin{center}
-        \textbf{External Validity \& Conclusions}\\[4pt]
-        \hyperlink{frame:pisadata}{\beamergotobutton{PISA Data}} \quad
-        \hyperlink{frame:pisagaps}{\beamergotobutton{Learning Gaps}} \quad
-        \hyperlink{frame:pisaclosure}{\beamergotobutton{School Closure}} \quad
-        \hyperlink{frame:conclusions}{\beamergotobutton{Conclusions}}
-    \end{center}
+
 \end{frame}
 
 
@@ -1196,6 +1211,35 @@ Bandwidth           &         365   &         365   &         365   &         36
 %blue!50!black
     \end{tikzpicture}
 \end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{GPA Trends by grade}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{frame}
+    \label{frame:gpa_trends_grades_elm}
+    \frametitle{Trends in data}
+               \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_grades_elm_std_gpa_m_adj_Tsiblings_Sall_Size2_4.pdf}    
+    \begin{flushleft}
+        \hyperlink{frame:gpa_trends}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}   
+    
+    
+\end{frame}
+
+\begin{frame}
+    \label{frame:gpa_trends_grades_sec}
+    \frametitle{Trends in data}
+               \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_grades_sec_std_gpa_m_adj_Tsiblings_Sall_Size2_4.pdf}    
+          \hyperlink{frame:gpa_trends}{\beamergotobutton{Go Back $\carriagereturn$}}
+  
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Threats to identification}
@@ -1326,7 +1370,7 @@ Observations        &     385,616   &     318,633   &     230,174   &     186,29
 
 
 \begin{transitionframe}
-    \label{frame:parentaldilution}
+    \label{frame:parentaldilution_summary}
     \frametitle{Parental dilution}
         {\resizebox{0.9\textwidth}{!}{
         \includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}%\includegraphics{./FIGURES/TWFE/covid_twfe_D_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
