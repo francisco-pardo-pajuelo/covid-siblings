@@ -32,7 +32,7 @@ program define main
 	
 	
 	
-	*- More complete run
+	*- M
 	***** Main Results
 	*- TWFE Estimates *** EDITED
 	twfe_summary 	siblings oldest
@@ -93,7 +93,7 @@ capture program drop setup_COVID_A03
 program define setup_COVID_A03
 
 	*- Define if test run
-	global covid_test = 0
+	global covid_test = 1
 	global covid_data = ""
 	if ${covid_test} == 1 global covid_data = "_TEST"
 	
