@@ -3828,6 +3828,11 @@ foreach only_covid in "all" /*"20_21"*/ {
 		
 							*- Remove early grades and years
 							keep if year>=2016
+							drop year_t_b6
+							drop year_t_b5 //no dummies for years 2014 and 2015 since they are not part of the data.
+							assert year>=2016
+							
+							
 							drop if grade==0
 							
 							if "`level'" == "all" {
@@ -3959,9 +3964,9 @@ foreach only_covid in "all" /*"20_21"*/ {
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
-										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										drop(/*year_t_b6 year_t_b5*/ year_t_b4) ///
 										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
-										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										coeflabels(/*year_t_b6 = "2014" year_t_b5 = "2015"*/ year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
 										yline(0,  lcolor(gs10))  ///
 										ytitle("`xtitle'") ///
 										ylab(-.1(.02).04) ///
@@ -3983,9 +3988,9 @@ foreach only_covid in "all" /*"20_21"*/ {
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
-										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										drop(/*year_t_b6 year_t_b5*/ year_t_b4) ///
 										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
-										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										coeflabels(/*year_t_b6 = "2014" year_t_b5 = "2015"*/ year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
 										yline(0,  lcolor(gs10))  ///
 										ytitle("`xtitle'") ///
 										ylab(-.1(.02).04) ///
@@ -4013,10 +4018,10 @@ foreach only_covid in "all" /*"20_21"*/ {
 										, ///
 										omitted ///
 										keep(year_t_??) msy(O) msize(1.5) vert recast(connected) ciopts(recast(rcap)) offset(0) ///
-										drop(year_t_b6 year_t_b5 year_t_b4) ///
+										drop(/*year_t_b6 year_t_b5*/ year_t_b4) ///
 										///leg(order(1 "Children with siblings" 3 "1 sibling" 5 "2 siblings" 7 "`legend_sib_${max_sibs}'")) ///
 										leg(order(1 "1 sibling" 3 "2 siblings" 5 "`legend_sib_${max_sibs}'")) ///
-										coeflabels(year_t_b6 = "2014" year_t_b5 = "2015" year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
+										coeflabels(/*year_t_b6 = "2014" year_t_b5 = "2015"*/ year_t_b4 = "2016" year_t_b3 = "2017" year_t_b2 = "2018" year_t_o1 = "2019" year_t_a0 = "2020" year_t_a1 = "2021" year_t_a2 = "2022" year_t_a3 = "2023" year_t_a4 = "2024") ///
 										yline(0,  lcolor(gs10))  ///
 										ytitle("`xtitle'") ///
 										ylab(-.1(.02).04) ///

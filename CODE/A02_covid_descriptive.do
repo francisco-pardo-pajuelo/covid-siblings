@@ -10,7 +10,8 @@ program define main
 	descriptive_statistics all
 	
 	*- Parental investment
-	parent_investment
+	parental_investment
+			parental_investment_by_number_sibs //Not worked as expected..
 	
 	*- Main Raw trend
 	raw_gpa_trends_main siblings all //with shade
@@ -377,6 +378,148 @@ capture qui graph export "$FIGURES\Descriptive\parental_investment_ses.pdf", rep
 	
 graph bar std_index if year==2015, over(educ_cat_mother_2p)
 graph bar std_index if year==2015, over(educ_cat_mother_2p)
+
+		
+end
+
+
+capture program drop parental_investment_by_number_sibs
+program define parental_investment_by_number_sibs
+
+
+use "$TEMP\match_siagie_ece_2p", clear
+rename id_e
+
+
+	*- Match ECE IDs
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_2p", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_2p
+	//tab grade merge_2p, row nofreq
+	rename (id_estudiante source) (id_estudiante_2p source_2p)
+
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_4p", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_4p
+	//tab grade merge_4p, row nofreq
+	rename (id_estudiante source) (id_estudiante_4p source_4p)
+
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_6p", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_6p
+	//tab grade merge_4p, row nofreq
+	rename (id_estudiante source) (id_estudiante_6p source_6p)
+	
+	merge m:1 id_per_umc using "$TEMP\match_siagie_ece_2s", keep(master match) keepusing(id_estudiante source)
+	rename _m merge_2s
+	//tab grade merge_2s, row nofreq
+	rename (id_estudiante source) (id_estudiante_2s source_2s)
+
+
+
+
+
+clear
+append using "$TEMP\ece_family_2p"
+gen grade=2
+merge 1:1 id_estudiante_2p year using "$TEMP\ece_2p"
+rename id_estudiante_2p id_estudiante
+drop _m
+merge 1:1 id_estudiante using "$TEMP\match_siagie_ece_2p", keep(master match) keepusing(id_per_umc)
+tempfile ece_siagie_2p
+save `ece_siagie_2p', replace
+
+use "$TEMP\ece_family_4p", clear
+rename id_estudiante_4p id_estudiante
+merge 1:1 id_estudiante using "$TEMP\match_siagie_ece_4p", keep(master match) keepusing(id_per_umc)
+tempfile ece_siagie_4p
+save `ece_siagie_4p', replace
+
+use "$TEMP\ece_family_6p", clear
+rename id_estudiante_6p id_estudiante
+merge 1:1 id_estudiante using "$TEMP\match_siagie_ece_6p", keep(master match) keepusing(id_per_umc)
+tempfile ece_siagie_6p
+save `ece_siagie_6p', replace
+
+use "$TEMP\ece_student_2s", clear
+rename id_estudiante_2s id_estudiante
+merge 1:1 id_estudiante using "$TEMP\match_siagie_ece_2s", keep(master match) keepusing(id_per_umc)
+tempfile ece_siagie_2s
+save `ece_siagie_2s', replace
+
+clear 
+append using `ece_siagie_2p'
+append using `ece_siagie_4p'
+append using `ece_siagie_6p'
+append using `ece_siagie_2s'
+
+drop _m
+
+
+preserve
+		use "$TEMP\id_siblings", clear
+		keep id_per_umc id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st dob_mother dob_father
+		tempfile id_siblings_sample
+		save `id_siblings_sample', replace
+restore
+
+*- Match Family info
+merge m:1 id_per_umc using `id_siblings_sample', keep(master match) keepusing(id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} born* closest_age_gap*${fam_type} covid_preg_sib covid_0_2_sib covid_2_4_sib exp_graduating_year? year_entry_1st dob_mother dob_father) 
+rename _m merge_siblings
+
+
+
+/*
+append using "$TEMP\ece_family_4p"
+replace grade=4 if grade==.
+append using "$TEMP\ece_family_6p"
+replace grade=6 if grade==.
+append using "$TEMP\ece_student_2s"
+replace grade=8 if grade==.
+*/
+egen index_parent_educ_inv = rmean(freq_parent_student_edu*)
+
+VarStandardiz index_parent_educ_inv, by(year grade) newvar(std_index)
+
+		foreach g in "2p" "4p" "6p" "2s" {
+			foreach adult in "mother" {
+				gen educ_cat_`adult'_`g' = 1 if inlist(edu_`adult'_`g',1,2,3,4)==1
+				replace educ_cat_`adult'_`g' = 2 if inlist(edu_`adult'_`g',5)==1
+				replace educ_cat_`adult'_`g' = 3 if inlist(edu_`adult'_`g',6,7,8,9,10,11,12)==1 //in 2S only matters until 10. There is no 11 or 12.
+			}
+		}
+		
+keep if fam_total_${fam_type}<=4
+gen multi_children = fam_total_${fam_type}>=2
+		
+
+/*
+graph bar std_index if year==2015, ///
+    over(socioec_index_cat, ///
+        relabel(1 "Low SES (Q1)" 2 "Q2" 3 "Q3" 4 "High SES (Q4)") ///
+        label(angle(0)) ///
+        gap(20)) ///
+    bar(1, fcolor(gs8) lcolor(gs0)) ///
+	ytitle("Index of Parental Investment") ///
+    yline(0, lcolor(gs0) lpattern(dash))
+capture qui graph export "$FIGURES\Descriptive\parental_investment_ses_by_sibs.png", replace			
+capture qui graph export "$FIGURES\Descriptive\parental_investment_ses_by_sibs.pdf", replace		
+*/
+
+graph bar std_index if year==2015, ///
+    over(multi_children, ///
+        relabel(1 "Only Children" 2 "Children with siblings") ///
+        label(angle(0))) ///
+    over(socioec_index_cat, ///
+        relabel(1 "Low SES (Q1)" 2 "Q2" 3 "Q3" 4 "High SES (Q4)") ///
+        label(angle(0)) ///
+        gap(20)) ///
+    bar(1, fcolor(gs12) lcolor(gs0)) ///
+    bar(2, fcolor(gs8) lcolor(gs0)) ///
+    ytitle("Index of Parental Investment") ///
+    yline(0, lcolor(gs0) lpattern(dash))
+
+
+	
+//graph bar std_index if year==2015, over(educ_cat_mother_2p)
+//graph bar std_index if year==2015, over(educ_cat_mother_2p)
 
 		
 end

@@ -1488,6 +1488,7 @@ args treatment_type subsample
 			, ///
 			bylabel("`coef2_lab'") ///
 			|| ///
+			coefplot ///
 			(`v'_`coef3'_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
 			(`v'_`coef3'_3, mcolor("${red_1}") 		fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
 			(`v'_`coef3'_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
