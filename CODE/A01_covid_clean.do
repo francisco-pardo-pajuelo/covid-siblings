@@ -139,13 +139,15 @@ program define clean_data
 		rename (urban) (base_urban_`g')
 		}
 		
+		
+	*- We store baseline outcomes. This ones are attached to students on every year (used for baseline controls or heterogeneity, mostly using years before 2020)	
 	*- Variables common in all 3 grades	
 	foreach g in "2p" "4p" /*"6p"*/ "2s" {	
-		if "`g'"=="2p"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') //m:1 because there are missings
-		if "`g'"=="4p"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') //m:1 because there are missings
-		if "`g'"=="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_student_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') //m:1 because there are missings
+		if "`g'"=="2p"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' tv_`g' phone_internet_`g' edu_mother_`g' edu_father_`g' raw_parent_edu_inv_com_`g' raw_parent_edu_inv_`g' std_parent_edu_inv_com_`g' std_parent_edu_inv_`g') //m:1 because there are missings
+		if "`g'"=="4p"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_family_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' tv_`g' phone_internet_`g' edu_mother_`g' edu_father_`g' raw_parent_edu_inv_com_`g' raw_parent_edu_inv_`g' std_parent_edu_inv_com_`g' std_parent_edu_inv_`g') //m:1 because there are missings
+		if "`g'"=="2s"	merge m:1 id_estudiante_`g'  using "$TEMP\ece_student_`g'", keep(master match) keepusing(aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' tv_`g' phone_internet_`g' edu_mother_`g' edu_father_`g' raw_parent_edu_inv_com_`g' raw_parent_edu_inv_`g' std_parent_edu_inv_com_`g' std_parent_edu_inv_`g') //m:1 because there are missings
 		rename _m merge_ece_survey_base_`g'
-		rename (aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' edu_mother_`g' edu_father_`g') (base_aspiration_`g' base_internet_`g' base_pc_`g' base_laptop_`g' base_radio_`g' base_edu_mother_`g' base_edu_father_`g')	
+		rename (aspiration_`g' internet_`g' pc_`g' laptop_`g' radio_`g' tv_`g'  phone_internet_`g' edu_mother_`g' edu_father_`g'  raw_parent_edu_inv_com_`g' raw_parent_edu_inv_`g' std_parent_edu_inv_com_`g' std_parent_edu_inv_`g') (base_aspiration_`g' base_internet_`g' base_pc_`g' base_laptop_`g' base_radio_`g' base_tv_`g'  base_phone_internet_`g' base_edu_mother_`g' base_edu_father_`g' base_raw_parent_edu_inv_com_`g' base_raw_parent_edu_inv_`g' base_std_parent_edu_inv_com_`g' base_std_parent_edu_inv_`g')	
 		}
 		
 	*- Variables only common to one or some grades:
@@ -227,11 +229,11 @@ program define clean_data
 	}
 
 	*- Match ECE survey
-	merge m:1 id_estudiante_2p year using "$TEMP\ece_family_2p", keep(master match) keepusing(aspiration_2p internet_2p pc_2p laptop_2p radio_2p) //m:1 because there are missings
+	merge m:1 id_estudiante_2p year using "$TEMP\ece_family_2p", keep(master match) keepusing(aspiration_2p internet_2p pc_2p laptop_2p radio_2p tv_2p  phone_internet_2p raw_parent_edu_inv_com_2p raw_parent_edu_inv_2p std_parent_edu_inv_com_2p std_parent_edu_inv_2p) //m:1 because there are missings
 	rename _m merge_ece_survey_fam_2p
 	rename aspiration_2p aspiration_fam_2p
 	
-	merge m:1 id_estudiante_4p year using "$TEMP\ece_family_4p", keep(master match) keepusing(aspiration_4p gender_subj_?_4p internet_4p pc_4p laptop_4p radio_4p study_desk_4p quiet_room_4p pc_hw_4p) //m:1 because there are missings
+	merge m:1 id_estudiante_4p year using "$TEMP\ece_family_4p", keep(master match) keepusing(aspiration_4p gender_subj_?_4p internet_4p pc_4p laptop_4p radio_4p tv_4p phone_internet_4p study_desk_4p quiet_room_4p pc_hw_4p raw_parent_edu_inv_com_4p raw_parent_edu_inv_4p std_parent_edu_inv_com_4p std_parent_edu_inv_4p) //m:1 because there are missings
 	rename _m merge_ece_survey_fam_4p
 	rename aspiration_4p aspiration_fam_4p
 	
@@ -243,7 +245,7 @@ program define clean_data
 	rename _m merge_ece_survey_stud_6p	
 	rename aspiration_6p aspiration_stu_6p	
 	
-	merge m:1 id_estudiante_2s year using "$TEMP\ece_student_2s", keep(master match) keepusing(aspiration_2s lives_with_*_2s total_siblings_2s pc_2s internet_2s laptop_2s radio_2s) //m:1 because there are missings
+	merge m:1 id_estudiante_2s year using "$TEMP\ece_student_2s", keep(master match) keepusing(aspiration_2s lives_with_*_2s total_siblings_2s pc_2s internet_2s laptop_2s radio_2s tv_2s phone_internet_2s raw_parent_edu_inv_com_2s raw_parent_edu_inv_2s std_parent_edu_inv_com_2s std_parent_edu_inv_2s) //m:1 because there are missings
 	rename _m merge_ece_survey_stud_2s
 	rename aspiration_2s aspiration_stu_2s
 		
@@ -389,6 +391,7 @@ program define clean_data
 		year_entry_1st ///
 		year_2p year_4p year_2s peso*  socioec* /**has_internet *has_comp *low_ses *quiet_room*/ ///
 		approved* std* math comm score* satisf* prim_on_time aspiration* ///
+		raw_parent* std_parent* ///
 		using "$TEMP\long_siagie_ece", clear
 
 		keep if fam_total_${fam_type}<=${max_sibs}
@@ -553,6 +556,6 @@ end
 
 
 
+//
 
-
-//main
+main

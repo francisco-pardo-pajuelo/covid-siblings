@@ -243,7 +243,47 @@ foreach size in "2_4" "2" "3" "4" {
 			di "REAL"
 			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
 			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
-			}	
+			}
+			
+			
+
+*- Figure ECE (no 8th)
+	coefplot ///
+			(ece_m_2p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+			(ece_r_2p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(ece_m_4p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ece_r_4p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("4th grade") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
+			keep(treated_post) ///
+			legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
+			ytitle("Standardized Exam relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.06(0.01)0.01) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}				
 			
 *- Figure Expectations
 	coefplot ///
@@ -1007,8 +1047,14 @@ args treatment_type subsample
 	gen pair_4 = ((year==2019 | year==2020) & grade==9)
 
 	keep if pair_1==1 | pair_2==1 | pair_3 ==1 | pair_4==1
-
-
+	
+	/*
+	*- Testing
+	gen base_phone_internet_2p= rnormal()<0
+	gen base_phone_internet_4p= rnormal()<0
+	gen base_phone_internet_2s= rnormal()<0
+	*/
+	
 	*- We stack each pair of years
 	forvalues i = 1(1)4 {
 		preserve
@@ -1017,7 +1063,7 @@ args treatment_type subsample
 					score* std* ///
 					${x_all_vars} ///
 					treated_post treated post ///
-					base_score* base_socioec* base_internet* base_pc* base_radio* base_aspiration* 				
+					base_score* base_socioec* base_tv* base_radio* base_pc* base_internet* base_phone_internet* base_aspiration* urban_siagie			
 			gen pair = `i'
 			tempfile pair_`i'
 			save `pair_`i'', replace
@@ -1063,7 +1109,7 @@ args treatment_type subsample
 
 	
 	*- In each case, we take the most recent ECE survey results (when there is more than 1 available year)
-	foreach v in "score_math" "score_com" "socioec_index" "socioec_index_cat" "internet" "pc" "radio" "aspiration" {
+	foreach v in "score_math" "score_com" "socioec_index" "socioec_index_cat" "tv" "radio" "pc"  "internet" "phone_internet" "aspiration" {
 		gen base_`v' 		= base_`v'_2p if pair==1
 		replace base_`v' 	= base_`v'_4p if pair==2
 		replace base_`v' 	= base_`v'_4p if pair==3
@@ -1138,19 +1184,43 @@ args treatment_type subsample
 					eststo `v'_all4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses}, a(id_ie grade year pair)
 					
 					//Effect by SES
-					eststo `v'_ses1_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==1, a(id_ie grade year pair)
+					eststo `v'_ses1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==1, a(id_ie grade year pair)
 					eststo `v'_ses2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==2, a(id_ie grade year pair)
 					eststo `v'_ses3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==3, a(id_ie grade year pair)
-					eststo `v'_ses4_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==4, a(id_ie grade year pair)
+					eststo `v'_ses4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==4, a(id_ie grade year pair)
 					
-					//Effect by Resources
+					//Effect by Resources (overall))
+					eststo `v'_resour0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0 & base_internet==0 & base_pc==0, a(id_ie grade year pair)
+					eststo `v'_resour1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if !(base_tv==0 & base_radio==0 & base_internet==0 & base_pc==0), a(id_ie grade year pair)
+
+					//Effect by Resources (TV)
+					eststo `v'_tv0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0, a(id_ie grade year pair)
+					eststo `v'_tv1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==1, a(id_ie grade year pair)
+						
+					//Effect by Resources (Radio)
+					eststo `v'_rad0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_radio==0, a(id_ie grade year pair)
+					eststo `v'_rad1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_radio==1, a(id_ie grade year pair)
+											
+					//Effect by Resources (TV & Radio)
+					eststo `v'_tvrad0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0, a(id_ie grade year pair)
+					eststo `v'_tvrad1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==1 | base_radio==1, a(id_ie grade year pair)					
+					
+					//Effect by Resources (TV & Radio Radio in Rural)
+					eststo `v'_tvradrur0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0 & urban_siagie==0, a(id_ie grade year pair)
+					eststo `v'_tvradrur1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if (base_tv==1 | base_radio==1) & urban_siagie==0, a(id_ie grade year pair)
+						
+					//Effect by Resources (PC + internet)
 					eststo `v'_pc_int0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==0 & base_pc==0, a(id_ie grade year pair)
 					eststo `v'_pc_int1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==1 & base_pc==1, a(id_ie grade year pair)
-			
+											
+					//Effect by Resources (Phone with internet)
+					eststo `v'_phoint0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_phone_internet==0, a(id_ie grade year pair)
+					eststo `v'_phoint1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_phone_internet==1, a(id_ie grade year pair)					
+
 					//Effect by Academic achievement
 					eststo `v'_acad1_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==1, a(id_ie grade year pair)
-					eststo `v'_acad2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==2, a(id_ie grade year pair)
-					eststo `v'_acad3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==3, a(id_ie grade year pair)
+					eststo `v'_acad2_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==2, a(id_ie grade year pair)
+					eststo `v'_acad3_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==3, a(id_ie grade year pair)
 					eststo `v'_acad4_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==4, a(id_ie grade year pair)
 			
 					//Effect by Expectations
@@ -1280,7 +1350,7 @@ args treatment_type subsample
 	
 			
 			*- For heterogeneity with different sample splits (2 groups)
-			foreach sample_split in  "ses" "pc_int" "acad" "asp" "asp2" {
+			foreach sample_split in  "ses" "resour" "tv" "rad" "tvrad" "tvradrur" "phoint" "pc_int" "acad" "asp" "asp2" {
 				if "`sample_split'" == "ses" {
 					local coef0 = "ses1"
 					local coef1 = "ses4"
@@ -1288,7 +1358,41 @@ args treatment_type subsample
 					local coef1_lab = "High SES Households (Q4)"
 				} 	
 	
+				if "`sample_split'" == "resour" {
+					local coef0 = "resour0"
+					local coef1 = "resour1"
+					local coef0_lab = "Households with neither TV, radio, PC or Internet"
+					local coef1_lab = "Households with TV, radio, PC or Internet"
+				} 	
 	
+				if "`sample_split'" == "tv" {
+					local coef0 = "tv0"
+					local coef1 = "tv1"
+					local coef0_lab = "Households with no TV"
+					local coef1_lab = "Households with TV"
+				} 
+	
+				if "`sample_split'" == "rad" {
+					local coef0 = "rad0"
+					local coef1 = "rad1"
+					local coef0_lab = "Households with no Radio"
+					local coef1_lab = "Households with Radio"
+				} 
+	
+				if "`sample_split'" == "tvrad" {
+					local coef0 = "tvrad0"
+					local coef1 = "tvrad1"
+					local coef0_lab = "Households with neither TV nor Radio"
+					local coef1_lab = "Households with TV or Radio"
+				} 
+				
+				if "`sample_split'" == "tvradrur" {
+					local coef0 = "tvradrur0"
+					local coef1 = "tvradrur1"
+					local coef0_lab = "Rural Households with neither TV nor Radio"
+					local coef1_lab = "Rural Households with TV or Radio"
+				} 				
+				
 				if "`sample_split'" == "pc_int" {
 					local coef0 = "pc_int0"
 					local coef1 = "pc_int1"
@@ -1296,6 +1400,13 @@ args treatment_type subsample
 					local coef1_lab = "Households with both PC and Internet"
 				} 
 				
+				if "`sample_split'" == "phoint" {
+					local coef0 = "phoint0"
+					local coef1 = "phoint1"
+					local coef0_lab = "Households with no phone with internet"
+					local coef1_lab = "Households with phone with internet"
+				} 
+
 				if "`sample_split'" == "acad" {
 					local coef0 = "acad1"
 					local coef1 = "acad4"
