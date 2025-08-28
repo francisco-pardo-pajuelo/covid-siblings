@@ -36,6 +36,17 @@
 \setbeamercolor{block body}{bg=blue!10,fg=black}
 \setbeamertemplate{blocks}[rounded][shadow=true]
 
+%To edit bullet point sizes
+\setbeamertemplate{itemize item}{\textbullet}
+\setbeamertemplate{itemize subitem}{\raisebox{0.25ex}{\scalebox{0.6}{\textbullet}}}
+
+% To have numbering
+\setbeamertemplate{footline}{
+    \hfill\insertframenumber\hspace{1em}\vspace{1em}
+}
+
+
+
 
 \definecolor{ColorOne}{named}{MidnightBlue}
 \definecolor{ColorTwo}{named}{Dandelion}
@@ -212,7 +223,7 @@
 %facts
 %policy questions
     
-    \begin{enumerate}
+    \begin{itemize}
         \item Persistent learning losses from Covid-19 across the world, especially in more vulnerable populations. %\textcolor{blue}{cite}
         \item With school closures and kids at home, less time with teachers and peers and more with family members.
         \item Along with remote schooling, this is a drastic change in education production function.
@@ -224,10 +235,10 @@
 %Test of an important theoretical prediction:
 \only<2->{
         \begin{block}{Research Question}
-Do children with siblings experience larger learning losses when households face an unexpected \textcolor{red}{shock/school closures/increased childcare needs}?
+Do children with siblings experience larger learning losses when households face unexpected \textcolor{red}{shocks/school closures/increased childcare needs}?
 \end{block}
 }
-    \end{enumerate}
+    \end{itemize}
     
 \end{frame}
 
@@ -237,32 +248,33 @@ Do children with siblings experience larger learning losses when households face
 
 %Just enough of your methodology so results don't feel like magic
 %Not so much that you crowd out the ndings
-\begin{transitionframe}
+\begin{frame}
     \label{frame:thispaper}
     \frametitle{This Paper}
-    \begin{enumerate}
-    \item I use a DID strategy to compare children with siblings with only children before and after school closures.
-    \item Both populations had equal trends before the pandemic
-    \item I find students with siblings do 0.06sd worse in GPA and 0.1 in standardized scores. 
+    \begin{itemize}
+    \item I use a DID strategy to compare children with siblings with only children before and after school closures. I complement this with IV and RD approaches.
+    %\item Both populations had equal trends before the pandemic.
+    \item I find that students with siblings do  worse in terms of GPA and standardized scores. 
     %\item parents reduced expectations in XX
-    \item Mechanisms
-    \item External validity
-    \end{enumerate}
-\end{transitionframe}
+    \item Most of this seems to be explained by households with high levels of parental involvement. Without schools and childcare, when there are more children, parents invest less in each child.
+    \item Similar patterns in other countries.
+    \end{itemize}
+\end{frame}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:contribution}
     \hypersetup{citecolor=blue}
     \frametitle{Contribution to literature}
-    \begin{enumerate}
+    \begin{itemize}
 
-    \item \textbf{Quantity-Quality:} Most papers find no reductions in quality of education when family size increases. {\footnotesize\cite{becker_child_1976}, \cite{black_more_2005}, \cite{caceres-delpiano_impacts_2006} \cite{conley_parental_2006}}. There might be if unexpected or vulnerable. {\footnotesize\cite{black_small_2010}, \cite{aslund_family_2010}.}
+    \item \textbf{Quantity-Quality:} Most papers find no reductions in quality of education with family size except with unexpected increases and vulnerable populations. {\tiny\cite{black_more_2005}, \cite{caceres-delpiano_impacts_2006} \cite{conley_parental_2006}}. {\tiny\cite{black_small_2010}, \cite{aslund_family_2010}.}
+    \\ 
     $\rightarrow$ I find that the influence of family size may depend on how much the family is pushed towards constraints.
+%\cite{becker_child_1976},
+    \item \textbf{Health Shocks:} {\tiny\cite{adhvaryu_endowments_2016}}
 
-    \item \textbf{Health Shocks:} {\footnotesize\cite{adhvaryu_endowments_2016}}
-
-    \item \textbf{School closures:} 
-    {\footnotesize \cite{haelermans_inequality_2022}, \cite{jakubowski_global_2023}}
+    \item \textbf{School closures:} Significant learning losses around the world. Worse for vulnerable and longer closures.
+    {\tiny \cite{haelermans_inequality_2022}, \cite{jakubowski_global_2023}} I provide evidence on how family structure plays a role in this when more participation from parents becomes more valuable.
    
     
      
@@ -278,19 +290,20 @@ Do children with siblings experience larger learning losses when households face
         %$\uparrow$ labor and earnings. Benefits $>>>$ Costs. \\
         %\small \textcolor{gray}{Jackson, Turner, Bastian (2025), Humphries et al (2025)}
 
-    \end{enumerate}
-\end{frame}
+    \end{itemize}
+\end{transitionframe}
 
 \begin{transitionframe}
     \label{frame:background}
     \frametitle{Background and Context}
-    \begin{enumerate}
-       \item Covid in Peru
-       \item School closures in Peru
-       \item What does this mean?
-       \item How much more were parents involved?
-       \item What happened to performance?
-    \end{enumerate}
+    \begin{itemize}
+       \item Peru had the highest Covid death rate in the world: 6,600 per 1 million, 83\% higher than the US.
+       \item Country-wide lockdown forbade  nonessential business operations. 
+       \item School closures in public and private schools that lasted $\approx$ 2 years. 
+       \item The government implemented remote schooling resources.
+       \item Classes were given through Radio, TV and online platforms.
+       \item \textcolor{green}{What does this meant for families?}
+    \end{itemize}
 \end{transitionframe}
 
 % ========================================
@@ -330,14 +343,14 @@ Do children with siblings experience larger learning losses when households face
 % ========================================
 \begin{frame}
     \label{frame:ece_trends}
-    \frametitle{Learning losses for both, but larger for children with siblings}
+    \frametitle{Learning losses in standardized exams for both, but larger for children with siblings}
                \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_ece_math_4.pdf}    
     
 \end{frame}
 
 \begin{frame}
     \label{frame:gpa_trends}
-    \frametitle{Gap in GPA also becomes larger}
+    \frametitle{Differences in GPA also become larger}
                \includegraphics[width=\textwidth]{./FIGURES/Descriptive/raw_shade_total_elm_std_gpa_m_adj_Tsiblings_Sall_Size2_4.pdf}    
             \hyperlink{frame:gpa_trends_grades_elm}{\beamergotobutton{GPA trends by grade}}
   
@@ -380,10 +393,10 @@ Do children with siblings experience larger learning losses when households face
     \end{block}
     
     \begin{itemize}
-         \item<2-> \textbf{No anticipation:} Given the unexpected nature of the pandemic, families couldn't have chosen to have or not have children or be affected by school closures before they happened. \\
+         \item<2-> \textbf{No anticipation:} \\
          $\Rightarrow$ School closures were unexpected, especially if thinking about fertility
          \item<3-> \textbf{No unobserved time varying shocks:} For example, if one parent doesn't work they may choose to have more children but also have more time for homeschooling (\textcolor{blue}{+}) or may need children to work (\textcolor{red}{-}). \\
-         $\Rightarrow$ Strategy controls for any unobserved time invariant shock. However, will provide some evidence with IV estimates.
+         $\Rightarrow$ Strategy controls for any unobserved time invariant shock and includes controls for potential proxies of time varying ones. However, I will provide some evidence with IV estimates.
     \end{itemize}
     \only<3->{
     \begin{flushleft}
@@ -428,7 +441,7 @@ Do children with siblings experience larger learning losses when households face
 % RESULTS
 % ========================================
 
-
+\section{Main Results}
 % A, Main Results
 
 %A.1. Event Study (all siblings)
@@ -486,7 +499,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:twfe_gpa_2_4_6_8}
-    \frametitle{The gap in learning losses is larger in earlier grades}
+    \frametitle{Effect on GPA is larger in earlier grades (2020-2021)}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
        \includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Soldest_4.pdf}
@@ -521,12 +534,12 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:twfe_gpa_controls_intro}
-    \frametitle{TWFE estimates for 2020-2021}
+    \frametitle{Controlling for baseline scores and SES}
        \begin{itemize}
            \item Using the administrative data we can control for sex, mother's age, mother's age at first birth, mother's education and school, year and grade FE.
            %\item In some cases, I can use survey data for a more rich set of controls.
-           \item For students in 6th, 7th and 9th grade, I can match baseline characteristics from 2nd, 4th and 8th grade.
-           \item Similar results with standardized exams and socioeconomic index controls.
+           \item For some years, we can match students in 6th, 7th and 9th grade with baseline characteristics from 2nd, 4th and 8th grade.
+           \item Similar results with baseline standardized exams and socioeconomic index controls.
 
 
 %    - 1. 2° (2015,2016) 					→ 6° (2019,2020)
@@ -557,7 +570,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:twfe_gpa_controls_siblings}
-    \frametitle{Results do not change when controlling for scores and socio-economic status}
+    \frametitle{And similar pattern when looking at effects by siblings}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bycontrols_bysibs_Tsiblings_Soldest_pairall_4.pdf}
@@ -575,28 +588,28 @@ Do children with siblings experience larger learning losses when households face
 % ========================================
 % MECHANISMS
 % ========================================
-\begin{frame}
-    \label{frame:mechanisms}
-    \frametitle{What's behind this?}
+\begin{frame}<1-2>
+    [label=mechanisms]
+    \frametitle{Why do children with siblings do worse than only children?}
 \begin{itemize}
     \item Having a sibling is related with larger learning losses.
-    \item Students interact less with teachers and peers and more with parents and siblings.
+    \item School closures and lockdowns can make students interact less with teachers and peers and more with parents and siblings.
     \item Potential Mechanisms:   
     \begin{itemize}
-        \item Birth Order
-        \item Scarce material resources
-        \item Sibling disruption
-        \item Parental dilution
-        \item Income Shocks
+        \item \only<1,2>{\color{black}}\only<3-6>{\color{gray!30}}Birth Order
+        \item \only<1,3>{\color{black}}\only<2,4-6>{\color{gray!30}}Scarce material resources
+        \item \only<1,4>{\color{black}}\only<2-3,5-6>{\color{gray!30}}Sibling disruption
+        \item \only<1,5>{\color{black}}\only<2-4,6>{\color{gray!30}}Parental time dilution
+        \item \only<1,6>{\color{black}}\only<2-5>{\color{gray!30}}Income Shocks
     \end{itemize} 
 \end{itemize}
 \end{frame}
 
 \begin{frame}
     \label{frame:birthorder}
-    \frametitle{Birth Order}
+    \frametitle{Separating birth order from family size effects}
        \begin{itemize}
-           \item Effects of school closures may be different for 1st, 2nd, 3rd... children.
+           \item Effects from school closures may be different for the 1st, 2nd, 3rd... children.
            \item This is different from family size effects.
            \item In order to separate both, we only consider first-born children.
        \end{itemize}
@@ -604,7 +617,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:birthorder_intro}
-    \frametitle{Birth Order}
+    \frametitle{Similar results with first-born children}
         {\resizebox{0.9\textwidth}{!}{ \includegraphics{./FIGURES/Event Study/covid_event_bysibs_all_all_std_gpa_m_adj_Tsiblings_Soldest_4.pdf}
       }
     }  
@@ -614,12 +627,14 @@ Do children with siblings experience larger learning losses when households face
     \end{flushleft}
 \end{frame}
 
+% Show overlay 3 (Birth Order highlighted)
+\againframe<3>{mechanisms}
 
 \begin{frame}
     \label{frame:resources_intro}
-    \frametitle{Material Resources}
+    \frametitle{Siblings may compete for access to radio, TV or computer}
        \begin{itemize}
-           \item Siblings may be competing for a computer to study
+           \item Siblings may be competing for a radio, TV or computer to study. \textcolor{green}{(Pending analysis with radio and TV)}
            \item But households without neither computer nor internet show similar patterns 
        \end{itemize}
 \end{frame}
@@ -627,7 +642,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:pcinternet}
-    \frametitle{PC and internet}
+    \frametitle{Similar effects with or without PC/Internet to fight for}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
         \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_Tsiblings_Soldest_pairall_4.pdf}
@@ -640,26 +655,26 @@ Do children with siblings experience larger learning losses when households face
 
 \end{frame}
 
+
+% Show overlay 4 (Scarce material resources highlighted)  
+\againframe<4>{mechanisms}
+
 \begin{frame}
-    \label{frame:pcinternet_siblings}
-    \frametitle{PC and internet}
-        {\resizebox{0.9\textwidth}{!}{
-        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_bysibs_Tsiblings_Soldest_pairall_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:pcinternet}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}       
-
+    \label{frame:siblingdisruption_intro}
+    \frametitle{Siblings may also be disrupting or distracting each other}
+       \begin{itemize}
+           \item Having to study at home also means having your sibling nearby. 
+           \item Distracting siblings may impact students negatively
+           \item Siblings close in age are more likely to interact with each other
+           \item However, I don't see big differences between siblings who are 0-2 and 3-5 years appart. 
+           \item \textcolor{green}{6+ show a smaller effect which made me think about how this may also be confounding parental inputs because older siblings require less from parents. Might need a better look into it.}
+       \end{itemize}
 \end{frame}
-
 
 
 \begin{frame}
     \label{frame:siblingdisruption}
-    \frametitle{Sibling disruption}
+    \frametitle{Similar effects when siblings are 0-2 and 3-5 years apart}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
         \includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_20_21_Tsiblings_Soldest_4.pdf}
@@ -672,39 +687,30 @@ Do children with siblings experience larger learning losses when households face
 
 \end{frame}
 
-\begin{frame}
-    \label{frame:siblingdisruption_siblings}
-    \frametitle{Sibling disruption}
-        {\resizebox{0.9\textwidth}{!}{
-        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_bysibs_20_21_Tsiblings_Soldest_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:siblingdisruption}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}        
-
-\end{frame}
 
 
-
-
+% Show overlay 5 (Sibling disruption highlighted)
+\againframe<5>{mechanisms}
 
 \begin{frame}
     \label{frame:parentaldilution_intro}
-    \frametitle{Parental Resources}
+    \frametitle{Do parents struggle to keep up with more children?}
        \begin{itemize}
            \item Parent's loose childcare and school support.
-           \item Without pre-k or children in school, they need to take up on childcare.
-           \item Additionally, they may need to provide help with schoolwork.
-           \item ``Parents who before the pandemic invested time and resources in their children use official education resources the most... because of the employment  disruptions of the pandemic, they \textbf{[low SES]} spent  even less time during the lockdowns.'' \cite{naslund-hadley_education_2021}
+           %\item This increhey need to take up on childcare.
+           \item Parental time investment becomes more relevant and may at the same time increase.
+           \item Around $50\%$ of students accessed school material in the company of their parents. Only 12\% in the company of a sibling. %[Family surveys, Ministry of Education, July 2020]
+
+
+           
+           %\item Additionally, they may need to provide help with schoolwork.
+           \item ``Parents who before the pandemic invested time and resources in their children use official education resources the most...  \textbf{[low SES]} spent  even less time during the lockdowns.'' {\tiny\cite{naslund-hadley_education_2021}}
        \end{itemize}
 \end{frame}
 
 \begin{frame}
     \label{frame:parental_investments_vs_ses}
-    \frametitle{Parental time Investment increases with SES}
+    \frametitle{Parental time helping with schoolwork is correlated with SES}
         {\resizebox{0.9\textwidth}{!}{
         \includegraphics{./FIGURES/Descriptive/parental_investment_ses.pdf}
       }
@@ -715,7 +721,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:byses}
-    \frametitle{Socio-Economic Status}
+    \frametitle{When parent's invest little time, there are smaller size effects}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
         \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byses_Tsiblings_Soldest_pairall_4.pdf}
@@ -730,7 +736,7 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:byses_siblings}
-    \frametitle{Socio-Economic Status}
+    \frametitle{Similar pattern by number of siblings}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
         \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byses_bysibs_Tsiblings_Soldest_pairall_4.pdf}
@@ -745,35 +751,6 @@ Do children with siblings experience larger learning losses when households face
 
 
 
-\begin{frame}
-    \label{frame:mothereduc}
-    \frametitle{Mother's Education}
-        {\resizebox{0.9\textwidth}{!}{
-        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_gpa_mom_sec_complete_20_21_Tsiblings_Soldest_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:mothereduc_siblings}{\beamergotobutton{Results by siblings}}
-    \end{flushleft}    
-
-\end{frame}
-
-\begin{frame}
-    \label{frame:mothereduc_siblings}
-    \frametitle{Mother's Education}
-        {\resizebox{0.9\textwidth}{!}{
-        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_gpa_mom_sec_complete_bysibs_20_21_Tsiblings_Soldest_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:mothereduc}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}        
-
-\end{frame}
 
 \begin{comment}
 \begin{frame}
@@ -812,10 +789,17 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:childcare}
-    \frametitle{Parental dilution - Increased childcare}
+    \frametitle{But does having a child at home affect parents' investment in their siblings?}
        \begin{itemize}
-            \item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
-            \item Mixed results in literature (US and Denmark) although not until younger starts school.
+            \item Children who turn 6 y.o after March 31st have to wait for the next school-year to enroll in 1st grade.
+            \item That creates a cutoff. \\
+                Born before $\rightarrow$ children go to school \\
+                Born after $\rightarrow$  they stay at home.
+            \item When schools are open, this creates a negative effect for siblings both in performance and parental time invested in them.
+            \item This provides some evidence of the effect of having all children stay at home during school closures.
+            \textcolor{green}{Think how to present these results...}
+            %\item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
+            %\item Mixed results in literature (US and Denmark) although not until younger starts school.
         \end{itemize}
 \end{frame}      
 
@@ -826,20 +810,20 @@ Do children with siblings experience larger learning losses when households face
 
       
     \only<2->{
-    \highlightboxflex{-0.6}{-0.2}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    \highlightboxflex{-0.6}{-0.15}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
     
     % Highlight box for Covid same sex coefficient  
-    \highlightboxflex{1.85}{-0.2}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    \highlightboxflex{1.85}{-0.15}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
     
     \begin{tikzpicture}[overlay, remember picture]
         % Single text label at the bottom
         \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Negative spillover of having a younger sibling stay at home};
         
         % Arrow to Pre-Covid coefficient (pointing to the left box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(-0.6,-0.25)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(-0.6,-0.2)}]current page.center);
         
         % Arrow to Covid coefficient (pointing to the right box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(1.85,-0.25)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(1.85,-0.2)}]current page.center);
     \end{tikzpicture}
     }
 \end{frame}
@@ -877,24 +861,41 @@ Bandwidth           &         365   &         365   &         365   &         36
     \only<2->{
 
     % Highlight box for Covid same sex coefficient  
-    \highlightboxflex{3.20}{-0.77}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    \highlightboxflex{3.20}{-0.60}{1.2}{1.0}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
     
     \begin{tikzpicture}[overlay, remember picture]
         % Single text label at the bottom
-        \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Reduce parental time investment when younger sibling stays at home};
+        \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Reduces parental time investment when younger sibling stays at home};
 
   
         
         % Arrow to Covid coefficient (pointing to the right box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.20,-0.77)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.20,-0.60)}]current page.center);
     \end{tikzpicture}
     }
 
 \end{frame}
 
+
+
+% Show overlay 6 (Parental dilution highlighted)
+\againframe<6>{mechanisms}
+
+\begin{frame}
+    \label{frame:incomeshocks_intro}
+    \frametitle{Do larger families experience larger income shocks?}
+    \begin{itemize}
+        \item Larger learning losses in larger families could be driven by them experiencing larger income losses that may cause more disruptions in the household.
+        \item When looking at an index of socio-economic status (household materials, access to services, etc.), we don't see a reduction in SES 2-4 years after the pandemic.
+        \item On the contrary, there are either no effects or slight increases in the SES of children with siblings compared to only  children.
+    \end{itemize}
+
+\end{frame}
+
+
 \begin{frame}
     \label{frame:incomeshocks}
-    \frametitle{Income Shocks}
+    \frametitle{No evidence of negative income shocks}
      
     %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
 
@@ -910,39 +911,23 @@ Bandwidth           &         365   &         365   &         365   &         36
    
 \end{frame}
 
-\begin{frame}
-    \label{frame:incomeshocks_siblings}
-    \frametitle{Income Shocks}
-     
-    %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
-
-     {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/twfe_ses_bysibs_2_4_8_Tsiblings_Soldest_4.pdf}
-      }
-    }
-
- \begin{flushleft}
-        \hyperlink{frame:incomeshocks}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}   
-    
-    
-\end{frame}
 
 
 
 \begin{frame}
     \label{frame:iv_intro}
-    \frametitle{Effect of family size on GPA: Using Same Sex and Twin IV}
+    \frametitle{Remaining endogeneity: Using Same Sex and Twin IV}
     \begin{itemize}
         \item To address any further remaining endogeneity concerns such as time-varying unobserved shocks we use an IV approach.
-        \item Having same sex children (BB or GG) makes families more likely to have a third child. Twin births is also used as a potential exogenous variation in family size.
+        \item Having same sex children (Boy-boy or girl-girl) makes families more likely to have a third child. Twin births is also used as a potential exogenous variation in family size.
+        \item this captures family size effects in families with at least 2 children.
     \end{itemize}    
    
 \end{frame}
 
 \begin{frame}[t]
     \label{frame:iv_results}
-    \frametitle{Effect of family size on GPA: Using same sex and twin births IV}
+    \frametitle{Same sex IV shows a reduction in family size effect during closures}
     \input{./TABLES/MANUAL/twfe_twins.tex}
    
     \only<2->{
@@ -971,7 +956,7 @@ Bandwidth           &         365   &         365   &         365   &         36
         \item We see a negative reduction in family size effects on performance using same sex IV.
         \item Twin IV might not be well suited for this context. Parents may be more able to teach, study and help siblings that share coursework. 
         %\item One reason why we don't find results could be that to some this captures more the effect of monetary cost but in terms of time, twins might not be twice as costly than two separate children
-        \item We are estimating here the differential effect from \#2 to \#3.
+        \item We are estimating here the differential effect from \#2 to \#3,\#4, etc. Not from single children to children with siblings.
     \end{itemize}
 \end{frame}
 
@@ -1056,16 +1041,14 @@ Bandwidth           &         365   &         365   &         365   &         36
 % ========================================
 \section{Conclusions}
 
-\begin{frame}
+\begin{transitionframe}
     \label{frame:conclusions}
     \frametitle{Conclusions}
     \begin{itemize}
         \item Should crisis interventions differentiate by family structure?
         \item Does resource stress activate latent quantity-quality tradeoffs in family investment?
     \end{itemize}
-
-
-\end{frame}
+\end{transitionframe}
 
 
 \begin{frame}
@@ -1200,7 +1183,7 @@ Bandwidth           &         365   &         365   &         365   &         36
 
 \end{frame}
 
-
+\begin{comment}
 \begin{frame}
     \label{frame:highlightfigure}
     \frametitle{Highlighting Parts of slide}
@@ -1211,7 +1194,7 @@ Bandwidth           &         365   &         365   &         365   &         36
 %blue!50!black
     \end{tikzpicture}
 \end{frame}
-
+\end{comment}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1241,26 +1224,6 @@ Bandwidth           &         365   &         365   &         365   &         36
 \end{frame}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Threats to identification}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-    \label{frame:research_feedback}
-    \frametitle{Threats to identification \textcolor{red}{(for feedback)}}
-        Any other thoughts on potential time varying shocks?
-        \begin{itemize}
-            \item Parent's work
-            \item 
-            \item There is a shift from private to public enrollment during COVID. If this was more common on siblings... would be composition?
-        \end{itemize}
-
- 
-    \begin{flushleft}
-        \hyperlink{frame:research}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}
-    
-\end{frame}
 
 
 \begin{comment}
@@ -1456,6 +1419,67 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\begin{frame}
+    \label{frame:pcinternet_siblings}
+    \frametitle{Similar results for households with or without PC/Internet}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:pcinternet}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:siblingdisruption_siblings}
+    \frametitle{Sibling disruption}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_age_gap_bysibs_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:siblingdisruption}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
+\end{frame}
+
+
+\begin{frame}
+    \label{frame:mothereduc}
+    \frametitle{Mother's Education}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_mom_sec_complete_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:mothereduc_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+\begin{frame}
+    \label{frame:mothereduc_siblings}
+    \frametitle{Mother's Education}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_gpa_mom_sec_complete_bysibs_20_21_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:mothereduc}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}        
+
+\end{frame}
+
 
 \begin{frame}
     \label{frame:byacad}
@@ -1578,6 +1602,150 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
         \hyperlink{frame:twfe_gpa_controls}{\beamergotobutton{Go Back $\carriagereturn$}}
     \end{flushleft}       
 \end{frame}
+
+
+\section{Income shock by siblings}
+
+
+\begin{frame}
+    \label{frame:incomeshocks_siblings}
+    \frametitle{Income Shocks}
+     
+    %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
+
+     {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/twfe_ses_bysibs_2_4_8_Tsiblings_Soldest_4.pdf}
+      }
+    }
+
+ \begin{flushleft}
+        \hyperlink{frame:incomeshocks}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}   
+    
+    
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Potential concerns}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \label{frame:research_feedback}
+    \frametitle{Threats to identification \textcolor{red}{(for feedback)}}
+        Any other thoughts on potential time varying shocks?
+        \begin{itemize}
+            \item Parent's work
+            \item 
+            \item There is a shift from private to public enrollment during COVID. If this was more common on siblings... would be composition?
+        \end{itemize}
+
+ 
+    \begin{flushleft}
+        \hyperlink{frame:research}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}
+    
+\end{frame}
+
+
+%\begin{comment} %####
+\begin{frame}
+        \label{frame:Leigh}
+    \frametitle{Leigh}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Scott}
+    \frametitle{Scott}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Rich}
+    \frametitle{Rich}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+        \label{frame:dean}
+    \frametitle{Dean}
+    \begin{itemize}
+        \item \textbf{Sibsize is not exogenou.}  Sibsize is correlated with parents age (sibsize unfolds over a lifecycle), parents age at first birth, parents employment, parents human capital, housing choices, etc. How much should we really be interpreting this as about sibsize? What if there are two types of parents, those who really care about investing in child quality (H) and human capital and those who do not (L). H types choose to have smaller sibsize so they can invest more in human capital, L types choose quantity over quality. AND when covid comes H types sacrifice more to protect learning than L types do. So you’re not identifying an effect of sibsize; you’re recovering the parents’ endogenous choices that determined sibsize.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:dean2}
+    \frametitle{Dean}
+    \begin{itemize}
+        \item \textbf{Measurement of the dependent variable.}   How is the outcome measured? GPAs seem like they could be directly impacted by covid in ways that are about measurement rather than education. Like, you’re not going to school in the same way, so you’re not being evaluated the same way. I understand that this would be presumably constant by sibship size, but it seems like at a minimum it bears on the interpretation of the results and whether they have a quantitative (rather than just qualitative) interpretation. (It also gets me wondering about strict exogeneity (assuming that you’re using period fixed effects) and the linearity assumptions built into fixed effects.)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:dean3}
+    \frametitle{Dean}
+    \begin{itemize}
+        \item \textbf{Is the effect size quantitatively informative?}   A JMP has to be interesting to get attention. I don’t know that people are going to be super-surprised by the sign of the effect. So is the effect size stably robust, interesting and informative?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Eric}
+    \frametitle{Eric}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Sandy}
+    \frametitle{Sandy}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Bo}
+    \frametitle{Bo}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Peter}
+    \frametitle{Peter}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+        \label{frame:Ofer}
+    \frametitle{Ofer}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \label{frame:fabiola}
+    \frametitle{Fabiola}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+%\end{comment} %####
 
 
 \end{document}
