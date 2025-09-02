@@ -1,0 +1,43 @@
+%
+\begingroup
+\setlength{\tabcolsep}{2pt} % Default value: 6pt
+\begin{table}[H]
+\centering
+\footnotesize
+%\begin{threeparttable}
+\centering
+\caption{Learning loss between August 2019 and December 2021}
+\label{tab:india}
+\resizebox{1\linewidth}{!}{
+\begin{tabular}{lcccccccccccc}
+\toprule
+& (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) & (10) & (11) & (12) \\
+\midrule
+\multicolumn{8}{l}{\textbf{Panel B: Learning loss in regression form}}\\
+&	\multicolumn{6}{c}{Math score (in SD)}&	\multicolumn{6}{c}{Tamil score (in SD)} \\
+ \cmidrule(lr){2-7} \cmidrule(lr){8-13}
+Wave 1 (Dec 2021)   &        -.73\sym{***}&        -.74\sym{***}&        -.76\sym{***}&        -.75\sym{***}&        -.68\sym{***}&        -.71\sym{***}&        -.35\sym{***}&        -.35\sym{***}&        -.37\sym{***}&        -.38\sym{***}&        -.32\sym{***}&        -.34\sym{***}\\
+                    &      (.031)         &      (.038)         &      (.042)         &      (.049)         &      (.037)         &      (.046)         &       (.02)         &      (.023)         &      (.027)         &      (.029)         &      (.024)         &      (.031)         \\
+Male $\times$ Dec 21&                     &        .023         &                     &                     &                     &                     &                     &      -.0074         &                     &                     &                     &                     \\
+                    &                     &      (.041)         &                     &                     &                     &                     &                     &      (.022)         &                     &                     &                     &                     \\
+Mother Edu: Gr. 9-11 $\times$ Dec 21&                     &                     &        .019         &                     &                     &        .021         &                     &                     &       .0015         &                     &                     &        .004         \\
+                    &                     &                     &      (.053)         &                     &                     &      (.053)         &                     &                     &       (.03)         &                     &                     &       (.03)         \\
+Mother Edu: Gr. 12+ $\times$ Dec 21&                     &                     &         .09\sym{*}  &                     &                     &        .084\sym{*}  &                     &                     &         .06\sym{**} &                     &                     &        .057\sym{**} \\
+                    &                     &                     &      (.049)         &                     &                     &      (.049)         &                     &                     &      (.025)         &                     &                     &      (.025)         \\
+SES Decile $\times$ Dec 21&                     &                     &                     &       .0046         &                     &                     &                     &                     &                     &       .0061         &                     &                     \\
+                    &                     &                     &                     &     (.0075)         &                     &                     &                     &                     &                     &     (.0039)         &                     &                     \\
+Has Siblings (2-10 yrs old)     $\times$ Dec 21&                     &                     &                     &                     &        -.11\sym{**} &         -.10\sym{**} &                     &                     &                     &                     &       -.065\sym{**} &       -.062\sym{**} \\
+                    &                     &                     &                     &                     &      (.041)         &      (.041)         &                     &                     &                     &                     &      (.025)         &      (.026)         \\
+N. of obs.          &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         &      13,083         \\
+R-squared           &         .33         &         .33         &         .33         &         .33         &         .33         &         .33         &         .31         &         .31         &         .31         &         .31         &         .31         &         .31         \\
+\bottomrule
+\end{tabular}
+}
+%\setlength\labelsep{0pt}
+
+\begin{minipage}{1\linewidth}
+\footnotesize
+\textit{Notes}: Panel A presents, for children of different ages, the raw IRT score in wave 0 (Aug 2019) and wave 1 (Dec 2021), as well as the difference between the two (the absolute learning loss in standard deviations), and the developmental lag (i.e., how much longer, in months, it took a student in 2021 to achieve the same score as a student in 2019). Panel B estimates the learning loss following Equation \ref{eq:1}. The estimation sample is restricted to individuals tested in Aug 2019 (Wave 0) or December 2021 (Wave 1) who were aged between 55--95 months at the time of the test. All regressions in Panel B include village fixed effects and control for age, gender, maternal education, and SES percentile. Test scores are normalized for age 60--72 months in 2019. Standard errors are clustered at the village level. Statistical significance at the 1, 5, 10\% levels is indicated by \sym{***}, \sym{**}, and \sym{*}.
+\end{minipage}
+\end{table}
+\endgroup
