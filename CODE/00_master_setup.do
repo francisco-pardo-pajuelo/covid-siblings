@@ -33,6 +33,9 @@ set scheme vertical n(10): HCL blues
 //ssc install rddensity
 //ssc install rdrobust
 //findit estread //needed?
+
+//grc1leg //for combined graphs with common legend (how to properly install?)
+
 /*
 *-  Install reghdfe - Development version (6.x): https://scorreia.com/software/reghdfe/install.html
 
@@ -132,11 +135,54 @@ end
 *- beep when finished
 cap prog drop finished
 prog define finished
-	forvalues i = 1/10 {
-	beep
-	sleep 165
-	}
+local delays "1000 800 600 400 200 100"
+foreach delay in `delays' {
+    beep
+    sleep `delay'
+}
+
+// Peak moment
+beep
+beep
+sleep 50
+beep
+
+// Descending pattern  
+local delays "100 200 400 600 800 1000"
+foreach delay in `delays' {
+    sleep `delay'
+    beep
+}
 end
+
+
+/*
+capture {
+    // Your program code
+}
+if _rc == 0 {
+    // Success pattern
+    forvalues i = 1/3 {
+        beep
+        sleep 300
+    }
+    display as result "Program completed successfully"
+}
+else {
+    // Error pattern  
+    forvalues i = 1/5 {
+        beep
+        sleep 100
+    }
+    display as error "Program ended with errors"
+}
+
+
+
+
+*/
+
+
 
 /*
 Default Stata colors

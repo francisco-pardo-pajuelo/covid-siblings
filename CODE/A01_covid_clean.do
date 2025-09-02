@@ -7,6 +7,7 @@ program define main
 	
 	*- Clean data *** EDITED
 	clean_data
+	clean_enrollment //For enrollment outcomes/grade on time/approved/prim complete.
 	internet_census
 	
 
@@ -164,7 +165,7 @@ program define clean_data
 			(base_lengua_?? base_did_prek_?? 	base_has_repeated_??	base_hh_size_??	base_total_siblings_??	base_lives_with_mom_?? 	base_lives_with_dad_?? 	base_lives_with_siblings_??	base_lives_with_grandparents_?? base_lives_with_uncle_aunt_??)
 	
 	
-		
+	compress	
 	/*
 	2p: edu_mother_`g' edu_father_`g' lengua_used_mother_`g'
 	4p: edu_mother_`g' edu_father_`g' lengua_used_mother_`g'
@@ -182,7 +183,7 @@ program define clean_data
 	
 	
 	foreach g in "2p" "4p" /*"6p"*/ "2s" {
-		merge m:1 id_estudiante_`g' year using "$TEMP\ece_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat urban spanish peso_?) //m:1 because there are missings		
+		merge m:1 id_estudiante_`g' year using "$TEMP\ece_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c socioec_index socioec_index_cat urban /*spanish*/ peso_?) //m:1 because there are missings		
 		rename _m merge_ece_`g'
 		rename peso_l peso_c
 		//replace year_`g' = year if year_`g'==.
@@ -196,7 +197,7 @@ program define clean_data
 		replace socioec_index_`g' 		= socioec_index 	if socioec_index_`g' 	==.
 		replace socioec_index_cat_`g' 	= socioec_index_cat if socioec_index_cat_`g' ==.
 		//replace urban_`g' 				= urban 			if urban_`g' ==.
-		replace spanish_`g' 			= spanish 			if spanish_`g' ==.
+		//replace spanish_`g' 			= spanish 			if spanish_`g' ==.
 		replace peso_m_`g'				= peso_m			if peso_m_`g'			==.
 		replace peso_c_`g'				= peso_c			if peso_c_`g'			==.		
 		
@@ -206,7 +207,7 @@ program define clean_data
 
 	*- Match EM exams
 	foreach g in "2p" "4p" "6p" "2s" {
-		merge m:1 id_estudiante_`g' year using  "$TEMP\em_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c  socioec_index socioec_index_cat urban spanish peso_?) //m:1 because there are missings
+		merge m:1 id_estudiante_`g' year using  "$TEMP\em_`g'", keep(master match) keepusing(score_math score_com score_math_std score_com_std score_acad_std label_m label_c  socioec_index socioec_index_cat urban /*spanish*/ peso_?) //m:1 because there are missings
 		rename _m merge_m_`g'
 		rename peso_l peso_c
 		//replace year_`g' = year if year_`g'==.
@@ -220,7 +221,7 @@ program define clean_data
 		replace socioec_index_`g' 		= socioec_index 	if socioec_index_`g' 	==.
 		replace socioec_index_cat_`g' 	= socioec_index_cat if socioec_index_cat_`g' ==.
 		//replace urban_`g' 				= urban 			if urban_`g' ==.
-		replace spanish_`g' 			= spanish 			if spanish_`g' ==.
+		//replace spanish_`g' 			= spanish 			if spanish_`g' ==.
 		replace peso_m_`g'				= peso_m			if peso_m_`g'			==.
 		replace peso_c_`g'				= peso_c			if peso_c_`g'			==.
 		
@@ -228,6 +229,8 @@ program define clean_data
 		drop  `r(varlist)'	
 	}
 
+	compress
+	
 	*- Match ECE survey
 	merge m:1 id_estudiante_2p year using "$TEMP\ece_family_2p", keep(master match) keepusing(aspiration_2p /*internet_2p pc_2p laptop_2p radio_2p tv_2p  phone_internet_2p*/ raw_parent_edu_inv_com_2p raw_parent_edu_inv_2p std_parent_edu_inv_com_2p std_parent_edu_inv_2p) //m:1 because there are missings
 	rename _m merge_ece_survey_fam_2p
@@ -552,6 +555,82 @@ program define clean_data
 		save "$TEMP\pre_reg_covid_TEST", replace
 	
 
+end
+
+
+
+********************************************************************************
+* Clean data
+********************************************************************************
+
+capture program drop clean_enrollment
+program define clean_enrollment
+
+	use   "$TEMP\siagie_append", clear
+	
+	keep id_per_umc year grade id_ie math com
+	/*
+	gen no_math = math==.
+	gen no_read = com==.
+	gen dropout_risk = (no_math==1 & no_read==1)
+	*/
+	save "$TEMP\siagie_id_year_grade_TEMP", replace
+
+	use   "$TEMP\siagie_append", clear
+
+	keep id_per_umc year id_ie male_siagie
+	rename id_ie id_ie_first
+	bys id_per_umc (year): keep if _n==1
+	drop year
+	
+	merge 1:1 id_per_umc using "$TEMP\id_siblings", keepusing(exp_entry_year) keep(master match)
+	drop _m
+	
+	keep if exp_entry_year>=2010 & exp_entry_year<=2024
+	
+	expand 11
+	bys id_per_umc: gen year =  exp_entry_year+_n-1
+	bys id_per_umc: gen grade =  (year-exp_entry_year)+1
+	drop if year<2014 | year>2024 //No enrollment data for this years
+	
+	compress
+	
+	merge 1:1 id_per_umc year grade using "$TEMP\siagie_id_year_grade_TEMP", keep(master match)
+	gen grade_on_time = _m==3
+	drop _m
+	
+	rename grade grade_expected
+	merge 1:1 id_per_umc year using "$TEMP\siagie_id_year_grade_TEMP", keep(master match) keepusing(grade id_ie)
+	gen enrolled = _m==3
+	drop _m
+	
+	merge m:1 id_per_umc using "$TEMP\id_siblings",  keep(master match) keepusing(id_fam_${fam_type} fam_order_${fam_type} fam_total_${fam_type} fam_total12021_${fam_type}  educ_caretaker educ_mother educ_father age_mother_1st age_mother_1st_oldest_${fam_type} exp_graduating_year? dob_mother) 
+	
+	*- Other vars
+	*-- Age of mother
+	gen age_mother = year - year(dob_mother) if year(dob_mother)>1901 & year(dob_mother)<2015 
+	drop dob_mother
+	
+	*-- Mother's education (SIAGIE)
+	gen educ_cat_mother = 1 if inlist(educ_mother,2,3,4)==1
+	replace educ_cat_mother = 2 if inlist(educ_mother,5)==1
+	replace educ_cat_mother = 3 if inlist(educ_mother,6,7,8)==1
+	label values educ_cat_mother educ_cat 
+	//bys id_per_umc (enrolled): egen id_ie_first = 
+	
+	erase "$TEMP\siagie_id_year_grade_TEMP.dta"
+	
+	compress
+	
+	save "$TEMP\pre_reg_covid_enrollment", replace
+	
+
+	bys id_ie_first: egen u = max(cond(_n==1,runiform(),.))
+	keep if u <0.05
+
+	save "$TEMP\pre_reg_covid_enrollment_TEST", replace	
+
+	
 end
 
 ********************************************************************************

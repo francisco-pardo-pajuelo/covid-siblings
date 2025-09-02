@@ -10,6 +10,9 @@ program define main
 	descriptive_statistics all
 	
 	*- Parental investment
+	parental_investment_new
+	
+	
 	parental_investment
 			parental_investment_by_number_sibs //Not worked as expected..
 	
@@ -329,6 +332,73 @@ end
 *******************************
 * PARENTAL INVESTMENT
 *******************************
+
+
+capture program drop parental_investment_new
+program define parental_investment_new
+
+use "$TEMP\pre_reg_covid${covid_data}", clear
+
+local g = 2
+
+keep if grade==2 
+
+*- Quartiles by Score
+gen	 score_acad_Q = .
+foreach y in "2015" "2022" {
+forvalues i = 1(1)4 {
+	xtile temp =  score_acad_std_2p 		if year==`y', nq(4)
+	replace score_acad_Q = temp 			if year==`y'
+	drop temp
+	}
+}
+	
+*- Quartiles by SES	
+ds socioec_index_cat_2p
+
+
+binsreg raw_parent_edu_inv_com_2p score_acad_Q if year==2015
+binsreg raw_parent_edu_inv_com_2p socioec_index_cat_2p if year==2015
+binsreg score_acad_std_2p socioec_index_cat_2p if year==2015
+
+binsreg raw_parent_edu_inv_com_2p score_acad_Q if year==2022
+binsreg raw_parent_edu_inv_com_2p socioec_index_cat_2p if year==2022
+
+binsreg raw_parent_edu_inv_2p score_acad_Q if year==2022
+binsreg raw_parent_edu_inv_2p socioec_index_cat_2p if year==2022
+
+
+*- Correlation increases after COVID
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2015
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2022
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2023
+
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2015 & fam_total_2==1
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2022 & fam_total_2==1
+binsreg score_acad_std_2p std_parent_edu_inv_com_2p if year==2022 & fam_total_2==1
+
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2015 & fam_total_2==3
+reg score_acad_std_2p std_parent_edu_inv_com_2p if year==2022 & fam_total_2==3
+
+*- Relation between investment and GPA across time
+use "$TEMP\pre_reg_covid${covid_data}", clear
+
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2015 & year_2p==2015 //2
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2016 & year_2p==2015 //3
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2017 & year_2p==2015 //4
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2018 & year_2p==2015 //5
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2019 & year_2p==2015 //6
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2020 & year_2p==2015 //7
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2021 & year_2p==2015 //8
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2022 & year_2p==2015 //9
+reg std_gpa_m_adj base_std_parent_edu_inv_com_2p if year==2023 & year_2p==2015 //10
+
+
+
+
+
+
+end
 
 capture program drop parental_investment
 program define parental_investment

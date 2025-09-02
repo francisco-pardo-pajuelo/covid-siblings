@@ -9,6 +9,8 @@ program define main
 	*-Pairs of ECE years with pre-post COVID
 	twfe_ece siblings oldest
 	twfe_ece siblings all
+	twfe_ece_gender siblings oldest
+	twfe_ece_gender siblings all
 	
 	twfe_gpa_baseline_survey_common	siblings oldest
 	twfe_gpa_baseline_survey_common	siblings all
@@ -26,7 +28,6 @@ program define main
 	//ece_baseline_netherlands  
 
 	
-	
 
 	
 end
@@ -39,7 +40,7 @@ capture program drop setup_COVID_A04
 program define setup_COVID_A04
 
 	*- Define if test run
-	global covid_test = 1
+	global covid_test = 0
 	global covid_data = ""
 	if ${covid_test} == 1 global covid_data = "_TEST"
 	
@@ -179,23 +180,23 @@ foreach size in "2_4" "2" "3" "4" {
 		di as result "*********************" _n as text "Size: `size'" _n  "Var: `v'" _n as result "*********************"	
 		
 		*- Panel A: 2nd Grade
-					//eststo `vlab'_2p_`size'	: reghdfe `v'_2p 		treated_post treated post fe		if sample_size==1 & sample_1==1, a(id_ie year)
-					eststo `vlab'_2p_x_`size'	: reghdfe `v'_2p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_1==1, a(id_ie year)
+					//eststo `vlab'_2p_`size'	: reghdfe `v'_2p 		treated_post treated post fe		if sample_size==1 & sample_1==1, a(year id_ie)  cluster(id_ie)
+					eststo `vlab'_2p_x_`size'	: reghdfe `v'_2p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_1==1, a(year id_ie)  cluster(id_ie)
 				
 		*- Panel B: 4th grade
-					//eststo `vlab'_4p_`size'	: reghdfe `v'_4p 		treated_post treated post fe		if sample_size==1 & sample_2==1, a(id_ie year)
-					eststo `vlab'_4p_x_`size'	: reghdfe `v'_4p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_2==1, a(id_ie year)
+					//eststo `vlab'_4p_`size'	: reghdfe `v'_4p 		treated_post treated post fe		if sample_size==1 & sample_2==1, a(year id_ie)  cluster(id_ie)
+					eststo `vlab'_4p_x_`size'	: reghdfe `v'_4p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_2==1, a(year id_ie)  cluster(id_ie)
 				
 
 		*- Panel B census: 4th grade (only census)
-					//eststo `vlab'_4p_c_`size'	: reghdfe `v'_4p 		treated_post treated post fe		if sample_size==1 & sample_3==1, a(id_ie year)
-					//eststo `vlab'_4p_c_x_`size'	: reghdfe `v'_4p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_3==1, a(id_ie year)
+					//eststo `vlab'_4p_c_`size'	: reghdfe `v'_4p 		treated_post treated post fe		if sample_size==1 & sample_3==1, a(year id_ie)  cluster(id_ie)
+					//eststo `vlab'_4p_c_x_`size'	: reghdfe `v'_4p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_3==1, a(year id_ie)  cluster(id_ie)
 			
 		
 		*- Panel C 8th grade (only those with potential baseline 2p scores (2014))
-					//eststo `vlab'_2s_`size'			: 	reghdfe `v'_2s 			treated_post treated post fe							if sample_size==1 & sample_4==1, a(id_ie year)
-					eststo `vlab'_2s_x_`size'			: 	reghdfe `v'_2s 			treated_post treated post fe ${x_all}						if sample_size==1 & sample_4==1, a(id_ie year)
-					eststo `vlab'_2s_x_base_`size'		:	reghdfe `v'_2s 			treated_post treated post fe ${x_all} ${baseline_score_2p}	if sample_size==1 & sample_4==1, a(id_ie year)
+					//eststo `vlab'_2s_`size'			: 	reghdfe `v'_2s 			treated_post treated post fe							if sample_size==1 & sample_4==1, a(year id_ie)  cluster(id_ie)
+					eststo `vlab'_2s_x_`size'			: 	reghdfe `v'_2s 			treated_post treated post fe ${x_all}						if sample_size==1 & sample_4==1, a(year id_ie)  cluster(id_ie)
+					eststo `vlab'_2s_x_base_`size'		:	reghdfe `v'_2s 			treated_post treated post fe ${x_all} ${baseline_score_2p}	if sample_size==1 & sample_4==1, a(year id_ie)  cluster(id_ie)
 		
 	capture drop sample_size
 	}
@@ -263,7 +264,7 @@ foreach size in "2_4" "2" "3" "4" {
 			vertical ///
 			recast(bar) barwidth(0.25) ///
 			ciopts(recast(rcap)) citop ///
-			xlabel(1 "2nd grade" 2 "4th grade" 3 "8th grade") ///	
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
 			keep(treated_post) ///
 			legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
 			ytitle("Standardized Exam relative to Only Children", size(medsmall) height(5)) ///							
@@ -282,7 +283,7 @@ foreach size in "2_4" "2" "3" "4" {
 		if "${covid_data}" == "" {
 			di "REAL"
 			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 			}				
 			
 *- Figure Expectations
@@ -868,7 +869,7 @@ keep id_per_umc id_ie year level grade male_siagie region_siagie public_siagie u
 			if "`size'" == "3" 		keep if inlist(fam_total_${fam_type},1,3)==1
 			if "`size'" == "4" 		keep if inlist(fam_total_${fam_type},1,4)==1		
 			
-			eststo gpa_m_`size': 	reghdfe std_gpa_m_adj 	treated_post treated post base_score_math_2p base_score_com_2p fe, a(id_ie )
+			eststo gpa_m_`size': 	reghdfe std_gpa_m_adj 	treated_post treated post base_score_math_2p base_score_com_2p fe, a(id_ie ) 
 			eststo gpa_c_`size': 	reghdfe std_gpa_c_adj 	treated_post treated post base_score_math_2p base_score_com_2p fe, a(id_ie )
 			//eststo ece_m_`size': 	reghdfe score_math_2s 	treated_post treated post base_score_math_2p base_score_com_2p fe, a(id_ie )
 			//eststo ece_c_`size': 	reghdfe score_com_2s 	treated_post treated post base_score_math_2p base_score_com_2p fe, a(id_ie )
@@ -2820,8 +2821,8 @@ program define event_ece_student
 		keep if inlist(year,2015,2016,2018,2019,2022,2023)==1
 		merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_2p_*) nogen
 		if inlist("`v'","score_math_2p","score_com_2p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
-		reghdfe 	`v' ${x}	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
-		*reghdfe 	score_acad_std_2p	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated if score_acad_std_2p_max==2022 & score_acad_std_2p_sum==5 & fam_order_2==1, a(id_ie)
+		reghdfe 	`v' ${x}	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie) vce(cluster id_ie)
+		*reghdfe 	score_acad_std_2p	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated if score_acad_std_2p_max==2022 & score_acad_std_2p_sum==5 & fam_order_2==1, a(id_ie) vce(cluster id_ie)
 		estimates 	store `v'
 		}
 
@@ -2835,7 +2836,7 @@ program define event_ece_student
 		keep if inlist(year,2016,2018,2019,2022,2023,2024)==1
 		merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_4p_*) nogen
 		if inlist("`v'","score_math_4p","score_com_4p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
-		reghdfe 	`v' 	${x}						year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4  treated, a(year id_ie)
+		reghdfe 	`v' 	${x}						year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4  treated, a(year id_ie)  cluster(id_ie)
 		estimates 	store `v'		
 		}	
 
@@ -2849,7 +2850,7 @@ program define event_ece_student
 		merge m:1 id_ie using "$TEMP\siagie_ece_ie_obs", keep(master match) keepusing(score_`subj'_std_2s_*) nogen
 		if inlist("`v'","score_math_2s","score_com_2s")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
 		keep if inlist(year,2015,2016,2018,2019,2022,2023)==1
-		reghdfe 	`v' ${x}			 year_t_b5 		year_t_b4  			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3  treated, a(year id_ie)
+		reghdfe 	`v' ${x}			 year_t_b5 		year_t_b4  			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3  treated, a(year id_ie)  cluster(id_ie)
 		estimates 	store `v'		
 		}	
 		
@@ -2947,8 +2948,8 @@ program define event_ece_school
 			if inlist("`v'","score_math_2p","score_com_2p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
 			gen pop = 1
 			collapse (sum) pop (mean) `v' [iw=peso_m_2p], by(id_ie year_?_?? year treated) 
-			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
-			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)
+			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie) vce(cluster id_ie)
+			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	year_t_b6 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie) vce(cluster id_ie)
 			estimates 	store `v'
 			}
 
@@ -2965,8 +2966,8 @@ program define event_ece_school
 			if inlist("`v'","score_math_4p","score_com_4p")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
 			gen pop = 1
 			collapse (sum) pop (mean) `v' [iw=peso_m_4p], by(id_ie year_?_?? year treated) 
-			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated, a(id_ie)
-			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated [aw=pop], a(id_ie)		
+			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated, a(id_ie) vce(cluster id_ie)
+			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	 		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 year_t_a4 i.year treated [aw=pop], a(id_ie) vce(cluster id_ie)		
 			estimates 	store `v'		
 			}	
 
@@ -2983,8 +2984,8 @@ program define event_ece_school
 			if inlist("`v'","score_math_2s","score_com_2s")==1 replace `v' = (`v'-500)/100 //standardize to reference year mean 0 and sd 1
 			gen pop = 1
 			collapse (sum) pop (mean) `v' [iw=peso_m_2s], by(id_ie year_?_?? year treated) 
-			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie)
-			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie)					
+			if "`weight'" == "" 		reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated, a(id_ie) vce(cluster id_ie)
+			if "`weight'" == "_weighted" 	reghdfe 	`v' /*${x}*/	 year_t_b5		year_t_b4 			year_t_b2 o.year_t_o1 year_t_a2 year_t_a3 i.year treated [aw=pop], a(id_ie) vce(cluster id_ie)					
 			estimates 	store `v'
 			}	
 			
@@ -3131,9 +3132,9 @@ program define ece_baseline_netherlands
 	
 	gen pop = 1 
 	
-	reghdfe satisf_m i.fam_total_${fam_type} i.year i.educ_mother i.educ_father if grade==2, a(id_ie)
-	reghdfe satisf_m i.fam_total_${fam_type} i.year i.educ_mother i.educ_father if grade==4, a(id_ie)
-	reghdfe satisf_m i.fam_total_${fam_type} i.year i.educ_mother i.educ_father if grade==8, a(id_ie)
+	reghdfe satisf_m i.fam_total_${fam_type} i.year i.educ_mother i.educ_father if grade==2, a(id_ie) vce(cluster id_ie)
+	reghdfe satisf_m i.fam_total_${fam_type} i.year i.educ_mother i.educ_father if grade==4, a(id_ie) vce(cluster id_ie)
+	reghdfe satisf_m i.fam_total_${fam_type} i.year i.educ_mother i.educ_father if grade==8, a(id_ie) vce(cluster id_ie)
 
 	/
 	collapse (mean) score_*_std satisf* init* socioec_index (sum) pop, by(grade year fam_total_${fam_type})
@@ -3330,6 +3331,221 @@ program define twfe_survey
 		}
 
 end
+
+
+********************************************************************************
+* TWFE - ECE
+********************************************************************************
+
+
+capture program drop twfe_ece_gender
+program define twfe_ece_gender	
+	
+args treatment_type subsample 	
+
+capture assert "`treatment_type'" == "siblings"
+if _rc!=0 di "Need to select type: usual is -siblings- (only for now)"
+
+capture assert "`subsample'" != ""
+if _rc!=0 di "Need to select subsample: can be -all-"		
+
+use "$TEMP\pre_reg_covid${covid_data}", clear
+
+estimates clear
+
+keep if inlist(fam_total_${fam_type},1,2,3,4)==1
+
+if "`subsample'" == "oldest" 	keep if fam_order_${fam_type} == 1
+if "`subsample'" == "youngest" 	keep if fam_order_${fam_type} == fam_total_${fam_type}
+if "`subsample'" == "middle" 	keep if (fam_total_${fam_type}==1 | (fam_total_${fam_type}>1 & fam_order_${fam_type}!=1 & fam_order_${fam_type}!=fam_total_${fam_type})) //famsize=1 or famsize>1 and not older or younger
+if "`subsample'" == "all" 		di "All siblings"
+
+
+gen fe=1
+
+gen byte asp_not_school_fam_2p 	= inlist(aspiration_fam_2p,1,2) 	if aspiration_fam_2p!=.
+gen byte asp_college2_fam_2p 	= inlist(aspiration_fam_2p,3,4,5) 	if aspiration_fam_2p!=.
+gen byte asp_college4_fam_2p 	= inlist(aspiration_fam_2p,4,5) 	if aspiration_fam_2p!=.
+
+gen byte asp_not_school_fam_4p 	= inlist(aspiration_fam_4p,1,2) 	if aspiration_fam_4p!=.
+gen byte asp_college2_fam_4p 	= inlist(aspiration_fam_4p,3,4,5) 	if aspiration_fam_4p!=.
+gen byte asp_college4_fam_4p 	= inlist(aspiration_fam_4p,4,5) 	if aspiration_fam_4p!=.
+
+gen byte asp_not_school_stu_2s 	= inlist(aspiration_stu_2s,1,2) 	if aspiration_stu_2s!=.
+gen byte asp_college2_stu_2s 	= inlist(aspiration_stu_2s,3,4,5) 	if aspiration_stu_2s!=.
+gen byte asp_college4_stu_2s 	= inlist(aspiration_stu_2s,4,5) 	if aspiration_stu_2s!=.
+
+//global x 		= "male i.educ_mother i.educ_father urban" //spanish
+
+
+*------------
+*- Table X: TWFE on ECE Scores, expectations and SES
+*-------------
+
+gen sample_1 = 1 if grade==2 & (year==2019 | year==2022)
+gen sample_2 = 1 if grade==4 //2016,2018,2019 - 2022, 2023, 2024
+gen sample_3 = 1 if grade==4 & (year==2018 | year==2024)
+gen sample_4 = 1 if grade==8
+
+
+rename (asp_not_school_fam_2p asp_not_school_fam_4p asp_not_school_stu_2s) 	(asp_not_school_2p asp_not_school_4p asp_not_school_2s)
+rename (asp_college4_fam_2p asp_college4_fam_4p asp_college4_stu_2s) 		(asp_college4_2p asp_college4_4p asp_college4_2s)
+
+gen treated_post_male = treated_post * male_siagie
+gen post_male = post*male_siagie
+gen treated_male  = treated*male_siagie
+
+foreach size in "2_4" /*"2" "3" "4"*/ {
+	foreach v in "score_math" "score_com" /*"score_math_std" "score_com_std"*/ {
+		di "******" _n "size:`size' / var: `var'" _n "*********"
+		
+		if "`size'" == "2_4" gen sample_size=1
+		if "`size'" != "2_4" gen sample_size=inlist(fam_total_${fam_type},1,`size')==1
+		
+		if "`v'" == "score_math" 	local vlab = "ece_m"
+		if "`v'" == "score_math_std" 	local vlab = "ece_m"
+		if "`v'" == "score_com" 	local vlab = "ece_r"
+		if "`v'" == "score_com_std" 	local vlab = "ece_r"
+		if "`v'" == "asp_not_school" 	local vlab = "asp_ns"
+		if "`v'" == "asp_college4" 		local vlab = "asp_c4"
+		if "`v'" == "socioec_index" 	local vlab = "ses"		
+		
+		eststo `vlab'_2p_x_`size'	: reghdfe `v'_2p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_1==1, a(year id_ie)  cluster(id_ie)
+		eststo `vlab'_2p_x_`size'_m	: reghdfe `v'_2p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_1==1 & male_siagie==1, a(year id_ie)  cluster(id_ie)
+		eststo `vlab'_2p_x_`size'_f	: reghdfe `v'_2p 		treated_post treated post fe ${x_all}	if sample_size==1 & sample_1==1 & male_siagie==0, a(year id_ie)  cluster(id_ie)
+		eststo `vlab'_2p_x_`size'_mf: reghdfe `v'_2p 		treated_post treated_post_male treated post treated_male post_male fe ${x_all}	if sample_size==1 & sample_1==1, a(year id_ie)  cluster(id_ie)
+		mat mat_`vlab'_2p = r(table)	
+		
+		eststo `vlab'_4p_x_`size'	:reghdfe `v'_4p 	treated_post treated post fe ${x_all}	if sample_size==1 & sample_2==1, a(year id_ie)  cluster(id_ie)
+		eststo `vlab'_4p_x_`size'_m	:reghdfe `v'_4p		treated_post treated post fe ${x_all}	if sample_size==1 & sample_2==1 & male_siagie==1, a(year id_ie)  cluster(id_ie)
+		eststo `vlab'_4p_x_`size'_f	:reghdfe `v'_4p		treated_post treated post fe ${x_all}	if sample_size==1 & sample_2==1 & male_siagie==0, a(year id_ie)  cluster(id_ie)
+		eststo `vlab'_4p_x_`size'_mf:reghdfe `v'_4p		treated_post treated_post_male treated post treated_male post_male ${x_all}	if sample_size==1 & sample_2==1, a(year id_ie)  cluster(id_ie)
+		mat mat_`vlab'_4p = r(table)	
+			
+		foreach g in "2p" "4p" {
+		if mat_`vlab'_`g'[4,2] < 0.01 {
+			local stars "***"
+		}
+		else if mat_`vlab'_`g'[4,2] < 0.05 {
+			local stars "**"
+		}
+		else if mat_`vlab'_`g'[4,2] < 0.1 {
+			local stars "*"
+		}
+		else {
+			local stars ""
+		}
+
+		local coef_`vlab'_`g' : display %4.3f mat_`vlab'_`g'[1,2] "`stars'"
+		mat drop mat_`vlab'_`g'
+		}
+		
+		
+		capture drop sample_size	
+		}
+	}
+
+
+
+
+
+*- Figure ECE (no 8th)
+	coefplot ///
+			(ece_m_2p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+			(ece_r_2p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(ece_m_4p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ece_r_4p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("4th grade") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
+			keep(treated_post) ///
+			legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
+			ytitle("Standardized Exam relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.06(0.01)0.01) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+			capture qui graph export "$FIGURES\TWFE\ece_2_4_T`treatment_type'_S`subsample'_TEST.png", replace	
+			capture qui graph export "$FIGURES\TWFE\ece_2_4_T`treatment_type'_S`subsample'_TEST.pdf", replace		
+
+//local coef_ece_m_2p	= "-0.02***"		
+//local coef_ece_m_4p	= "-0.02***"		
+//local coef_ece_r_2p	= "-0.02***"		
+//local coef_ece_r_4p	= "-0.02***"	
+	
+	coefplot ///
+			(ece_m_2p_x_2_4_m, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+			(ece_m_2p_x_2_4_f, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			///(ece_m_2p_x_2_4_mf, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("2nd grade (Mathematics)") ///
+			|| ///
+			(ece_r_2p_x_2_4_m, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+			(ece_r_2p_x_2_4_f, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			///(ece_r_2p_x_2_4_mf, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("2nd grade (Reading)") ///
+			|| ///
+			(ece_m_4p_x_2_4_m, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ece_m_4p_x_2_4_f, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			///(ece_m_4p_x_2_4_mf, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("4th grade (Mathematics)") ///
+			|| ///
+			(ece_r_4p_x_2_4_m, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ece_r_4p_x_2_4_f, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			///(ece_r_4p_x_2_4_mf, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("4th grade (Reading)") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 `""2nd grade" "(Mathematics)""' 2 `""2nd grade" "(Reading)""' 3 `""4th grade" "(Mathematics)""' 4 `""4th grade" "(Reading)""') ///	
+			keep(treated_post) ///
+			legend(order(1 "Boys" 3 "Girls"/* 5 "Boys-Girls"*/) col(3) pos(6)) ///
+			ytitle("Standardized Exam relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.06(0.01)0.01) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			text(0.005 1 "Boys - Girls = `coef_ece_m_2p'", place(n) size(small)) ///
+			text(0.005 2 "Δ = `coef_ece_r_2p'", place(n) size(small)) ///
+			text(0.005 3 "Δ = `coef_ece_m_4p'", place(n) size(small)) ///
+			text(0.005 4 "Δ = `coef_ece_r_4p'", place(n) size(small)) ///
+			bycoefs 
+			capture qui graph export "$FIGURES\TWFE\ece_2_4_gender_T`treatment_type'_S`subsample'.png", replace	
+			capture qui graph export "$FIGURES\TWFE\ece_2_4_gender_T`treatment_type'_S`subsample'.pdf", replace	
+			capture qui graph save "$FIGURES\TWFE\ece_2_4_gender_T`treatment_type'_S`subsample'.gph", replace	
+			
+/*			
+gen sibs = fam_total_2>1
+
+collapse score_math_4p score_com_4p  [iw=peso_m_4p], by(year male_siagie sibs)			
+			
+			
+twoway 	(line score_math_4p year if sibs==0 & male_siagie==0, lcolor("${ek_red}%50")) 	///
+		(line score_math_4p year if sibs==1 & male_siagie==0, lcolor("${ek_blue}%50"))	///
+		(line score_math_4p year if sibs==0 & male_siagie==1, lcolor("${ek_red}")) 	///
+		(line score_math_4p year if sibs==1 & male_siagie==1, lcolor("${ek_blue}"))	///
+		, ///
+		xtitle("Year") ///
+		ytitle("${g${g}tit} ${subj_title_`subj'}standardize exam population") /// 
+		legend(order(1 "Only Children" 2 "Children with Siblings") pos(6) col(2))				
+
+*/	
+end
+
 	
 
 ***********************
