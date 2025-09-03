@@ -222,14 +222,19 @@
 %anecdotes
 %facts
 %policy questions
-    
     \begin{itemize}
-        \item Persistent learning losses from Covid-19 across the world, especially in more vulnerable populations. %\textcolor{blue}{cite}
-        \item With school closures and kids at home, there's less time with teachers and peers and more with family members.
-        \item Along with remote schooling, this is a drastic change in education production function.
-        \item We know family size may affect children negatively when facing unexpected changes or in vulnerable populations
-        \item COVID-19 school closures forecast to cost up to \$17 trillion in lost lifetime earnings. (World Bank, UNESCO and UNICEF, 2021). There has been recovery due to natural catch-up or government assistance (50\% and 25\%) (\cite{singh_covid-19_2022}). It’s important to understand better how to effectively do that.
-        \item No evidence of the role of family size in places with significant school closures.
+
+        \item Research demonstrates that parents substitute their time investments in response to school quality changes. %with public and private investments in children acting as substitutes.
+
+        \item While family size typically has no negative effects on child outcomes, studies show negative effects emerge during unexpected shocks that strain parental resources. %such as twin births that create sudden increases in family size.
+
+        \item School closures transformed the fundamental education production function - moving learning to households. Yet we know little about how families allocate their resources in such a setting when multiple children compete for parental attention. %Limits of parental input in a context with no or poor education services.?
+        % to households and dramatically increasing parental time requirements and sibling interactions
+        \item Understanding these dynamics is crucial as governments invest billions in recovery efforts and consider policies like universal pre-K %that fundamentally change the balance between family and institutional education provision. 
+        %\cite{jackson_universal_2025}, \cite{humphries_parents_2024} \cite{garcia-vazquez_equilibrium_2024}, \cite{chaparro_early_2020}
+        
+
+
         
 %Policy/counterfactual question:
 %important deep parameter:
@@ -237,12 +242,22 @@
 
 \only<2->{
         \begin{block}{Research Question}
-Do children with siblings experience larger learning losses when households face unexpected \textcolor{red}{shocks/school closures/increased childcare needs}?
+        Do children with siblings experience larger learning losses when households face unexpected school closures? What drives this effect?
 \end{block}
 }
     \end{itemize}
     
 \end{frame}
+
+\begin{transitionframe}
+    \label{frame:motivation}
+    \frametitle{Other potential motivations...} 
+\begin{itemize}
+     \item COVID-19 learning losses have been substantial, especially in developing countries, yet no research has examined how family structure influenced these losses.
+         %COVID-19 school closures forecast to cost up to \$17 trillion in lost lifetime earnings. (World Bank, UNESCO and UNICEF, 2021). There has been recovery due to natural catch-up or government assistance (50\% and 25\%) (\cite{singh_covid-19_2022}). It’s important to understand better how to effectively do that.
+\end{itemize}
+
+\end{transitionframe}
 
 
 
@@ -256,27 +271,38 @@ Do children with siblings experience larger learning losses when households face
     \begin{itemize}
     \item I use a DID strategy to compare children with siblings with only children before and after school closures. I complement this with IV and RD approaches.
     %\item Both populations had equal trends before the pandemic.
-    \item I find that students with siblings do  worse in terms of GPA and standardized scores. 
+    \item I find that students with siblings:
+    \begin{itemize}
+        \item Engage less with their teachers
+        \item Those who engage get lower grades
+        \item This translates into lower performance in standardized exams and lower expectations for higher education.
+    \end{itemize}
     %\item parents reduced expectations in XX
-    \item Most of this seems to be explained by households with high levels of parental involvement. Without schools and childcare, when there are more children, parents invest less in each child.
-    \item Similar patterns in other countries.
+    \item Most of this seems to be explained by households with high levels of parental involvement. %Without schools and childcare, when there are more children, parents invest less in each child.
+    \item I find similar pattern in other developed and developing countries countries.
     \end{itemize}
 \end{frame}
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:contribution}
-    \hypersetup{citecolor=blue}
+
+    \hypersetup{citecolor=lightgray}
+    
     \frametitle{Contribution to literature}
     \begin{itemize}
 
-    \item \textbf{Quantity-Quality:} Most papers find no reductions in quality of education with family size except with unexpected increases and vulnerable populations. {\tiny\cite{black_more_2005}, \cite{caceres-delpiano_impacts_2006} \cite{conley_parental_2006}}. {\tiny\cite{black_small_2010}, \cite{aslund_family_2010}.}
+    \item \textbf{Quantity-Quality:} Most papers find no reductions in quality of education. Some with unexpected shocks. I find large effects of family size when school quality and resources are drastically reduced.{\tiny\textcolor{lightgray}{\cite{black_more_2005}, \cite{caceres-delpiano_impacts_2006} \cite{conley_parental_2006}, \cite{black_small_2010}  \cite{aslund_family_2010}}}
+    %\cite{adhvaryu_endowments_2016}
+    % with family size except with unexpected increases and vulnerable populations.
     \\ 
-    $\rightarrow$ I find that the influence of family size may depend on how much the family is pushed towards constraints.
+    %$\rightarrow$  
+    %I find that the influence of family size may depend on how much the family is pushed towards constraints.
 %\cite{becker_child_1976},
-    \item \textbf{Health Shocks:} {\tiny\cite{adhvaryu_endowments_2016}}
+    \item \textbf{School vs Parent inputs:} Parents react to lower school quality by raising parental investment.  This crowd out has limits and can create inequalities when considering differences in family size.{\tiny\textcolor{lightgray}{\cite{fredriksson_parental_2016}, \cite{houtenville_parental_2008}}}
 
-    \item \textbf{School closures:} Significant learning losses around the world. Worse for vulnerable and longer closures.
-    {\tiny \cite{haelermans_inequality_2022}, \cite{jakubowski_global_2023}, \cite{jack_pandemic_2023}, \cite{singh_covid-19_2022}, \cite{goldhaber_educational_2023}, \cite{lichand_impacts_2021} or \cite{lichand_lasting_2024}} I provide evidence on how family structure plays a role in this when more participation from parents becomes more valuable.
+    \item \textbf{School closures:} Significant learning losses around the world. Worse for vulnerable and longer closures. Family structure plays an import role.
+    {\tiny\textcolor{lightgray}{ \cite{jakubowski_global_2023}, , \cite{singh_covid-19_2022}, \cite{goldhaber_educational_2023}, \cite{lichand_impacts_2021}, \cite{lichand_lasting_2024}}} 
+    %\cite{haelermans_inequality_2022}, \cite{jack_pandemic_2023}
    
     %Haelermans - Netherlands
     %Jakubowski - Global (deviation from linear trendsPIRLS)
@@ -299,7 +325,7 @@ Do children with siblings experience larger learning losses when households face
         %\small \textcolor{gray}{Jackson, Turner, Bastian (2025), Humphries et al (2025)}
 
     \end{itemize}
-\end{transitionframe}
+\end{frame}
 
 \begin{frame}
     \label{frame:background}
@@ -314,18 +340,18 @@ Do children with siblings experience larger learning losses when households face
     \end{itemize}
 \end{frame}
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:learning_home}
     \frametitle{Learning from home}
     \begin{itemize}
-       \item TVs were the most used resource in public schools ($\approx$ 75\%)
-       \item There were 30 min time slots for each pair of grades were assignments were given.
+       \item TVs and online platforms were the most used resource in public schools ($\approx$ 75\%)
        \item Students would also use workbooks or online platforms to reinforce the material.
+       \item 30 min daily TV slots for each pair of grades.
         \item $\approx$ 80\% would access the material in the company of their parent.
         \item $\approx$ 90\% of parents have spoken with the teacher last week.
         \item Students often send daily schoolwork to their teacher through whatsapp.
     \end{itemize}
-\end{transitionframe}
+\end{frame}
 
 \begin{frame}
     \label{frame:access}
@@ -354,15 +380,16 @@ Do children with siblings experience larger learning losses when households face
 \begin{frame}
     
     \label{frame:data}
-    \frametitle{Data}
+    \frametitle{Data: Administrative (2014-2024) matched with survey}
 
     \begin{itemize}
         \item School progression (approval and GPA per grade-year). 
         \begin{itemize}
             \item Teachers decide whether to promote a student to the next grade based on their assessments of competencies.
-            \item Grade criteria changed during 2020-2021
+            \item Grade criteria changed during 2020-2021. Automatic grade promotion. No grade if no evidence (dropout risk).
         \end{itemize}
-        \item Standardized test scores in 2nd, 4th, 6th, 8th grade in some years. 
+        \item \textcolor{blue}{Identify siblings} through matched parent's anonymized ID.
+        \item Standardized test scores in 2nd, 4th, 8th grade in some years. 
         \begin{itemize}
             \item Low stakes, not used by teachers. Comparable across schools and time.
         \end{itemize}
@@ -377,7 +404,6 @@ Do children with siblings experience larger learning losses when households face
             %\item Specifically related to siblings: ``Read out loud to my siblings''.
         \end{itemize}
         \item Family and teacher monitoring surveys during school closures
-        \item Identify siblings through parent's anonymized ID.
         %\item In both primary and secondary schools, teachers decide whether to promote a student to the next grade based on their assessments of competencies in the national curriculum (MINEDU, 2005). The national standardized examinations are not used by teachers in the decision to promote students to the next grade since the results from these examinations are only available to teachers in the following academic year by which time the promotion decision has already been made.
     \end{itemize}
 \end{frame}
@@ -411,6 +437,10 @@ Do children with siblings experience larger learning losses when households face
         \caption{Similar pattern in rest of the world}
         \label{fig:1b}
     \end{figure}
+
+    \begin{flushleft}
+        \hyperlink{frame:india}{\beamergotobutton{Evidence from India}}
+    \end{flushleft}  
     
     
 \end{frame}
@@ -453,7 +483,7 @@ Do children with siblings experience larger learning losses when households face
          \item<2-> \textbf{No anticipation:} \\
          $\Rightarrow$ School closures were unexpected, especially if thinking about fertility
          \item<3-> \textbf{No unobserved time varying shocks:} For example, if one parent doesn't work they may choose to have more children but also have more time for homeschooling (\textcolor{blue}{+}) or may need children to work (\textcolor{red}{-}). \\
-         $\Rightarrow$ Strategy controls for any unobserved time invariant shock and includes controls for potential proxies of time varying ones. However, I will provide some evidence with IV estimates.
+         $\Rightarrow$ Strategy controls for any unobserved time invariant shock and includes controls for potential proxies of time varying ones. I will also provide some evidence with RD and IV estimates that further address this issues.
     \end{itemize}
     \only<3->{
     \begin{flushleft}
@@ -583,7 +613,7 @@ Do children with siblings experience larger learning losses when households face
     \frametitle{Similar pattern in elementary school even 3 years after schools open (2022-2024)}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-       \includegraphics{./FIGURES/TWFE/twfe_ece_2_4_8_Tsiblings_Soldest_4.pdf}
+       \includegraphics{./FIGURES/TWFE/twfe_ece_2_4_Tsiblings_Soldest_4.pdf}
       }
     }
 \end{frame}
@@ -656,7 +686,7 @@ Do children with siblings experience larger learning losses when households face
         \item \only<1,2>{\color{black}}\only<3-6>{\color{gray!30}}Birth Order
         \item \only<1,3>{\color{black}}\only<2,4-6>{\color{gray!30}}Scarce material resources
         \item \only<1,4>{\color{black}}\only<2-3,5-6>{\color{gray!30}}Sibling disruption
-        \item \only<1,5>{\color{black}}\only<2-4,6>{\color{gray!30}}Parental time dilution
+        \item \only<1,5>{\color{black}}\only<2-4,6>{\color{gray!30}}Parental resources
         \item \only<1,6>{\color{black}}\only<2-5>{\color{gray!30}}Income Shocks
     \end{itemize} 
 \end{itemize}
@@ -689,19 +719,35 @@ Do children with siblings experience larger learning losses when households face
 
 \begin{frame}
     \label{frame:resources_intro}
-    \frametitle{Siblings may compete for access to radio, TV or computer}
+    \frametitle{Siblings may compete for access to phone, TV, radio or computer}
        \begin{itemize}
-           \item Siblings may be competing for a radio, TV or computer to study. \textcolor{green}{(Pending analysis with radio and TV)}
-           \item But households without neither computer nor internet show similar patterns 
+           \item Siblings may be competing for access to school resources, do homework and send materials. They might also need it for leisure.
+           \item But households without resources show similar patterns 
        \end{itemize}
 \end{frame}
+
+\begin{frame}
+    \label{frame:phoint}
+    \frametitle{Similar effects with or without Phone with internet to fight for}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byphoint_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:phoint_siblings}{\beamergotobutton{Results by siblings}}
+    \end{flushleft}    
+
+\end{frame}
+
+
+
 
 
 \begin{frame}
     \label{frame:pcinternet}
     \frametitle{Similar effects with or without PC/Internet to fight for}
         {\resizebox{0.9\textwidth}{!}{
-        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
         \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
@@ -1048,48 +1094,6 @@ Bandwidth           &         365   &         365   &         365   &         36
 % ========================================
 % EXTERNAL VALIDITY
 % ========================================
-\section{External Validity}
-
-    \begin{frame}
-            \label{frame:pisadata}
-            \frametitle{Is this only about Peru?}
-        \begin{itemize}
-            \item International examination to 15 year olds
-            \item 81 countries (37 OECD and 44 non-OECD).
-            \item In 2009, 2012 and 2022, I am able to identify only-child and sibling sample.
-            \item In most countries, children with siblings also exhibit larger learning losses
-            \item Longer school closures where associated with larger gaps.
-        \end{itemize}
-    \end{frame}
-
-\begin{frame}
-    \label{frame:pisagaps}
-    \frametitle{Learning gaps in Mathematics by year}
-    
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_distribution_2012_2022_PV4MATH.pdf}
-        \caption{Learning gaps in Mathematics by year}
-        \label{fig:1a}
-    \end{figure}
-    
-\end{frame}
-
-\begin{frame}
-    \label{frame:pisaclosure}
-    \frametitle{Change in learning gaps by duration of school closure}
-    
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_raw_DID_PV4MATH_not_fully_open.pdf}
-        \caption{Similar pattern in rest of the world}
-        \label{fig:1b}
-    \end{figure}
-    
-    
-\end{frame}
-
-
 
 
 
@@ -1102,8 +1106,10 @@ Bandwidth           &         365   &         365   &         365   &         36
     \label{frame:conclusions}
     \frametitle{Conclusions}
     \begin{itemize}
-        \item Should crisis interventions differentiate by family structure?
-        \item Does resource stress activate latent quantity-quality tradeoffs in family investment?
+        \item Households are not able to adequately compensate for school closures. With more children, parents have more difficulty investing sufficient time in each of them. 
+        \item Children with siblings engage less, obtain worse grades and have lower performance in standardized tests years after schools reopened.
+        \item Parental time investment, rather than sibling competition for resources is the main mechanism behind this effects.
+        \item Low SES families, which have the lowest investment in their children, exhibit lower tradeoffs.
     \end{itemize}
 \end{transitionframe}
 
@@ -1444,6 +1450,80 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 
 \end{transitionframe}
 \end{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{External Validity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \begin{frame}
+            \label{frame:pisadata}
+            \frametitle{Is this only about Peru?}
+        \begin{itemize}
+            \item International examination to 15 year olds
+            \item 81 countries (37 OECD and 44 non-OECD).
+            \item In 2009, 2012 and 2022, I am able to identify only-child and sibling sample.
+            \item In most countries, children with siblings also exhibit larger learning losses
+            \item Longer school closures where associated with larger gaps.
+        \end{itemize}
+    \end{frame}
+
+\begin{frame}
+    \label{frame:pisagaps}
+    \frametitle{Learning gaps in Mathematics by year}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_distribution_2012_2022_PV4MATH.pdf}
+        \caption{Learning gaps in Mathematics by year}
+        \label{fig:1a}
+    \end{figure}
+    
+\end{frame}
+
+\begin{frame}
+    \label{frame:pisaclosure}
+    \frametitle{Change in learning gaps by duration of school closure}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{./FIGURES/Descriptive/PISA_raw_DID_PV4MATH_not_fully_open.pdf}
+        \caption{Similar pattern in rest of the world}
+        \label{fig:1b}
+    \end{figure}
+    
+    
+\end{frame}
+
+
+\begin{frame}[T]
+    \label{frame:india}
+    \frametitle{India exhibits similar heterogeneity}
+    
+      \input{./TABLES/MANUAL/india_PRES.tex}
+
+      \only<2->{
+    \highlightboxflex{0.13}{-1.45}{1.4}{0.55}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    
+    % Highlight box for Covid same sex coefficient  
+    \highlightboxflex{4}{-1.45}{1.4}{0.55}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    
+    \begin{tikzpicture}[overlay, remember picture]
+        % Single text label at the bottom
+        \node[red, above] at ([shift={(0,-3.5)}]current page.center) {\small Larger learning losses when children have siblings!};
+        
+        % Arrow to Pre-Covid coefficient (pointing to the left box)
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.9)}]current page.center) -- ([shift={(0.3,-1.6)}]current page.center);
+        
+        % Arrow to Covid coefficient (pointing to the right box)
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.9)}]current page.center) -- ([shift={(3.55,-1.48)}]current page.center);
+    \end{tikzpicture}
+    }
+\end{frame}
+
+    \begin{flushleft}
+        \hyperlink{frame:pisaclosure}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}  
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Describing IV}
@@ -1475,6 +1555,21 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 \section{Additional Heterogeneity}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\begin{frame}
+    \label{frame:phoint_siblings}
+    \frametitle{Similar results for households with or without Phone with internet}
+        {\resizebox{0.9\textwidth}{!}{
+        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byphoint_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+      }
+    }
+
+    \begin{flushleft}
+        \hyperlink{frame:phoint}{\beamergotobutton{Go Back $\carriagereturn$}}
+    \end{flushleft}       
+
+\end{frame}
 
 \begin{frame}
     \label{frame:pcinternet_siblings}
