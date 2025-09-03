@@ -203,6 +203,46 @@ foreach size in "2_4" "2" "3" "4" {
 }
 
 
+			
+
+*- Figure ECE (no 8th)
+	coefplot ///
+			(ece_m_2p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
+			(ece_r_2p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(ece_m_4p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ece_r_4p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			, ///
+			bylabel("4th grade") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
+			keep(treated_post) ///
+			legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
+			ytitle("Standardized Exam relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.06(0.01)0.01) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}	
+
 *- Figure ECE
 	coefplot ///
 			(ece_m_2p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
@@ -247,16 +287,14 @@ foreach size in "2_4" "2" "3" "4" {
 			}
 			
 			
-
-*- Figure ECE (no 8th)
+			
+*- Figure Expectations (no eigth)
 	coefplot ///
-			(ece_m_2p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50")	ciopts(color("${blue_1}"))) ///
-			(ece_r_2p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(asp_c4_2p_x_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
 			, ///
 			bylabel("2nd grade") ///
 			|| ///
-			(ece_m_4p_x_2_4, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
-			(ece_r_4p_x_2_4, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(asp_c4_4p_x_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
 			, ///
 			bylabel("4th grade") ///
 			|| ///
@@ -266,10 +304,11 @@ foreach size in "2_4" "2" "3" "4" {
 			ciopts(recast(rcap)) citop ///
 			xlabel(1 "2nd grade" 2 "4th grade") ///	
 			keep(treated_post) ///
-			legend(order(1 "Mathematics" 3 "Reading") col(3) pos(6)) ///
-			ytitle("Standardized Exam relative to Only Children", size(medsmall) height(5)) ///							
+			///legend(order(1 "Not finish high school" 3 "4+ College") col(3) pos(6)) ///
+			legen(off) ///
+			ytitle("Expectation of not achieving 4+ year college" "relative to Only Children (%)", size(medsmall) height(5)) ///							
 			///xline(0, lcolor(gs12)) ///
-			ylabel(-0.06(0.01)0.01) ///
+			ylabel(-0.04 "-4%" -0.02 "-2%" 0 "0%" 0.02 "2%") ///
 			yline(0, lcolor(gs0) lpattern(dash)) ///
 			grid(none) ///
 			bycoefs 
@@ -277,13 +316,52 @@ foreach size in "2_4" "2" "3" "4" {
 		
 		if "${covid_data}" == "_TEST" {
 			di "TEST"
-			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_expectation_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_expectation_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
 			}
 		if "${covid_data}" == "" {
 			di "REAL"
-			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
-			capture qui graph export "$FIGURES\TWFE\twfe_ece_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			capture qui graph export "$FIGURES\TWFE\twfe_expectation_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_expectation_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}	
+			
+	coefplot ///
+			(asp_c4_2p_x_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(asp_c4_2p_x_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(asp_c4_2p_x_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(asp_c4_4p_x_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(asp_c4_4p_x_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(asp_c4_4p_x_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("4th grade") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
+			keep(treated_post) ///
+			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+			ytitle("Expectation of not achieving 4+ year college" "relative to Only Children (%)", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.04 "-4%" -0.02 "-2%" 0 "0%" 0.02 "2%") ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_expectation_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_expectation_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_expectation_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_expectation_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 			}				
 			
 *- Figure Expectations
@@ -372,6 +450,83 @@ foreach size in "2_4" "2" "3" "4" {
 			capture qui graph export "$FIGURES\TWFE\twfe_expectation_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
 			}				
 			
+*- Figure Income (no eight)
+	coefplot ///
+			(ses_2p_x_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(ses_4p_x_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
+			, ///
+			bylabel("4th grade") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
+			keep(treated_post) ///
+			///legend(order(1 "Not finish high school" 3 "4+ College") col(3) pos(6)) ///
+			legend(off) ///
+			ytitle("SES index relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.02(0.02)0.02) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ses_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ses_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_ses_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_ses_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace
+			}				
+
+
+	coefplot ///
+			(ses_2p_x_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ses_2p_x_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(ses_2p_x_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("2nd grade") ///
+			|| ///
+			(ses_4p_x_2, mcolor("${blue_1}") 	fcolor("${blue_1}%50")	lcolor("${blue_1}%50") 	ciopts(color("${blue_1}"))) ///
+			(ses_4p_x_3, mcolor("${red_1}") 	fcolor("${red_1}%50")	lcolor("${red_1}%50") 	ciopts(color("${red_1}"))) ///
+			(ses_4p_x_4, mcolor("${green_1}") 	fcolor("${green_1}%50")	lcolor("${green_1}%50") 	ciopts(color("${green_1}"))) ///
+			, ///
+			bylabel("4th grade") ///
+			|| ///
+			, ///
+			vertical ///
+			recast(bar) barwidth(0.25) ///
+			ciopts(recast(rcap)) citop ///
+			xlabel(1 "2nd grade" 2 "4th grade") ///	
+			keep(treated_post) ///
+			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
+			ytitle("SES index relative to Only Children", size(medsmall) height(5)) ///							
+			///xline(0, lcolor(gs12)) ///
+			ylabel(-0.02(0.02)0.02) ///
+			yline(0, lcolor(gs0) lpattern(dash)) ///
+			grid(none) ///
+			bycoefs 
+
+		
+		if "${covid_data}" == "_TEST" {
+			di "TEST"
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ses_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES_TEMP\TWFE\twfe_ses_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace	
+			}
+		if "${covid_data}" == "" {
+			di "REAL"
+			capture qui graph export "$FIGURES\TWFE\twfe_ses_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
+			capture qui graph export "$FIGURES\TWFE\twfe_ses_bysibs_2_4_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace			
+		}
+		
 *- Figure Income
 	coefplot ///
 			(ses_2p_x_2_4, mcolor(gs0) 	fcolor(gs0%20)	lcolor(gs0%20) 	ciopts(color(gs0))) ///
@@ -457,7 +612,7 @@ foreach size in "2_4" "2" "3" "4" {
 			di "REAL"
 			capture qui graph export "$FIGURES\TWFE\twfe_ses_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.png", replace	
 			capture qui graph export "$FIGURES\TWFE\twfe_ses_bysibs_2_4_8_T`treatment_type'_S`subsample'_`other_filters'${max_sibs}${covid_data}.pdf", replace			
-		}
+		}		
 //assert 1==0
 
 ****

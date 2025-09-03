@@ -20,7 +20,7 @@ end
 capture program drop setup_iv
 program define setup_iv
 
-
+	global fam_type=2
 	global x_complete = "male_siagie age_mother age_mother_1st_oldest_${fam_type} i.educ_cat_mother"
 	global x_complete_vars = "male_siagie age_mother age_mother_1st_oldest_${fam_type} educ_cat_mother"
 
@@ -387,7 +387,7 @@ program define sex_composition
 		*/
 		
 	
-		di as result "*******" _n as text "OLS WITH CONTROLS" _n as result "*******"
+		di as result "*******" _n as text "OLS WITHOUT CONTROLS" _n as result "*******"
 		reghdfe std_gpa_m_adj fam_total_2 if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)
 		estimates store ols_ssize_pre_n`n'
 		reghdfe std_gpa_m_adj fam_total_2 if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie)
@@ -399,12 +399,39 @@ program define sex_composition
 		reghdfe std_gpa_m_adj fam_total_2 ${x_complete} if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie)
 		estimates store ols_c_ssize_post_n`n'
 		
-		di as result "*******" _n as text "OLS WITH CONTROLS" _n as result "*******"
+		di as result "*******" _n as text "IV" _n as result "*******"
 		local n=3
 		ivreghdfe std_gpa_m_adj ${x_complete} (fam_total_2=treated) if inlist(year,2018,2019)  & grade>=1 & grade<=6, a(year grade id_ie)  first savefirst  savefprefix(iv_sex_pre_n`n'_)
 		estimates store iv_sex_pre_n`n'
 		ivreghdfe std_gpa_m_adj ${x_complete} (fam_total_2=treated) if inlist(year,2020,2021)  & grade>=1 & grade<=6, a(year grade id_ie) first savefirst  savefprefix(iv_sex_post_n`n'_)
 		estimates store iv_sex_post_n`n'
+	
+	
+		// Test equality
+		estimates restore iv_sex_pre_n3
+		matrix b_A = e(b)
+		matrix V_A = e(V)
+		scalar coef_A = b_A[1,colnumb(b_A,"fam_total_2")]
+		scalar var_A = V_A[rownumb(V_A,"fam_total_2"),colnumb(V_A,"fam_total_2")]
+
+		estimates restore iv_sex_post_n3
+		matrix b_B = e(b)  
+		matrix V_B = e(V)
+		scalar coef_B = b_B[1,colnumb(b_B,"fam_total_2")]
+		scalar var_B = V_B[rownumb(V_B,"fam_total_2"),colnumb(V_B,"fam_total_2")]
+
+		
+		scalar diff = coef_A - coef_B
+		scalar se_diff = sqrt(var_A + var_B)
+		scalar t_stat = diff / se_diff
+		scalar p_val = 2*(1-normal(abs(t_stat)))
+
+		display "Coefficient A: " coef_A
+		display "Coefficient B: " coef_B  
+		display "Difference: " diff
+		display "SE of difference: " se_diff
+		display "t-statistic: " t_stat
+		display "p-value: " p_val
 	
 end	
 
