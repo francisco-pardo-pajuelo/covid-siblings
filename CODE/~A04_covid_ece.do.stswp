@@ -40,7 +40,7 @@ capture program drop setup_COVID_A04
 program define setup_COVID_A04
 
 	*- Define if test run
-	global covid_test = 0
+	global covid_test = 1
 	global covid_data = ""
 	if ${covid_test} == 1 global covid_data = "_TEST"
 	
@@ -1179,60 +1179,62 @@ args treatment_type subsample
 					
 				
 				//local subj = "m"
-					eststo `v'_all1_`size'	: reghdfe `v' treated_post treated post, a(id_ie grade year pair)
-					eststo `v'_all2_`size'	: reghdfe `v' treated_post treated post ${x_all}, a(id_ie grade year pair)
-					eststo `v'_all3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score}, a(id_ie grade year pair)
-					eststo `v'_all4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses}, a(id_ie grade year pair)
+					eststo `v'_all1_`size'	: reghdfe `v' treated_post treated post, vce(cluster id_ie)
+					eststo `v'_all2_`size'	: reghdfe `v' treated_post treated post ${x_all}, vce(cluster id_ie)
+					eststo `v'_all3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score}, vce(cluster id_ie)
+					eststo `v'_all4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses}, vce(cluster id_ie)
 					
 					//Effect by SES
-					eststo `v'_ses1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==1, a(id_ie grade year pair)
-					eststo `v'_ses2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==2, a(id_ie grade year pair)
-					eststo `v'_ses3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==3, a(id_ie grade year pair)
-					eststo `v'_ses4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==4, a(id_ie grade year pair)
+					eststo `v'_ses1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==1, vce(cluster id_ie)
+					eststo `v'_ses2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==2, vce(cluster id_ie)
+					eststo `v'_ses3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==3, vce(cluster id_ie)
+					eststo `v'_ses4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_socioec_index_cat==4, vce(cluster id_ie)
 					
 					//Effect by Resources (overall))
-					eststo `v'_resour0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0 & base_internet==0 & base_pc==0, a(id_ie grade year pair)
-					eststo `v'_resour1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if !(base_tv==0 & base_radio==0 & base_internet==0 & base_pc==0), a(id_ie grade year pair)
+					eststo `v'_resour1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if /*base_internet==1 &*/ base_pc==0 & base_phone_internet==0, vce(cluster id_ie)
+					eststo `v'_resour2_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if /*base_internet==1 &*/ base_pc==1 & base_phone_internet==0, vce(cluster id_ie)
+					eststo `v'_resour3_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if /*base_internet==1 &*/ base_pc==0 & base_phone_internet==1, vce(cluster id_ie)
+					eststo `v'_resour4_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if /*base_internet==1 &*/ base_pc==1 & base_phone_internet==1, vce(cluster id_ie)
 
 					//Effect by Resources (TV)
-					eststo `v'_tv0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0, a(id_ie grade year pair)
-					eststo `v'_tv1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==1, a(id_ie grade year pair)
+					eststo `v'_tv0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0, vce(cluster id_ie)
+					eststo `v'_tv1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==1, vce(cluster id_ie)
 						
 					//Effect by Resources (Radio)
-					eststo `v'_rad0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_radio==0, a(id_ie grade year pair)
-					eststo `v'_rad1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_radio==1, a(id_ie grade year pair)
+					eststo `v'_rad0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_radio==0, vce(cluster id_ie)
+					eststo `v'_rad1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_radio==1, vce(cluster id_ie)
 											
 					//Effect by Resources (TV & Radio)
-					eststo `v'_tvrad0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0, a(id_ie grade year pair)
-					eststo `v'_tvrad1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==1 | base_radio==1, a(id_ie grade year pair)					
+					eststo `v'_tvrad0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0, vce(cluster id_ie)
+					eststo `v'_tvrad1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==1 | base_radio==1, vce(cluster id_ie)					
 					
 					//Effect by Resources (TV & Radio Radio in Rural)
-					eststo `v'_tvradrur0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0 & urban_siagie==0, a(id_ie grade year pair)
-					eststo `v'_tvradrur1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if (base_tv==1 | base_radio==1) & urban_siagie==0, a(id_ie grade year pair)
+					eststo `v'_tvradrur0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_tv==0 & base_radio==0 & urban_siagie==0, vce(cluster id_ie)
+					eststo `v'_tvradrur1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if (base_tv==1 | base_radio==1) & urban_siagie==0, vce(cluster id_ie)
 						
 					//Effect by Resources (PC + internet)
-					eststo `v'_pc_int0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==0 & base_pc==0, a(id_ie grade year pair)
-					eststo `v'_pc_int1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==1 & base_pc==1, a(id_ie grade year pair)
+					eststo `v'_pc_int0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==0 & base_pc==0, vce(cluster id_ie)
+					eststo `v'_pc_int1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_internet==1 & base_pc==1, vce(cluster id_ie)
 											
 					//Effect by Resources (Phone with internet)
-					eststo `v'_phoint0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_phone_internet==0, a(id_ie grade year pair)
-					eststo `v'_phoint1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_phone_internet==1, a(id_ie grade year pair)					
+					eststo `v'_phoint0_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_phone_internet==0, vce(cluster id_ie)
+					eststo `v'_phoint1_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_phone_internet==1, vce(cluster id_ie)					
 
 					//Effect by Academic achievement
-					eststo `v'_acad1_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==1, a(id_ie grade year pair)
-					eststo `v'_acad2_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==2, a(id_ie grade year pair)
-					eststo `v'_acad3_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==3, a(id_ie grade year pair)
-					eststo `v'_acad4_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==4, a(id_ie grade year pair)
+					eststo `v'_acad1_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==1, vce(cluster id_ie)
+					eststo `v'_acad2_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==2, vce(cluster id_ie)
+					eststo `v'_acad3_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==3, vce(cluster id_ie)
+					eststo `v'_acad4_`size'		: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if base_score_acad_Q==4, vce(cluster id_ie)
 			
 					//Effect by Expectations
-					eststo `v'_asp_low_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,1,2)==1, a(id_ie grade year pair)
-					//eststo `v'_asp_med_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, a(id_ie grade year pair)
-					eststo `v'_asp_hig_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,4,5)==1, a(id_ie grade year pair)
+					eststo `v'_asp_low_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,1,2)==1, vce(cluster id_ie)
+					//eststo `v'_asp_med_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, vce(cluster id_ie)
+					eststo `v'_asp_hig_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,4,5)==1, vce(cluster id_ie)
 			
 					//Effect by Expectations
-					eststo `v'_asp2_low_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,1,2,3,4)==1, a(id_ie grade year pair)
-					//eststo `v'_asp_med_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, a(id_ie grade year pair)
-					eststo `v'_asp2_hig_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,5)==1, a(id_ie grade year pair)				
+					eststo `v'_asp2_low_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,1,2,3,4)==1, vce(cluster id_ie)
+					//eststo `v'_asp_med_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,3)==1, vce(cluster id_ie)
+					eststo `v'_asp2_hig_`size'	: reghdfe `v' treated_post treated post ${x_all} ${x_score} ${x_ses} if inlist(base_aspiration,5)==1, vce(cluster id_ie)				
 			restore
 			}
 	
@@ -1248,7 +1250,7 @@ args treatment_type subsample
 			if "`v'" == "approved_first" 	local xtitle = "Grade Promotion without recovery"
 			if "`v'" == "higher_ed_parent" 	local xtitle = "% Parent with higher education"
 	
-			local v = "std_gpa_m_adj"
+			//local v = "std_gpa_m_adj"
 			
 			
 			
@@ -1351,7 +1353,7 @@ args treatment_type subsample
 	
 			
 			*- For heterogeneity with different sample splits (2 groups)
-			foreach sample_split in  "ses" "resour" "tv" "rad" "tvrad" "tvradrur" "phoint" "pc_int" "acad" "asp" "asp2" {
+			foreach sample_split in  "ses"  "tv" "rad" "tvrad" "tvradrur" "phoint" "pc_int" "acad" "asp" "asp2" {
 				if "`sample_split'" == "ses" {
 					local coef0 = "ses1"
 					local coef1 = "ses4"
@@ -1359,12 +1361,6 @@ args treatment_type subsample
 					local coef1_lab = "High SES Households (Q4)"
 				} 	
 	
-				if "`sample_split'" == "resour" {
-					local coef0 = "resour0"
-					local coef1 = "resour1"
-					local coef0_lab = "Households with neither TV, radio, PC or Internet"
-					local coef1_lab = "Households with TV, radio, PC or Internet"
-				} 	
 	
 				if "`sample_split'" == "tv" {
 					local coef0 = "tv0"
@@ -1404,7 +1400,7 @@ args treatment_type subsample
 				if "`sample_split'" == "phoint" {
 					local coef0 = "phoint0"
 					local coef1 = "phoint1"
-					local coef0_lab = "Households with no phone with internet"
+					local coef0_lab = "Households with no phone with internet" 
 					local coef1_lab = "Households with phone with internet"
 				} 
 
@@ -1508,8 +1504,7 @@ args treatment_type subsample
 		
 
 		*- For heterogeneity with different sample splits (4 groups)
-		foreach sample_split in  "ses" /*"pc_int"*/ "acad" /*"asp"*/ {
-			local v = "std_gpa_m_adj"
+		foreach sample_split in  "ses" /*"pc_int"*/ "acad" /*"asp"*/ "resour" {
 
 			if "`sample_split'" == "ses" {
 				local coef1 = "ses1"
@@ -1531,7 +1526,24 @@ args treatment_type subsample
 				local coef2_lab = "Q2"
 				local coef3_lab = "Q3"
 				local coef4_lab = "High achievement students (Q4)"
-			} 
+			}
+			
+			local v = "std_gpa_m_adj"
+			local sample_split = "resour"
+			if "`sample_split'" == "resour" {
+				local coef1 = "resour1"
+				local coef2 = "resour2"
+				local coef3 = "resour3"
+				local coef4 = "resour4"
+				//local coef1_lab = "No PC nor phone with internet"
+				local coef1_lab = `""No PC nor phone" "with internet""'
+				
+				local coef2_lab =  `""Only PC" "with internet""'
+				local coef3_lab =  `""Only Phone" "with internet""'
+				local coef4_lab =  `""PC and phone" "with internet""'
+			}
+			
+			di `"`coef3_lab'"'
 			
 			/*
 			if "`sample_split'" == "asp" {
@@ -1564,7 +1576,7 @@ args treatment_type subsample
 			vertical ///
 			recast(bar) barwidth(0.25) ///
 			ciopts(recast(rcap)) citop ///
-			xlabel(1 "`coef1_lab'" 2 "`coef2_lab'" 3 "`coef3_lab'" 4 "`coef4_lab'") ///	
+			xlabel(1 `"`coef1_lab'"' 2 `"`coef2_lab'"' 3 `"`coef3_lab'"' 4 `"`coef4_lab'"') ///	
 			keep(treated_post) ///
 			///legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
 			legend(off) ///
@@ -2483,8 +2495,8 @@ args treatment_type subsample
 	
 	*/
 		
-		}
-	}
+		} // pair: all,1-4
+	} // Outcome: v
 	
 
 
@@ -2655,25 +2667,25 @@ program define twfe_gpa_baseline_survey_unique
 	*/
 	
 					//Parent's education
-					eststo `v'_edu1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_edu_mother_2p,1,2,3,4)==1			& pair==1, a(id_ie grade year pair)
-					eststo `v'_edu2_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_edu_mother_2p,4)==1					& pair==1, a(id_ie grade year pair)
-					eststo `v'_edu3_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_edu_mother_2p,5,6,7,8,9,10,11,12)==1	& pair==1, a(id_ie grade year pair)
+					eststo `v'_edu1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_edu_mother_2p,1,2,3,4)==1			& pair==1, vce(cluster id_ie)
+					eststo `v'_edu2_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_edu_mother_2p,4)==1					& pair==1, vce(cluster id_ie)
+					eststo `v'_edu3_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_edu_mother_2p,5,6,7,8,9,10,11,12)==1	& pair==1, vce(cluster id_ie)
 												
 					//Books
-					eststo `v'_book0_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_books_cat_2p,1,2)==1					& pair==1, a(id_ie grade year pair)
-					eststo `v'_book1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_books_cat_2p,3,4,5,6,7)==1			& pair==1, a(id_ie grade year pair)
+					eststo `v'_book0_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_books_cat_2p,1,2)==1					& pair==1, vce(cluster id_ie)
+					eststo `v'_book1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_books_cat_2p,3,4,5,6,7)==1			& pair==1, vce(cluster id_ie)
 					
 					//Quiet room
-					eststo `v'_quiet0_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_quiet_room_2p==0 & base_pc==0				& pair==1, a(id_ie grade year pair)
-					eststo `v'_quiet1_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_quiet_room_2p==1 & base_pc==1				& pair==1, a(id_ie grade year pair)
+					eststo `v'_quiet0_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_quiet_room_2p==0 & base_pc==0				& pair==1, vce(cluster id_ie)
+					eststo `v'_quiet1_`size'	: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_quiet_room_2p==1 & base_pc==1				& pair==1, vce(cluster id_ie)
 			
 					//By years in Pre-K
-					eststo `v'_prek0_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_years_prek_2p,1,2,3,5)==1				& pair==1, a(id_ie grade year pair)
-					eststo `v'_prek1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_years_prek_2p,4)==1				& pair==1, a(id_ie grade year pair)
+					eststo `v'_prek0_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_years_prek_2p,1,2,3,5)==1				& pair==1, vce(cluster id_ie)
+					eststo `v'_prek1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if inlist(base_years_prek_2p,4)==1				& pair==1, vce(cluster id_ie)
 			
 					//By grade repetition
-					eststo `v'_rep0_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_has_repeated_2s==1							& pair==4, a(id_ie grade year pair)
-					eststo `v'_rep1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_has_repeated_2s==2							& pair==4, a(id_ie grade year pair)
+					eststo `v'_rep0_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_has_repeated_2s==1							& pair==4, vce(cluster id_ie)
+					eststo `v'_rep1_`size'		: reghdfe `v' treated_post treated post ${x_score} ${x_ses} if base_has_repeated_2s==2							& pair==4, vce(cluster id_ie)
 				
 			restore
 			}
