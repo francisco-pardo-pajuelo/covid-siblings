@@ -40,7 +40,7 @@ capture program drop setup_COVID_A04
 program define setup_COVID_A04
 
 	*- Define if test run
-	global covid_test = 1
+	global covid_test = 0
 	global covid_data = ""
 	if ${covid_test} == 1 global covid_data = "_TEST"
 	
@@ -1504,8 +1504,7 @@ args treatment_type subsample
 		
 
 		*- For heterogeneity with different sample splits (4 groups)
-		foreach sample_split in  "ses" /*"pc_int"*/ "acad" /*"asp"*/ "resour" {
-
+		foreach sample_split in  "ses" /*"pc_int"*/ "acad" /*"asp"*/ "resour" {		
 			if "`sample_split'" == "ses" {
 				local coef1 = "ses1"
 				local coef2 = "ses2"
@@ -1528,8 +1527,8 @@ args treatment_type subsample
 				local coef4_lab = "High achievement students (Q4)"
 			}
 			
-			local v = "std_gpa_m_adj"
-			local sample_split = "resour"
+			//local v = "std_gpa_m_adj"
+			//local sample_split = "resour"
 			if "`sample_split'" == "resour" {
 				local coef1 = "resour1"
 				local coef2 = "resour2"
@@ -1628,12 +1627,12 @@ args treatment_type subsample
 			vertical ///
 			recast(bar) barwidth(0.25) ///
 			ciopts(recast(rcap)) citop ///
-			xlabel(1 "`coef1_lab'" 2 "`coef2_lab'" 3 "`coef3_lab'" 4 "`coef4_lab'") ///	
+			xlabel(1 `"`coef1_lab'"' 2 `"`coef2_lab'"' 3 `"`coef3_lab'"' 4 `"`coef4_lab'"') ///	
 			keep(treated_post) ///
 			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
 			ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
 			///xline(0, lcolor(gs12)) ///
-			ylabel(-0.04(0.02)0.02) ///
+			ylabel(-0.0(0.02)0.02) ///
 			yline(0, lcolor(gs0) lpattern(dash)) ///
 			grid(none) ///
 			bycoefs 

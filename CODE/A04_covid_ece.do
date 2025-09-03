@@ -1504,8 +1504,7 @@ args treatment_type subsample
 		
 
 		*- For heterogeneity with different sample splits (4 groups)
-		foreach sample_split in  "ses" /*"pc_int"*/ "acad" /*"asp"*/ "resour" {
-
+		foreach sample_split in  "ses" /*"pc_int"*/ "acad" /*"asp"*/ "resour" {		
 			if "`sample_split'" == "ses" {
 				local coef1 = "ses1"
 				local coef2 = "ses2"
@@ -1633,7 +1632,7 @@ args treatment_type subsample
 			legend(order(1 "1 sibling" 3 "2 siblings" 5 "3 siblings") col(3) pos(6)) ///
 			ytitle("Standardized Mathematics GPA" "relative to Only Children", size(medsmall) height(5)) ///							
 			///xline(0, lcolor(gs12)) ///
-			ylabel(-0.04(0.02)0.02) ///
+			ylabel(-1.6(0.02)0.02) ///
 			yline(0, lcolor(gs0) lpattern(dash)) ///
 			grid(none) ///
 			bycoefs 
