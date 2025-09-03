@@ -249,6 +249,8 @@
     
 \end{frame}
 
+\begin{comment}
+
 \begin{transitionframe}
     \label{frame:motivation}
     \frametitle{Other potential motivations...} 
@@ -259,7 +261,7 @@
 
 \end{transitionframe}
 
-
+\end{comment}
 
 
 
@@ -485,11 +487,13 @@
          \item<3-> \textbf{No unobserved time varying shocks:} For example, if one parent doesn't work they may choose to have more children but also have more time for homeschooling (\textcolor{blue}{+}) or may need children to work (\textcolor{red}{-}). \\
          $\Rightarrow$ Strategy controls for any unobserved time invariant shock and includes controls for potential proxies of time varying ones. I will also provide some evidence with RD and IV estimates that further address this issues.
     \end{itemize}
-    \only<3->{
-    \begin{flushleft}
-        \hyperlink{frame:research_feedback}{\beamergotobutton{Threats}}
-    \end{flushleft}   
-    }
+    
+    
+    %\only<3->{
+    %\begin{flushleft}
+    %    \hyperlink{frame:research_feedback}{\beamergotobutton{Threats}}
+    %\end{flushleft}   
+    %}
 \end{frame}
 
 
@@ -583,6 +587,17 @@
       }
     }
 \end{frame}
+
+
+\begin{frame}
+        \label{frame:robustness}
+        \frametitle{This happens in all type of schools}
+  {\resizebox{0.9\textwidth}{!}{
+    \includegraphics{./FIGURES/TWFE/covid_twfe_school_bysibs_elm_20_21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
+  }
+}   %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+\end{frame}
+
 
 \begin{frame}
     \label{frame:twfe_gpa_2_4_6_8}
@@ -727,36 +742,21 @@
 \end{frame}
 
 \begin{frame}
-    \label{frame:phoint}
-    \frametitle{Similar effects with or without Phone with internet to fight for}
+    \label{frame:resources}
+    \frametitle{Similar effects by access to resources}
         {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byphoint_Tsiblings_Soldest_pairall_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byresour4_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
 
     \begin{flushleft}
-        \hyperlink{frame:phoint_siblings}{\beamergotobutton{Results by siblings}}
+        \hyperlink{frame:resources_siblings}{\beamergotobutton{Results by siblings}}
     \end{flushleft}    
 
 \end{frame}
 
 
 
-
-
-\begin{frame}
-    \label{frame:pcinternet}
-    \frametitle{Similar effects with or without PC/Internet to fight for}
-        {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_Tsiblings_Soldest_pairall_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:pcinternet_siblings}{\beamergotobutton{Results by siblings}}
-    \end{flushleft}    
-
-\end{frame}
 
 
 % Show overlay 4 (Scarce material resources highlighted)  
@@ -770,7 +770,7 @@
            \item Distracting siblings may impact students negatively
            \item Siblings close in age are more likely to interact with each other
            \item However, I don't see big differences between siblings who are 0-2 and 3-5 years appart. 
-           \item \textcolor{green}{6+ show a smaller effect which made me think about how this may also be confounding parental inputs because older siblings require less from parents. Might need a better look into it.}
+           \item \textcolor{green}{6+ show a smaller effect which made me think about how this may also be confounding parental inputs because older siblings require less from parents. Might need a different approach to it}
        \end{itemize}
 \end{frame}
 
@@ -827,7 +827,7 @@
     \frametitle{When parent's invest little time, there are smaller size effects}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byses_Tsiblings_Soldest_pairall_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byses4_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
 
@@ -900,7 +900,7 @@
                 Born after $\rightarrow$  they stay at home.
             \item When schools are open, this creates a negative effect for siblings both in performance and parental time invested in them.
             \item This provides some evidence of the effect of having all children stay at home during school closures.
-            \textcolor{green}{Think how to present these results...}
+            %\textcolor{green}{Think how to present these results...}
             %\item We use effects of delayed schooling (more childcare) outside of Covid to have a sense of how parents react to this.
             %\item Mixed results in literature (US and Denmark) although not until younger starts school.
         \end{itemize}
@@ -933,7 +933,7 @@
 
 \begin{frame}
     \label{frame:delayedentryscores}
-    \frametitle{Effects of delaying younger School Entry (Scores and investment)}
+    \frametitle{Effects of delaying younger School Entry (Standardized exams and investment)}
 \makeatletter
      \centering
        \resizebox{0.95\textwidth}{!}%
@@ -1041,13 +1041,13 @@ Bandwidth           &         365   &         365   &         365   &         36
     
     \begin{tikzpicture}[overlay, remember picture]
         % Single text label at the bottom
-        \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Reduction in family size effect!};
+        \node[red, above] at ([shift={(0,-2.8)}]current page.center) {\small Reduction in family size effect! \\ $\Delta$ = -.094*};
         
         % Arrow to Pre-Covid coefficient (pointing to the left box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(0.3,-0.25)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-1.8)}]current page.center) -- ([shift={(0.3,-0.25)}]current page.center);
         
         % Arrow to Covid coefficient (pointing to the right box)
-        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-2.2)}]current page.center) -- ([shift={(3.55,-0.25)}]current page.center);
+        \draw[->, thick, blue, opacity=0.4] ([shift={(0,-1.8)}]current page.center) -- ([shift={(3.55,-0.25)}]current page.center);
     \end{tikzpicture}
     }
 \end{frame}
@@ -1057,7 +1057,7 @@ Bandwidth           &         365   &         365   &         365   &         36
     \frametitle{Effect of family size on GPA: Using Same Sex and Twin IV}
  \begin{itemize}
         \item We see a negative reduction in family size effects on performance using same sex IV.
-        \item Twin IV might not be well suited for this context. Parents may be more able to teach, study and help siblings that share coursework. 
+        \item Twin IV might not be well suited for this context. Parents may be more able to teach, study and help siblings that share coursework.
         %\item One reason why we don't find results could be that to some this captures more the effect of monetary cost but in terms of time, twins might not be twice as costly than two separate children
         \item We are estimating here the differential effect from \#2 to \#3,\#4, etc. Not from single children to children with siblings.
     \end{itemize}
@@ -1077,20 +1077,47 @@ Bandwidth           &         365   &         365   &         365   &         36
     }   %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
     \end{frame}
 
+ \begin{frame}
+            \label{frame:dropout_risk}
+            \frametitle{Risk of dropout}
+       \begin{itemize}
+           \item During school closures, students are automatically promoted to the next grade.
+           \item If no evidence was provided from students, their grade would be left blank.
+           \item Similar to \cite{lichand_impacts_2021}, I estimate risk of dropout by looking at the percentage of students without a grade.
+           \item I see that dropout risk increases during school closures for children with siblings.
+       \end{itemize}
+    \end{frame} 
+
+
     \begin{frame}
-            \label{frame:grade_progression}
-            \frametitle{Grade progression}
-   \textcolor{green}{Pending}
-    %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+            \label{frame:dropout_risk}
+            \frametitle{Increased likelihood of dropout with number of siblings}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/Event Study/covid_event_bysibs_elm_all_dropout_risk_Tsiblings_Soldest_4.pdf}
+      }
+    }   %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+   
     \end{frame}   
 
+    \begin{frame}
+            \label{frame:dropout_risk}
+            \frametitle{Heterogeneity by gender}
+        {\resizebox{0.9\textwidth}{!}{
+        \includegraphics{./FIGURES/TWFE/ece_2_4_gender_Tsiblings_Soldest.pdf}
+      }
+    }   %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
+   
+    \end{frame} 
+    
+
+\begin{comment}
     \begin{frame}
             \label{frame:college_app}
             \frametitle{College Applications}
    \textcolor{green}{Pending}
     %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
     \end{frame}      
-
+\end{comment}
 % ========================================
 % EXTERNAL VALIDITY
 % ========================================
@@ -1102,7 +1129,7 @@ Bandwidth           &         365   &         365   &         365   &         36
 % ========================================
 \section{Conclusions}
 
-\begin{transitionframe}
+\begin{frame}
     \label{frame:conclusions}
     \frametitle{Conclusions}
     \begin{itemize}
@@ -1111,7 +1138,7 @@ Bandwidth           &         365   &         365   &         365   &         36
         \item Parental time investment, rather than sibling competition for resources is the main mechanism behind this effects.
         \item Low SES families, which have the lowest investment in their children, exhibit lower tradeoffs.
     \end{itemize}
-\end{transitionframe}
+\end{frame}
 
 
 \begin{frame}
@@ -1134,24 +1161,6 @@ Bandwidth           &         365   &         365   &         365   &         36
 
 \end{frame}
 
-
-
-% ========================================
-% Some thoughts
-% ========================================
-
-\section{Thoughts}
-
-\begin{frame}
-    \label{frame:thoughts}
-    \frametitle{Thoughts}
-    \begin{itemize}
-        \item How to think about heterogeneity? We should expect more effects not where there lacks parental suppport but where there is $\rightarrow$ more possibilities of substitution from teachers to parents. But not too much because otherwise they could do it all?
-        \item Have school level estimates. Idea was to do heterogeneity. Needed or our excercise is enough?
-    \end{itemize}
-
-
-\end{frame}
 
 
 
@@ -1556,23 +1565,9 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}
-    \label{frame:phoint_siblings}
-    \frametitle{Similar results for households with or without Phone with internet}
-        {\resizebox{0.9\textwidth}{!}{
-        %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byphoint_bysibs_Tsiblings_Soldest_pairall_4.pdf}
-      }
-    }
-
-    \begin{flushleft}
-        \hyperlink{frame:phoint}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}       
-
-\end{frame}
 
 \begin{frame}
-    \label{frame:pcinternet_siblings}
+    \label{frame:resources}
     \frametitle{Similar results for households with or without PC/Internet}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
@@ -1581,7 +1576,7 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
     }
 
     \begin{flushleft}
-        \hyperlink{frame:pcinternet}{\beamergotobutton{Go Back $\carriagereturn$}}
+        \hyperlink{frame:resources}{\beamergotobutton{Go Back $\carriagereturn$}}
     \end{flushleft}       
 
 \end{frame}
@@ -1777,127 +1772,6 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
     
 \end{frame}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Potential concerns}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-    \label{frame:research_feedback}
-    \frametitle{Threats to identification \textcolor{red}{(for feedback)}}
-        Any other thoughts on potential time varying shocks?
-        \begin{itemize}
-            \item Parent's work
-            \item 
-            \item There is a shift from private to public enrollment during COVID. If this was more common on siblings... would be composition?
-        \end{itemize}
-
- 
-    \begin{flushleft}
-        \hyperlink{frame:research}{\beamergotobutton{Go Back $\carriagereturn$}}
-    \end{flushleft}
-    
-\end{frame}
-
-
-%\begin{comment} %####
-\begin{frame}
-        \label{frame:Leigh}
-    \frametitle{Leigh}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Scott}
-    \frametitle{Scott}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Rich}
-    \frametitle{Rich}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-        \label{frame:dean}
-    \frametitle{Dean}
-    \begin{itemize}
-        \item \textbf{Sibsize is not exogenou.}  Sibsize is correlated with parents age (sibsize unfolds over a lifecycle), parents age at first birth, parents employment, parents human capital, housing choices, etc. How much should we really be interpreting this as about sibsize? What if there are two types of parents, those who really care about investing in child quality (H) and human capital and those who do not (L). H types choose to have smaller sibsize so they can invest more in human capital, L types choose quantity over quality. AND when covid comes H types sacrifice more to protect learning than L types do. So you’re not identifying an effect of sibsize; you’re recovering the parents’ endogenous choices that determined sibsize.
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:dean2}
-    \frametitle{Dean}
-    \begin{itemize}
-        \item \textbf{Measurement of the dependent variable.}   How is the outcome measured? GPAs seem like they could be directly impacted by covid in ways that are about measurement rather than education. Like, you’re not going to school in the same way, so you’re not being evaluated the same way. I understand that this would be presumably constant by sibship size, but it seems like at a minimum it bears on the interpretation of the results and whether they have a quantitative (rather than just qualitative) interpretation. (It also gets me wondering about strict exogeneity (assuming that you’re using period fixed effects) and the linearity assumptions built into fixed effects.)
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:dean3}
-    \frametitle{Dean}
-    \begin{itemize}
-        \item \textbf{Is the effect size quantitatively informative?}   A JMP has to be interesting to get attention. I don’t know that people are going to be super-surprised by the sign of the effect. So is the effect size stably robust, interesting and informative?
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Eric}
-    \frametitle{Eric}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Sandy}
-    \frametitle{Sandy}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Bo}
-    \frametitle{Bo}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Peter}
-    \frametitle{Peter}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-        \label{frame:Ofer}
-    \frametitle{Ofer}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \label{frame:fabiola}
-    \frametitle{Fabiola}
-    \begin{itemize}
-        \item 
-    \end{itemize}
-\end{frame}
-%\end{comment} %####
-
+%\input{./_PRESENTATIONS/feedback.tex}
 
 \end{document}
