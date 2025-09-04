@@ -429,6 +429,16 @@ program define parental_investment
 			
 
 
+	binsreg std_index socioec_index, ///
+		xtitle("Index of Socio-Economic Status (2015)")	///
+		ytitle("Index of Parental Investment (2015)")  ///
+		bycolors(gs0%40) ///
+		nbins(400)
+	capture qui graph export "$FIGURES\Descriptive\parental_investment_ses_scatter.png", replace			
+	capture qui graph export "$FIGURES\Descriptive\parental_investment_ses_scatter.pdf", replace	
+
+			
+			
 			
 	graph bar std_index if year==2015, over(educ_cat_mother_2p) 
 
