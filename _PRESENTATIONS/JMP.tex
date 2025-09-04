@@ -252,7 +252,7 @@
 \begin{comment}
 
 \begin{transitionframe}
-    \label{frame:motivation}
+    \label{frame:motivationB}
     \frametitle{Other potential motivations...} 
 \begin{itemize}
      \item COVID-19 learning losses have been substantial, especially in developing countries, yet no research has examined how family structure influenced these losses.
@@ -271,13 +271,13 @@
     \label{frame:thispaper}
     \frametitle{This Paper}
     \begin{itemize}
-    \item I use a DID strategy to compare children with siblings with only children before and after school closures. I complement this with IV and RD approaches.
+    \item I use a DID strategy to compare differential effects between children with siblings and only children before, during and after school closures. I complement this with IV and RD approaches.
     %\item Both populations had equal trends before the pandemic.
     \item I find that students with siblings:
     \begin{itemize}
         \item Engage less with their teachers
         \item Those who engage get lower grades
-        \item This translates into lower performance in standardized exams and lower expectations for higher education.
+        \item This translates into persistent lower performance in standardized exams and lower expectations for higher education years after schools reopen.
     \end{itemize}
     %\item parents reduced expectations in XX
     \item Most of this seems to be explained by households with high levels of parental involvement. %Without schools and childcare, when there are more children, parents invest less in each child.
@@ -302,7 +302,7 @@
 %\cite{becker_child_1976},
     \item \textbf{School vs Parent inputs:} Parents react to lower school quality by raising parental investment.  This crowd out has limits and can create inequalities when considering differences in family size.{\tiny\textcolor{lightgray}{\cite{fredriksson_parental_2016}, \cite{houtenville_parental_2008}}}
 
-    \item \textbf{School closures:} Significant learning losses around the world. Worse for vulnerable and longer closures. Family structure plays an import role.
+    \item \textbf{School closures:} Significant learning losses around the world. Worse for vulnerable and longer closures. Children with siblings show larger learning losses. 
     {\tiny\textcolor{lightgray}{ \cite{jakubowski_global_2023}, , \cite{singh_covid-19_2022}, \cite{goldhaber_educational_2023}, \cite{lichand_impacts_2021}, \cite{lichand_lasting_2024}}} 
     %\cite{haelermans_inequality_2022}, \cite{jack_pandemic_2023}
    
@@ -333,34 +333,46 @@
     \label{frame:background}
     \frametitle{Background and Context}
     \begin{itemize}
-       \item Peru had the highest Covid death rate in the world: 6,600 per 1 million, 83\% higher than the US.
-       \item Country-wide lockdown forbade  nonessential business operations. 
-       \item School closures in public and private schools that lasted $\approx$ 2 years. 
+       \item Peru had one of the highest Covid death rates in the world: 6,600 per 1 million, 83\% higher than the US.
+       \item Country-wide lockdown forbade  nonessential business operations.
+       \item School closures in public and private schools that lasted $\approx$ 2 full academic years. 
        \item The government implemented remote schooling resources: radio, TV and online platforms
        %\item Classes were given through Radio, TV and online platforms.
        %\item \textcolor{green}{What does this meant for families?}
     \end{itemize}
 \end{frame}
 
-\begin{frame}
-    \label{frame:learning_home}
+\begin{frame}<1>
+    [label=learning_home]
     \frametitle{Learning from home}
     \begin{itemize}
        \item TVs and online platforms were the most used resource in public schools ($\approx$ 75\%)
        \item Students would also use workbooks or online platforms to reinforce the material.
        \item 30 min daily TV slots for each pair of grades.
-        \item $\approx$ 80\% would access the material in the company of their parent.
-        \item $\approx$ 90\% of parents have spoken with the teacher last week.
-        \item Students often send daily schoolwork to their teacher through whatsapp.
+         \item \only<2,3>{\color{black}}\only<1>{\color{gray!30}} $\approx$ 80\% would access the material in the company of their parent.
+        \item \only<3>{\color{black}}\only<1,2>{\color{gray!30}} $\approx$ 90\% of parents have spoken with the teacher last week.
+        \item \only<3>{\color{black}}\only<1,2>{\color{gray!30}} Students often send daily schoolwork to their teacher through whatsapp.
     \end{itemize}
 \end{frame}
 
 \begin{frame}
     \label{frame:access}
-    \frametitle{Most elementary school students acces resources through  TV or online}
+    \frametitle{Most elementary school students access resources through  TV or online}
                \includegraphics[width=\textwidth]{./FIGURES/Descriptive/SER_access_elm.pdf}    
     
 \end{frame}
+
+\againframe<2>{learning_home}
+
+
+\begin{frame}
+    \label{frame:parental_support}
+    \frametitle{Parents accompany students while they attend classes and review students' work}
+               \includegraphics[width=\textwidth]{./FIGURES/Descriptive/SER_parent_elm.pdf}    
+    
+\end{frame}
+
+\againframe<3>{learning_home}
 
 \begin{frame}
     \label{frame:teacher_com}
@@ -369,12 +381,9 @@
     
 \end{frame}
 
-\begin{frame}
-    \label{frame:parental_support}
-    \frametitle{Parents accompany students while they attend classes and review students' work}
-               \includegraphics[width=\textwidth]{./FIGURES/Descriptive/SER_parent_elm.pdf}    
-    
-\end{frame}
+
+
+
 
 % ========================================
 % DATA
@@ -385,7 +394,7 @@
     \frametitle{Data: Administrative (2014-2024) matched with survey}
 
     \begin{itemize}
-        \item School progression (approval and GPA per grade-year). 
+        \item School progression (GPA per grade-year). 
         \begin{itemize}
             \item Teachers decide whether to promote a student to the next grade based on their assessments of competencies.
             \item Grade criteria changed during 2020-2021. Automatic grade promotion. No grade if no evidence (dropout risk).
@@ -408,6 +417,62 @@
         \item Family and teacher monitoring surveys during school closures
         %\item In both primary and secondary schools, teachers decide whether to promote a student to the next grade based on their assessments of competencies in the national curriculum (MINEDU, 2005). The national standardized examinations are not used by teachers in the decision to promote students to the next grade since the results from these examinations are only available to teachers in the following academic year by which time the promotion decision has already been made.
     \end{itemize}
+\end{frame}
+
+
+\begin{frame}[T]
+    \label{frame:descriptive}
+    \frametitle{Descriptive statistics}
+    \input{./TABLES/MANUAL/manual_descriptive_PRES.tex}
+    
+    % Box 1 appears on slide 2
+    \only<2>{
+    \highlightboxflex{-0.2}{-1.25}{1.55}{2.5}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    }
+    
+    % Box 3 appears on slide 3
+    \only<3>{
+    \highlightboxflex{1.4}{-1.25}{0.85}{2.5}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    }
+    
+    % Box 4 appears on slide 4
+    \only<4>{
+    \highlightboxflex{2.25}{-1.25}{0.85}{2.5}{draw=blue, draw opacity=0.8, dashed, fill=yellow!30, fill opacity=0.3}
+    }
+    
+    % Box D appears on slide 5
+    \only<5>{
+    \highlightboxflex{-0.2}{-3}{3.2}{1.35}{draw=red, draw opacity=0.8, dashed, fill=green!30, fill opacity=0.3}
+    }
+    
+    \begin{tikzpicture}[overlay, remember picture]
+         % Single text label at the bottom
+        %\node[red, above] at ([shift={(0,-4.5)}]current page.center) {\small Larger learning losses when children have siblings!};
+        
+        % Box 1 arrow and text (appears on slide 2)
+        \only<2>{
+        %\draw[->, thick, blue, opacity=0.8] ([shift={(1.35,1)}]current page.center) -- ([shift={(3,1)}]current page.center);
+        \node[blue, right] at ([shift={(3.05,1)}]current page.center) {\small Children with one \\ sibling perform \\ slightly higher};
+        }
+        
+        % Box 3 arrow and text (appears on slide 3)
+        \only<3>{
+        %\draw[->, thick, blue, opacity=0.8] ([shift={(2.55,0)}]current page.center) -- ([shift={(3,0)}]current page.center);
+        \node[blue, right] at ([shift={(3.05,0)}]current page.center) {\small Children with two \\ sibling perform \\ similarly};
+        }
+        
+        % Box 4 arrow and text (appears on slide 4)
+        \only<4>{
+        %\draw[->, thick, blue, opacity=0.8] ([shift={(3.1,-1)}]current page.center) -- ([shift={(3,-1)}]current page.center);
+        \node[blue, right] at ([shift={(3.05,-1)}]current page.center) {\small Children with two \\ sibling perform \\ slighly lower};
+        }
+        
+        % Box D arrow and text (appears on slide 5)
+        \only<5>{
+        %\draw[->, thick, red, opacity=0.8] ([shift={(3.0,-2.33)}]current page.center) -- ([shift={(3.45,-2.33)}]current page.center);
+        \node[red, right] at ([shift={(3.0,-2.33)}]current page.center) {\small Access to resources \\ is similar for first  \\ two groups but \\ lower for next two};
+        }
+    \end{tikzpicture}
 \end{frame}
 
 % ========================================
@@ -484,7 +549,7 @@
     \begin{itemize}
          \item<2-> \textbf{No anticipation:} \\
          $\Rightarrow$ School closures were unexpected, especially if thinking about fertility
-         \item<3-> \textbf{No unobserved time varying shocks:} For example, if one parent doesn't work they may choose to have more children but also have more time for homeschooling (\textcolor{blue}{+}) or may need children to work (\textcolor{red}{-}). \\
+         \item<3-> \textbf{No unobserved time varying shocks:} For example, if one parent doesn't work they may choose to have \textcolor{blue}{more} or \textcolor{red}{less} children but also have more time for homeschooling $\Rightarrow$\textcolor{blue}{+}/\textcolor{red}{-}. \\
          $\Rightarrow$ Strategy controls for any unobserved time invariant shock and includes controls for potential proxies of time varying ones. I will also provide some evidence with RD and IV estimates that further address this issues.
     \end{itemize}
     
@@ -591,7 +656,7 @@
 
 \begin{frame}
         \label{frame:robustness}
-        \frametitle{This happens in all type of schools}
+        \frametitle{This happens in all type of schools \\ {\tiny TWFE for 2020-2021}}
   {\resizebox{0.9\textwidth}{!}{
     \includegraphics{./FIGURES/TWFE/covid_twfe_school_bysibs_elm_20_21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
   }
@@ -601,7 +666,7 @@
 
 \begin{frame}
     \label{frame:twfe_gpa_2_4_6_8}
-    \frametitle{Effect on GPA is larger in earlier grades (2020-2021)}
+    \frametitle{Effect on GPA is larger in earlier grades}
         {\resizebox{0.9\textwidth}{!}{
        %\includegraphics{./FIGURES/TWFE/covid_twfe_summ_bysibs_all_20-21_gpa_m_adj_Tsiblings_Soldest_4.pdf}
        \includegraphics{./FIGURES/TWFE/twfe_gpa_2_4_6_8_20_21_Tsiblings_Soldest_4.pdf}
@@ -616,6 +681,7 @@
        \item So far we have seen that children with siblings do worse in terms of GPA.
         \begin{itemize}
             \item Worse when there are more siblings
+            \item Happens in Urban/Rural and Public/Private schools
             \item Worse when they are younger
             \item Effects can be persistent
         \end{itemize}
@@ -638,10 +704,11 @@
     \label{frame:twfe_gpa_controls_intro}
     \frametitle{Controlling for baseline scores and SES}
        \begin{itemize}
-           \item Using the administrative data we can control for sex, mother's age, mother's age at first birth, mother's education and school, year and grade FE.
+           \item Using the administrative data we can control for sex, mother's age, mother's age at first birth, mother's education, and school, year and grade FE.
            %\item In some cases, I can use survey data for a more rich set of controls.
            \item For some years, we can match students in 6th, 7th and 9th grade with baseline characteristics from 2nd, 4th and 8th grade.
-           \item Similar results with baseline standardized exams and socioeconomic index controls.
+           \item We could expect potential unobserved time varying differences to be correlated with SES, academic performance or parental education.
+           \item However, similar results for the TWFE estimate when controlling for demographics, baseline standardized exams and socioeconomic index controls.
 
 
 %    - 1. 2° (2015,2016) 					→ 6° (2019,2020)
@@ -737,7 +804,7 @@
     \frametitle{Siblings may compete for access to phone, TV, radio or computer}
        \begin{itemize}
            \item Siblings may be competing for access to school resources, do homework and send materials. They might also need it for leisure.
-           \item But households without resources show similar patterns 
+           \item But households with less resources show similar patterns 
        \end{itemize}
 \end{frame}
 
@@ -1003,7 +1070,7 @@ Bandwidth           &         365   &         365   &         365   &         36
     %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
 
      {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/twfe_ses_2_4_8_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_ses_2_4_Tsiblings_Soldest_4.pdf}
       }
     }
 
@@ -1072,13 +1139,13 @@ Bandwidth           &         365   &         365   &         365   &         36
             \label{frame:expectations}
             \frametitle{Reduction in educational expectations}
       {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/twfe_expectation_bysibs_2_4_8_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_expectation_bysibs_2_4_Tsiblings_Soldest_4.pdf}
       }
     }   %\input{./TABLES/MANUAL/twfe_ece_expectations.tex}
     \end{frame}
 
  \begin{frame}
-            \label{frame:dropout_risk}
+            \label{frame:dropout_risk_intro}
             \frametitle{Risk of dropout}
        \begin{itemize}
            \item During school closures, students are automatically promoted to the next grade.
@@ -1100,7 +1167,7 @@ Bandwidth           &         365   &         365   &         365   &         36
     \end{frame}   
 
     \begin{frame}
-            \label{frame:dropout_risk}
+            \label{frame:ece_gender}
             \frametitle{Heterogeneity by gender}
         {\resizebox{0.9\textwidth}{!}{
         \includegraphics{./FIGURES/TWFE/ece_2_4_gender_Tsiblings_Soldest.pdf}
@@ -1197,11 +1264,11 @@ Bandwidth           &         365   &         365   &         365   &         36
             \vspace{0.1cm}
             
             \hyperlink{frame:motivation}{\beamergotobutton{Motivation}}\\[2pt]
-            \hyperlink{frame:thispaper}{\beamergotobutton{This Paper}}\\[2pt]
+            %\hyperlink{frame:thispaper}{\beamergotobutton{This Paper}}\\[2pt]
             \hyperlink{frame:contribution}{\beamergotobutton{Literature}}\\[2pt]
             \hyperlink{frame:background}{\beamergotobutton{Background}}\\[2pt]
             \hyperlink{frame:data}{\beamergotobutton{Data}}\\[2pt]
-            \hyperlink{frame:ece_trends}{\beamergotobutton{Data Trends}}
+            \hyperlink{frame:ece_trends}{\beamergotobutton{Descriptive}}
             
             \vspace{0.2cm}
             \textbf{Mechanisms}
@@ -1209,13 +1276,15 @@ Bandwidth           &         365   &         365   &         365   &         36
             
             \hyperlink{frame:mechanisms}{\beamergotobutton{Potential Mechanisms}}\\[2pt]
             \hyperlink{frame:birthorder}{\beamergotobutton{Birth Order}}\\[2pt]
-            \hyperlink{frame:pcinternet}{\beamergotobutton{PC \& Internet}}\\[2pt]
-            \hyperlink{frame:siblingdisruption}{\beamergotobutton{Sibling Disruption}}\\[2pt]
-            \hyperlink{frame:parentaldilution_intro}{\beamergotobutton{Parental Dilution}} \\[2pt]
-            \hyperlink{frame:byses}{\beamergotobutton{SES Analysis}}\\[2pt]
+            \hyperlink{frame:resources_intro}{\beamergotobutton{Resource Competition}} \\[2pt]
+            \hyperlink{frame:siblingdisruption_intro}{\beamergotobutton{Sibling Disruption}} \\[2pt]
+            \hyperlink{frame:parentaldilution_intro}{\beamergotobutton{Parental Resources}} \\[2pt]
+            \hyperlink{frame:parental_investments_vs_ses}{\beamergotobutton{Parental Investment vs SES}} \\[2pt]
+            \hyperlink{frame:byses}{\beamergotobutton{Analysis by SES}}\\[2pt]
             \hyperlink{frame:childcare}{\beamergotobutton{Childcare Effects}}\\[2pt]
-            \hyperlink{frame:delayedentry}{\beamergotobutton{Delayed Entry}}\\[2pt]
-            \hyperlink{frame:incomeshocks}{\beamergotobutton{Income Shocks}}          
+            %\hyperlink{frame:delayedentry}{\beamergotobutton{Delayed Entry}}\\[2pt]
+            %\hyperlink{frame:delayedentryscores}{\beamergotobutton{Delayed Entry Scores}} \\[2pt]
+            \hyperlink{frame:incomeshocks}{\beamergotobutton{Income Shocks}}              
         \end{column}
         
         \begin{column}{0.45\textwidth}
@@ -1238,15 +1307,17 @@ Bandwidth           &         365   &         365   &         365   &         36
         
             \hyperlink{frame:otherstrategies}{\beamergotobutton{Other Strategies}}\\[2pt]
             \hyperlink{frame:iv_intro}{\beamergotobutton{Twin IV}} \\[2pt]
-            \hyperlink{frame:expectations}{\beamergotobutton{Expectations}}
+            \hyperlink{frame:expectations}{\beamergotobutton{Expectations}} \\[2pt]
+            \hyperlink{frame:dropout_risk}{\beamergotobutton{Risk of Dropout}} \\[2pt]
+            \hyperlink{frame:ece_gender}{\beamergotobutton{Gender Heterogeneity}}
 
             \vspace{0.2cm}
-            \textbf{External Validity \& Conclusions}
+            \textbf{Conclusions}
             \vspace{0.1cm}
             
-            \hyperlink{frame:pisadata}{\beamergotobutton{PISA Data}} \\[2pt]
-            \hyperlink{frame:pisagaps}{\beamergotobutton{Learning Gaps}} \\[2pt]
-            \hyperlink{frame:pisaclosure}{\beamergotobutton{School Closure}} \\[2pt]
+            %\hyperlink{frame:pisadata}{\beamergotobutton{PISA Data}} \\[2pt]
+            %\hyperlink{frame:pisagaps}{\beamergotobutton{Learning Gaps}} \\[2pt]
+            %\hyperlink{frame:pisaclosure}{\beamergotobutton{School Closure}} \\[2pt]
             \hyperlink{frame:conclusions}{\beamergotobutton{Conclusions}}
             
         \end{column}
@@ -1571,7 +1642,7 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
     \frametitle{Similar results for households with or without PC/Internet}
         {\resizebox{0.9\textwidth}{!}{
         %\includegraphics{./FIGURES/TWFE/covid_twfe_C_bysibs_elm_all_gpa_m_adj_Tsiblings_Soldest_4.pdf}
-        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_bypc_int_bysibs_Tsiblings_Soldest_pairall_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_std_gpa_m_adj_byresour4_bysibs_Tsiblings_Soldest_pairall_4.pdf}
       }
     }
 
@@ -1761,7 +1832,7 @@ Observations        &     793,797   &     552,557   &     452,886   &     360,21
     %\input{./TABLES/MANUAL/twfe_ece_ses.tex}
 
      {\resizebox{0.9\textwidth}{!}{
-        \includegraphics{./FIGURES/TWFE/twfe_ses_bysibs_2_4_8_Tsiblings_Soldest_4.pdf}
+        \includegraphics{./FIGURES/TWFE/twfe_ses_bysibs_2_4_Tsiblings_Soldest_4.pdf}
       }
     }
 
